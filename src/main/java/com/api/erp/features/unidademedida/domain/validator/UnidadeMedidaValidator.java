@@ -1,0 +1,63 @@
+package com.api.erp.features.unidademedida.domain.validator;
+
+import com.api.erp.shared.domain.exception.ValidationException;
+import org.springframework.stereotype.Component;
+
+/**
+ * Validador de UnidadeMedida
+ * 
+ * SRP: Responsável única por validações de domínio
+ */
+@Component
+public class UnidadeMedidaValidator {
+    
+    /**
+     * Valida os dados básicos de uma unidade de medida
+     */
+    public void validarCriacao(String sigla, String descricao, String tipo) {
+        validarSigla(sigla);
+        validarDescricao(descricao);
+        validarTipo(tipo);
+    }
+    
+    /**
+     * Valida a sigla
+     */
+    public void validarSigla(String sigla) {
+        if (sigla == null || sigla.trim().isEmpty()) {
+            throw new ValidationException("sigla", "A sigla é obrigatória");
+        }
+        
+        if (sigla.length() > 10) {
+            throw new ValidationException("sigla", "A sigla não pode ter mais de 10 caracteres");
+        }
+        
+        if (!sigla.matches("^[A-Z0-9]+$")) {
+            throw new ValidationException("sigla", "A sigla deve conter apenas letras maiúsculas e números");
+        }
+    }
+    
+    /**
+     * Valida a descrição
+     */
+    public void validarDescricao(String descricao) {
+        if (descricao == null || descricao.trim().isEmpty()) {
+            throw new ValidationException("descricao", "A descrição é obrigatória");
+        }
+        
+        if (descricao.length() > 100) {
+            throw new ValidationException("descricao", "A descrição não pode ter mais de 100 caracteres");
+        }
+    }
+    
+    /**
+     * Valida o tipo
+     */
+    public void validarTipo(String tipo) {
+        if (tipo != null && !tipo.trim().isEmpty()) {
+            if (tipo.length() > 255) {
+                throw new ValidationException("tipo", "O tipo não pode ter mais de 255 caracteres");
+            }
+        }
+    }
+}
