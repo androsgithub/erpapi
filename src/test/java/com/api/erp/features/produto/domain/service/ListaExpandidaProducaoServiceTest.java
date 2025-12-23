@@ -62,7 +62,6 @@ class ListaExpandidaProducaoServiceTest {
                 .tipo(TipoProduto.COMPRADO)
                 .status(StatusProduto.ATIVO)
                 .unidadeMedida(unidadeKG)
-                .ncm("72081599")
                 .build();
         
         produtoCompradoB = Produto.builder()
@@ -72,7 +71,6 @@ class ListaExpandidaProducaoServiceTest {
                 .tipo(TipoProduto.COMPRADO)
                 .status(StatusProduto.ATIVO)
                 .unidadeMedida(unidadeKG)
-                .ncm("32081599")
                 .build();
         
         produtoFabricavelC = Produto.builder()
@@ -82,7 +80,6 @@ class ListaExpandidaProducaoServiceTest {
                 .tipo(TipoProduto.FABRICAVEL)
                 .status(StatusProduto.ATIVO)
                 .unidadeMedida(unidadeKG)
-                .ncm("73081599")
                 .build();
     }
     
@@ -149,7 +146,7 @@ class ListaExpandidaProducaoServiceTest {
         
         // Assert
         assertEquals(1, resultado.size());
-        assertEquals(BigDecimal.valueOf(25), resultado.get(produtoCompradoA));
+        assertEquals(0, BigDecimal.valueOf(25).compareTo(resultado.get(produtoCompradoA)));
         // 10 (quantidade) x 2.5 (composição) = 25
     }
     
@@ -165,7 +162,6 @@ class ListaExpandidaProducaoServiceTest {
                 .tipo(TipoProduto.FABRICAVEL)
                 .status(StatusProduto.ATIVO)
                 .unidadeMedida(unidadeKG)
-                .ncm("73081599")
                 .build();
         
         // PROD-001 usa PROD-002 (2x) e MAT-002 (1x)
@@ -271,7 +267,7 @@ class ListaExpandidaProducaoServiceTest {
         );
         
         // Assert - Deve ser 100 x 2.5 = 250
-        assertEquals(BigDecimal.valueOf(250), resultado.get(produtoCompradoA));
+        assertEquals(0, BigDecimal.valueOf(250).compareTo(resultado.get(produtoCompradoA)));
     }
     
     @Test
@@ -285,7 +281,6 @@ class ListaExpandidaProducaoServiceTest {
                 .tipo(TipoProduto.FABRICAVEL)
                 .status(StatusProduto.ATIVO)
                 .unidadeMedida(unidadeKG)
-                .ncm("73081599")
                 .build();
         
         ProdutoComposicao comp1 = ProdutoComposicao.builder()

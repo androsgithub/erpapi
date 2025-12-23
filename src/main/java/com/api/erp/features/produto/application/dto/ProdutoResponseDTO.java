@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 
 /**
  * DTO para resposta de Produto
+ * 
+ * Expõe todos os dados do produto incluindo sua classificação fiscal completa
  */
 @Getter
 @Setter
@@ -25,8 +27,25 @@ public class ProdutoResponseDTO {
     private StatusProduto status;
     private TipoProduto tipo;
     private UnidadeMedidaSimplificadaDTO unidadeMedida;
+    
+    /**
+     * Classificação fiscal completa do produto
+     * Inclui NCM, origem, CEST, benefício fiscal e unidade tributável
+     */
+    private ClassificacaoFiscalDTO classificacaoFiscal;
+    
+    /**
+     * @deprecated Use classificacaoFiscal.ncm em seu lugar
+     */
+    @Deprecated(since = "1.0", forRemoval = true)
     private String ncm;
+    
+    /**
+     * @deprecated Não utilizado. Use classificacaoFiscal em seu lugar
+     */
+    @Deprecated(since = "1.0", forRemoval = true)
     private String informacoesFiscais;
+    
     private BigDecimal precoVenda;
     private BigDecimal precoCusto;
     

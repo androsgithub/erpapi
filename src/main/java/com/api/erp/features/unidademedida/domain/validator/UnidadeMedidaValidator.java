@@ -14,10 +14,9 @@ public class UnidadeMedidaValidator {
     /**
      * Valida os dados básicos de uma unidade de medida
      */
-    public void validarCriacao(String sigla, String descricao, String tipo) {
+    public void validarCriacao(String sigla, String descricao) {
         validarSigla(sigla);
         validarDescricao(descricao);
-        validarTipo(tipo);
     }
     
     /**
@@ -47,17 +46,6 @@ public class UnidadeMedidaValidator {
         
         if (descricao.length() > 100) {
             throw new ValidationException("descricao", "A descrição não pode ter mais de 100 caracteres");
-        }
-    }
-    
-    /**
-     * Valida o tipo
-     */
-    public void validarTipo(String tipo) {
-        if (tipo != null && !tipo.trim().isEmpty()) {
-            if (tipo.length() > 255) {
-                throw new ValidationException("tipo", "O tipo não pode ter mais de 255 caracteres");
-            }
         }
     }
 }

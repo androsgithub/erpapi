@@ -4,8 +4,6 @@ import com.api.erp.features.unidademedida.application.dto.UnidadeMedidaRequestDT
 import com.api.erp.features.unidademedida.application.dto.UnidadeMedidaResponseDTO;
 import com.api.erp.features.unidademedida.application.service.UnidadeMedidaService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,17 +16,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * Controller para UnidadeMedida
- * 
+ * <p>
  * Responsabilidades:
  * - Receber requisições HTTP
  * - Validar entrada
  * - Chamar serviço apropriado
  * - Retornar resposta formatada
- * 
+ * <p>
  * SRP: Apenas manipulação de requisições/respostas
  */
 @RestController
@@ -36,35 +32,35 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Unidade de Medida", description = "Gerenciamento de unidades de medida")
 public class UnidadeMedidaController {
-    
+
     private final UnidadeMedidaService service;
-    
+
     @PostMapping
     @Operation(
-        summary = "Criar nova unidade de medida",
-        description = "Cria uma nova unidade de medida com validações de domínio"
+            summary = "Criar nova unidade de medida",
+            description = "Cria uma nova unidade de medida com validações de domínio"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Unidade criada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-        @ApiResponse(responseCode = "409", description = "Sigla já existe")
+            @ApiResponse(responseCode = "201", description = "Unidade criada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "409", description = "Sigla já existe")
     })
     public ResponseEntity<UnidadeMedidaResponseDTO> criar(
             @RequestBody UnidadeMedidaRequestDTO dto) {
         UnidadeMedidaResponseDTO resposta = service.criar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
-    
+
     @PutMapping("/{id}")
     @Operation(
-        summary = "Atualizar unidade de medida",
-        description = "Atualiza os dados de uma unidade de medida existente"
+            summary = "Atualizar unidade de medida",
+            description = "Atualiza os dados de uma unidade de medida existente"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Unidade atualizada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-        @ApiResponse(responseCode = "404", description = "Unidade não encontrada"),
-        @ApiResponse(responseCode = "409", description = "Sigla já existe")
+            @ApiResponse(responseCode = "200", description = "Unidade atualizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Unidade não encontrada"),
+            @ApiResponse(responseCode = "409", description = "Sigla já existe")
     })
     public ResponseEntity<UnidadeMedidaResponseDTO> atualizar(
             @PathVariable Long id,
@@ -72,24 +68,24 @@ public class UnidadeMedidaController {
         UnidadeMedidaResponseDTO resposta = service.atualizar(id, dto);
         return ResponseEntity.ok(resposta);
     }
-    
+
     @GetMapping("/{id}")
     @Operation(
-        summary = "Obter unidade de medida",
-        description = "Retorna os dados de uma unidade de medida pelo ID"
+            summary = "Obter unidade de medida",
+            description = "Retorna os dados de uma unidade de medida pelo ID"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Unidade encontrada"),
-        @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
+            @ApiResponse(responseCode = "200", description = "Unidade encontrada"),
+            @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
     })
     public ResponseEntity<UnidadeMedidaResponseDTO> obter(@PathVariable Long id) {
         return ResponseEntity.ok(service.obter(id));
     }
-    
+
     @GetMapping
     @Operation(
-        summary = "Listar unidades de medida",
-        description = "Retorna todas as unidades de medida com paginação"
+            summary = "Listar unidades de medida",
+            description = "Retorna todas as unidades de medida com paginação"
     )
     @ApiResponse(responseCode = "200", description = "Lista de unidades")
     public ResponseEntity<Page<UnidadeMedidaResponseDTO>> listar(
@@ -99,51 +95,41 @@ public class UnidadeMedidaController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
         return ResponseEntity.ok(service.listar(pageable));
     }
-    
-    @GetMapping("/ativas/lista")
-    @Operation(
-        summary = "Listar unidades ativas",
-        description = "Retorna todas as unidades de medida que estão ativas"
-    )
-    @ApiResponse(responseCode = "200", description = "Lista de unidades ativas")
-    public ResponseEntity<List<UnidadeMedidaResponseDTO>> listarAtivas() {
-        return ResponseEntity.ok(service.listarAtivas());
-    }
-    
+
     @PatchMapping("/{id}/ativar")
     @Operation(
-        summary = "Ativar unidade de medida",
-        description = "Ativa uma unidade de medida desativada"
+            summary = "Ativar unidade de medida",
+            description = "Ativa uma unidade de medida desativada"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Unidade ativada com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
+            @ApiResponse(responseCode = "200", description = "Unidade ativada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
     })
     public ResponseEntity<UnidadeMedidaResponseDTO> ativar(@PathVariable Long id) {
         return ResponseEntity.ok(service.ativar(id));
     }
-    
+
     @PatchMapping("/{id}/desativar")
     @Operation(
-        summary = "Desativar unidade de medida",
-        description = "Desativa uma unidade de medida ativa"
+            summary = "Desativar unidade de medida",
+            description = "Desativa uma unidade de medida ativa"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Unidade desativada com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
+            @ApiResponse(responseCode = "200", description = "Unidade desativada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
     })
     public ResponseEntity<UnidadeMedidaResponseDTO> desativar(@PathVariable Long id) {
         return ResponseEntity.ok(service.desativar(id));
     }
-    
+
     @DeleteMapping("/{id}")
     @Operation(
-        summary = "Deletar unidade de medida",
-        description = "Remove uma unidade de medida do sistema"
+            summary = "Deletar unidade de medida",
+            description = "Remove uma unidade de medida do sistema"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Unidade deletada com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
+            @ApiResponse(responseCode = "204", description = "Unidade deletada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
     })
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);

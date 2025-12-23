@@ -13,17 +13,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Serviço de aplicação para UnidadeMedida
- * 
+ * <p>
  * Responsabilidades:
  * - Orquestrar operações de domínio
  * - Coordenar transações
  * - Transformar DTOs
- * 
+ * <p>
  * SRP: Lógica de aplicação para UnidadeMedida
  * DIP: Depende de abstrações (repositório, validador)
  */
@@ -31,60 +28,48 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class UnidadeMedidaService {
-    
+
     private final UnidadeMedidaRepository repository;
     private final UnidadeMedidaValidator validator;
-    
+
     /**
      * Cria uma nova unidade de medida
      */
     public UnidadeMedidaResponseDTO criar(UnidadeMedidaRequestDTO dto) {
-        validator.validarCriacao(dto.getSigla(), dto.getDescricao(), dto.getTipo());
-        
+        validator.validarCriacao(dto.getSigla(), dto.getDescricao());
+
         if (repository.existsBySigla(dto.getSigla())) {
-            throw new BusinessException(
-                HttpStatus.CONFLICT,
-                "Já existe uma unidade de medida com a sigla: " + dto.getSigla()
-            );
+            throw new BusinessException(HttpStatus.CONFLICT, "Já existe uma unidade de medida com a sigla: " + dto.getSigla());
         }
-        
-        UnidadeMedida unidade = UnidadeMedida.builder()
-                .sigla(dto.getSigla().trim().toUpperCase())
-                .descricao(dto.getDescricao().trim())
-                .tipo(dto.getTipo() != null ? dto.getTipo().trim() : null)
-                .ativo(true)
-                .build();
-        
+
+        UnidadeMedida unidade = UnidadeMedida.builder().sigla(dto.getSigla().trim().toUpperCase()).descricao(dto.getDescricao().trim()).ativo(true).build();
+
         UnidadeMedida salva = repository.save(unidade);
         return converterParaResponseDTO(salva);
     }
-    
+
     /**
      * Atualiza uma unidade de medida
      */
     public UnidadeMedidaResponseDTO atualizar(Long id, UnidadeMedidaRequestDTO dto) {
         UnidadeMedida unidade = obterPorId(id);
-        
+
         if (!unidade.getSigla().equals(dto.getSigla())) {
             if (repository.existsBySigla(dto.getSigla())) {
-                throw new BusinessException(
-                    HttpStatus.CONFLICT,
-                    "Já existe uma unidade de medida com a sigla: " + dto.getSigla()
-                );
+                throw new BusinessException(HttpStatus.CONFLICT, "Já existe uma unidade de medida com a sigla: " + dto.getSigla());
             }
         }
-        
-        validator.validarCriacao(dto.getSigla(), dto.getDescricao(), dto.getTipo());
-        
+
+        validator.validarCriacao(dto.getSigla(), dto.getDescricao());
+
         unidade.setSigla(dto.getSigla().trim().toUpperCase());
         unidade.setDescricao(dto.getDescricao().trim());
-        unidade.setTipo(dto.getTipo() != null ? dto.getTipo().trim() : null);
         unidade.atualizarDataAtualizacao();
-        
+
         UnidadeMedida atualizada = repository.save(unidade);
         return converterParaResponseDTO(atualizada);
     }
-    
+
     /**
      * Obtém uma unidade de medida por ID
      */
@@ -92,26 +77,15 @@ public class UnidadeMedidaService {
     public UnidadeMedidaResponseDTO obter(Long id) {
         return converterParaResponseDTO(obterPorId(id));
     }
-    
+
     /**
      * Lista todas as unidades de medida (paginada)
      */
     @Transactional(readOnly = true)
     public Page<UnidadeMedidaResponseDTO> listar(Pageable pageable) {
-        return repository.findAll(pageable)
-                .map(this::converterParaResponseDTO);
+        return repository.findAll(pageable).map(this::converterParaResponseDTO);
     }
-    
-    /**
-     * Lista todas as unidades de medida ativas
-     */
-    @Transactional(readOnly = true)
-    public List<UnidadeMedidaResponseDTO> listarAtivas() {
-        return repository.findByAtivoTrue().stream()
-                .map(this::converterParaResponseDTO)
-                .collect(Collectors.toList());
-    }
-    
+
     /**
      * Ativa uma unidade de medida
      */
@@ -121,7 +95,7 @@ public class UnidadeMedidaService {
         UnidadeMedida atualizada = repository.save(unidade);
         return converterParaResponseDTO(atualizada);
     }
-    
+
     /**
      * Desativa uma unidade de medida
      */
@@ -131,7 +105,7 @@ public class UnidadeMedidaService {
         UnidadeMedida atualizada = repository.save(unidade);
         return converterParaResponseDTO(atualizada);
     }
-    
+
     /**
      * Deleta uma unidade de medida
      */
@@ -139,30 +113,18 @@ public class UnidadeMedidaService {
         obterPorId(id); // Valida existência
         repository.deleteById(id);
     }
-    
+
     /**
      * Obtém uma unidade por ID ou lança exceção
      */
     private UnidadeMedida obterPorId(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                    HttpStatus.NOT_FOUND,
-                    "Unidade de medida não encontrada com ID: " + id
-                ));
+        return repository.findById(id).orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Unidade de medida não encontrada com ID: " + id));
     }
-    
+
     /**
      * Converte entidade para DTO
      */
     private UnidadeMedidaResponseDTO converterParaResponseDTO(UnidadeMedida unidade) {
-        return UnidadeMedidaResponseDTO.builder()
-                .id(unidade.getId())
-                .sigla(unidade.getSigla())
-                .descricao(unidade.getDescricao())
-                .tipo(unidade.getTipo())
-                .ativo(unidade.getAtivo())
-                .dataCriacao(unidade.getDataCriacao())
-                .dataAtualizacao(unidade.getDataAtualizacao())
-                .build();
+        return UnidadeMedidaResponseDTO.builder().id(unidade.getId()).sigla(unidade.getSigla()).descricao(unidade.getDescricao()).ativo(unidade.getAtivo()).dataCriacao(unidade.getDataCriacao()).dataAtualizacao(unidade.getDataAtualizacao()).build();
     }
 }

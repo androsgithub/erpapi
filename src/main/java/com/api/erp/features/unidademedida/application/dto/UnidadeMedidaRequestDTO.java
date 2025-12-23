@@ -16,5 +16,4 @@ public class UnidadeMedidaRequestDTO {
     
     private String sigla;
     private String descricao;
-    private String tipo;
 }

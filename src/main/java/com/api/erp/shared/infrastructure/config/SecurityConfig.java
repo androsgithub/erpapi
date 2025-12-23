@@ -48,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/composicoes/**").authenticated()
                         .requestMatchers("/api/v1/lista-expandida/**").authenticated()
                         .requestMatchers("/api/v1/produtos/**").authenticated()
+                        // Websocket
+                        .requestMatchers("/ws/**").permitAll() // Permite WebSocket
                         .anyRequest().permitAll())
                 .addFilterBefore(bearerTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
@@ -62,7 +64,8 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(false);
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        configuration.setAllowCredentials(true); // ← CRUCIAL para WebSocket
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

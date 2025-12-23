@@ -32,9 +32,6 @@ public class UnidadeMedida {
     @Column(nullable = false, length = 100)
     private String descricao;
     
-    @Column(columnDefinition = "VARCHAR(255)")
-    private String tipo; // ex: "MASSA", "VOLUME", "COMPRIMENTO", "QUANTIDADE"
-    
     @Column(nullable = false)
     @Builder.Default
     private Boolean ativo = true;

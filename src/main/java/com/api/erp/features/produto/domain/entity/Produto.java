@@ -57,16 +57,10 @@ public class Produto {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "unidade_medida_id", nullable = false)
     private UnidadeMedida unidadeMedida;
-    
-    /**
-     * Informações Fiscais
-     */
-    @Column(nullable = false, length = 8)
-    private String ncm;
-    
-    // Preparação para futuras regras fiscais
-    @Column(name = "informacoes_fiscais", columnDefinition = "VARCHAR(500)")
-    private String informacoesFiscais;
+
+
+    @Embedded
+    private ClassificacaoFiscal classificacaoFiscal;
     
     // Campos adicionais úteis
     @Column(columnDefinition = "DECIMAL(10,2)")
