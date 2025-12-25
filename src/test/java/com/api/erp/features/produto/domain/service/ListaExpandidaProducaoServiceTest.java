@@ -1,12 +1,13 @@
 package com.api.erp.features.produto.domain.service;
 
-import com.api.erp.features.produto.domain.entity.Produto;
-import com.api.erp.features.produto.domain.entity.ProdutoComposicao;
-import com.api.erp.features.produto.domain.entity.StatusProduto;
-import com.api.erp.features.produto.domain.entity.TipoProduto;
-import com.api.erp.features.produto.domain.exception.ProdutoException;
-import com.api.erp.features.produto.domain.repository.ProdutoComposicaoRepository;
-import com.api.erp.features.unidademedida.domain.entity.UnidadeMedida;
+import com.api.erp.v1.features.produto.domain.entity.Produto;
+import com.api.erp.v1.features.produto.domain.entity.ProdutoComposicao;
+import com.api.erp.v1.features.produto.domain.entity.StatusProduto;
+import com.api.erp.v1.features.produto.domain.entity.TipoProduto;
+import com.api.erp.v1.features.produto.domain.exception.ProdutoException;
+import com.api.erp.v1.features.produto.domain.repository.ProdutoComposicaoRepository;
+import com.api.erp.v1.features.produto.domain.service.ListaExpandidaProducaoService;
+import com.api.erp.v1.features.unidademedida.domain.entity.UnidadeMedida;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
