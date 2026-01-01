@@ -1,5 +1,6 @@
 package com.api.erp.v1.shared.websocket;
 
+import com.api.erp.v1.shared.domain.entity.UsuarioAutenticado;
 import com.api.erp.v1.shared.infrastructure.security.BearerTokenAuthentication;
 import com.api.erp.v1.shared.infrastructure.security.JwtTokenProvider;
 import org.slf4j.Logger;
@@ -39,12 +40,14 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
                 if (jwtTokenProvider.isTokenValid(token)) {
                     String email = jwtTokenProvider.getEmailFromToken(token);
-                    String usuarioId = jwtTokenProvider.getUsuarioIdFromToken(token);
+                    Long usuarioId = jwtTokenProvider.getUsuarioIdFromToken(token);
+                    Long tenantId = jwtTokenProvider.getTenantIdFromToken(token);
+                    UsuarioAutenticado usuarioAutenticado = new UsuarioAutenticado(usuarioId, tenantId);
 
                     logger.info("Usuário autenticado via WebSocket: {} ({})", email, usuarioId);
 
                     BearerTokenAuthentication authentication =
-                            new BearerTokenAuthentication(token, email);
+                            new BearerTokenAuthentication(token, email, usuarioAutenticado);
                     authentication.setDetails(usuarioId);
 
                     // Define a autenticação no contexto do STOMP

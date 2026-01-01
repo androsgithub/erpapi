@@ -1,5 +1,6 @@
 package com.api.erp.v1.features.usuario.domain.entity;
 
+import com.api.erp.v1.features.contato.domain.entity.UsuarioContato;
 import com.api.erp.v1.features.permissao.domain.entity.UsuarioPermissao;
 import com.api.erp.v1.shared.domain.valueobject.CPF;
 import com.api.erp.v1.shared.domain.valueobject.Email;
@@ -22,6 +23,8 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private Long tenantId;
 
     @Column(nullable = false)
     private String nomeCompleto;
@@ -56,12 +59,25 @@ public class Usuario {
     )
     private Set<UsuarioPermissao> permissoes;
 
+    @OneToMany(
+            mappedBy = "usuario",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<UsuarioContato> contatos;
+
     // Builder Pattern
     public static class Builder {
         private Usuario usuario = new Usuario();
 
         public Builder id(Long id) {
             usuario.id = id;
+            return this;
+        }
+
+        public Builder tenantId(Long tenantId) {
+            usuario.tenantId = tenantId;
             return this;
         }
 

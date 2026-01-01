@@ -1,26 +1,67 @@
 package com.api.erp.v1.features.permissao.infrastructure.factory;
 
-import com.api.erp.v1.features.permissao.domain.service.PermissaoService;
+import com.api.erp.v1.features.permissao.domain.repository.UsuarioPermissaoRepository;
+import com.api.erp.v1.features.permissao.domain.service.IPermissaoService;
 import com.api.erp.v1.features.permissao.infrastructure.cache.PermissaoCacheManager;
 import com.api.erp.v1.features.permissao.infrastructure.decorator.PermissaoAuditServiceDecorator;
 import com.api.erp.v1.features.permissao.infrastructure.decorator.PermissaoCacheServiceDecorator;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import com.api.erp.v1.features.permissao.infrastructure.decorator.ValidationDecoratorPermissaoService;
+import com.api.erp.v1.features.permissao.infrastructure.service.PermissaoService;
+import com.api.erp.v1.features.empresa.domain.entity.PermissaoConfig;
+import com.api.erp.v1.features.empresa.domain.service.IEmpresaService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-@Configuration
+@Slf4j
+@RequiredArgsConstructor
 public class PermissaoServiceFactory {
 
-    @Bean
-    @Primary
-    public PermissaoService permissaoService(
-            @Qualifier("permissaoServiceImpl") PermissaoService baseService,
-            PermissaoCacheManager cacheManager) {
+    private final UsuarioPermissaoRepository usuarioPermissaoRepository;
+    private final PermissaoCacheManager cacheManager;
+    private final IEmpresaService empresaService;
+
+    public IPermissaoService create() {
+        log.info("[PERMISSAO FACTORY] Construindo PermissaoService com decorators");
         
-        // Monta a cadeia de decorators para o serviço de permissão
-        // A ordem é importante: Audit -> Cache -> Implementação Base
-        PermissaoService cachedService = new PermissaoCacheServiceDecorator(baseService, cacheManager);
-        return new PermissaoAuditServiceDecorator(cachedService);
+        PermissaoConfig config = obterConfiguracao();
+        IPermissaoService service = new PermissaoService(usuarioPermissaoRepository);
+        
+        service = aplicarDecorators(service, config);
+        
+        log.info("[PERMISSAO FACTORY] PermissaoService construído com sucesso");
+        return service;
+    }
+
+    private IPermissaoService aplicarDecorators(IPermissaoService service, PermissaoConfig config) {
+        // Validação é aplicada primeiro
+        if (config != null && config.isPermissaoValidationEnabled()) {
+            service = new ValidationDecoratorPermissaoService(service);
+            log.debug("[PERMISSAO FACTORY] ValidationDecorator aplicado");
+        }
+
+        // Cache é aplicado antes de auditoria
+        if (config != null && config.isPermissaoCacheEnabled()) {
+            service = new PermissaoCacheServiceDecorator(service, cacheManager);
+            log.debug("[PERMISSAO FACTORY] CacheDecorator aplicado");
+        }
+
+        // Auditoria é a última
+        if (config != null && config.isPermissaoAuditEnabled()) {
+            service = new PermissaoAuditServiceDecorator(service);
+            log.debug("[PERMISSAO FACTORY] AuditDecorator aplicado");
+        }
+
+        return service;
+    }
+
+    private PermissaoConfig obterConfiguracao() {
+        try {
+            return empresaService.getEmpresaConfig().getPermissaoConfig();
+        } catch (Exception e) {
+            log.warn("[PERMISSAO FACTORY] Não foi possível obter PermissaoConfig, " +
+                    "usando apenas serviço base. Erro: {}", e.getMessage());
+            return null;
+        }
     }
 }
+

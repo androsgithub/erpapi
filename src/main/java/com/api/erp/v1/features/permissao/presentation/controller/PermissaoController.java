@@ -2,10 +2,12 @@ package com.api.erp.v1.features.permissao.presentation.controller;
 
 import com.api.erp.v1.features.permissao.application.dto.request.CreatePermissaoRequest;
 import com.api.erp.v1.features.permissao.application.dto.response.PermissaoResponse;
+import com.api.erp.v1.features.permissao.application.mapper.PermissaoMapper;
+import com.api.erp.v1.features.permissao.domain.controller.IPermissaoController;
 import com.api.erp.v1.features.permissao.domain.entity.PermissaoPermissions;
-import com.api.erp.v1.features.permissao.domain.service.GerenciamentoPermissaoService;
+import com.api.erp.v1.features.permissao.domain.service.IGerenciamentoPermissaoService;
 import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,22 +16,24 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/permissoes")
-@RequiredArgsConstructor
-public class PermissaoController {
+public class PermissaoController implements IPermissaoController {
 
-    private final GerenciamentoPermissaoService gerenciamentoPermissaoService;
+    @Autowired
+    private IGerenciamentoPermissaoService gerenciamentoPermissaoService;
+    @Autowired
+    private PermissaoMapper permissaoMapper;
 
     @PostMapping
     @RequiresPermission(PermissaoPermissions.CRIAR)
     public ResponseEntity<PermissaoResponse> createPermissao(@RequestBody CreatePermissaoRequest request) {
-        PermissaoResponse response = gerenciamentoPermissaoService.createPermissao(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        var permissao = gerenciamentoPermissaoService.createPermissao(request);
+        return new ResponseEntity<>(permissaoMapper.toResponse(permissao), HttpStatus.CREATED);
     }
 
     @GetMapping
     @RequiresPermission(PermissaoPermissions.VISUALIZAR)
     public ResponseEntity<List<PermissaoResponse>> getAllPermissoes() {
-        List<PermissaoResponse> response = gerenciamentoPermissaoService.getAllPermissoes();
-        return ResponseEntity.ok(response);
+        var permissoes = gerenciamentoPermissaoService.getAllPermissoes();
+        return ResponseEntity.ok(permissaoMapper.toResponseList(permissoes));
     }
 }

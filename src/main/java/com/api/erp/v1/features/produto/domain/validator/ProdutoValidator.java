@@ -27,10 +27,9 @@ public class ProdutoValidator {
      * Nota: A validação de classificação fiscal (NCM, origem, etc) é feita
      * nos Value Objects (NCM, OrigemMercadoria, etc) no serviço de aplicação
      */
-    public void validarCriacao(String codigo, String descricao, String ncm) {
+    public void validarCriacao(String codigo, String descricao) {
         validarCodigo(codigo);
         validarDescricao(descricao);
-        // NCM será validado como Value Object no service
     }
     
     /**

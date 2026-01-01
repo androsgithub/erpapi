@@ -2,6 +2,10 @@ package com.api.erp.v1.features.produto.application.dto;
 
 import com.api.erp.v1.features.produto.domain.entity.StatusProduto;
 import com.api.erp.v1.features.produto.domain.entity.TipoProduto;
+import com.api.erp.v1.shared.domain.valueobject.CustomData;
+import com.api.erp.v1.shared.infrastructure.persistence.converters.CustomDataAttributeConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -24,25 +28,8 @@ public class ProdutoRequestDTO {
     private StatusProduto status;
     private TipoProduto tipo;
     private Long unidadeMedidaId;
-    
-    /**
-     * Classificação fiscal completa do produto
-     * Inclui NCM, origem, CEST, benefício fiscal e unidade tributável
-     */
     private ClassificacaoFiscalDTO classificacaoFiscal;
-    
-    /**
-     * @deprecated Use classificacaoFiscal.ncm em seu lugar
-     */
-    @Deprecated(since = "1.0", forRemoval = true)
-    private String ncm;
-    
-    /**
-     * @deprecated Não utilizado. Use classificacaoFiscal em seu lugar
-     */
-    @Deprecated(since = "1.0", forRemoval = true)
-    private String informacoesFiscais;
-    
     private BigDecimal precoVenda;
     private BigDecimal precoCusto;
+    private CustomData customData;
 }

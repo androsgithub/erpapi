@@ -1,5 +1,6 @@
 package com.api.erp.v1.features.usuario.application.dto.response;
 
+import com.api.erp.v1.features.contato.application.dto.response.ContatoResponse;
 import com.api.erp.v1.features.permissao.application.dto.response.PermissaoResponse;
 import com.api.erp.v1.features.permissao.application.dto.response.RoleResponse;
 import com.api.erp.v1.features.usuario.domain.entity.StatusUsuario;
@@ -18,6 +19,8 @@ public class UsuarioPermissoesResponse {
     private String cpf;
     private StatusUsuario status;
     private LocalDateTime dataCriacao;
+    private Set<ContatoResponse> contatos;
     private Set<PermissaoResponse> permissoes;
     private Set<RoleResponse> roles;
 }
+

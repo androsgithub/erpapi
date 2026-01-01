@@ -1,15 +1,15 @@
 package com.api.erp.v1.features.usuario.application.validator;
 
 import com.api.erp.v1.features.usuario.application.dto.request.CreateUsuarioRequest;
-import com.api.erp.v1.features.usuario.domain.validator.UsuarioValidator;
+import com.api.erp.v1.features.usuario.domain.validator.IUsuarioValidator;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
 
-public class BasicUsuarioValidator implements UsuarioValidator {
+public class BasicUsuarioValidator implements IUsuarioValidator {
     
     @Override
     public void validar(CreateUsuarioRequest request) {
-        validarNome(request.getNomeCompleto());
-        validarSenha(request.getSenha());
+        validarNome(request.nomeCompleto());
+        validarSenha(request.senha());
     }
     
     private void validarNome(String nome) {

@@ -1,6 +1,6 @@
 package com.api.erp.v1.features.permissao.infrastructure.decorator;
 
-import com.api.erp.v1.features.permissao.domain.service.PermissaoService;
+import com.api.erp.v1.features.permissao.domain.service.IPermissaoService;
 import com.api.erp.v1.features.permissao.infrastructure.cache.PermissaoCacheManager;
 import lombok.RequiredArgsConstructor;
 
@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class PermissaoCacheServiceDecorator implements PermissaoService {
+public class PermissaoCacheServiceDecorator implements IPermissaoService {
 
-    private final PermissaoService delegate;
+    private final IPermissaoService delegate;
     private final PermissaoCacheManager cacheManager;
 
     @Override

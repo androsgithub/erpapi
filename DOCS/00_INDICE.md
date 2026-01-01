@@ -20,6 +20,14 @@ Bem-vindo à documentação completa do Sistema ERP API. Aqui você encontrará 
 - [FEATURE_ENDERECO.md](FEATURE_ENDERECO.md) - Feature de Endereço
 - [FEATURE_PERMISSAO.md](FEATURE_PERMISSAO.md) - Feature de Permissão/Acesso
 - [FEATURE_UNIDADEMEDIDA.md](FEATURE_UNIDADEMEDIDA.md) - Feature de Unidade de Medida
+- [FEATURE_CONTATO_USUARIO.md](FEATURE_CONTATO_USUARIO.md) - Feature de Contato de Usuário
+
+### 🎨 Decorators Dinâmicos (Advanced)
+- [FEATURE_CLIENTE_DECORATORS.md](FEATURE_CLIENTE_DECORATORS.md) - Documentação técnica de Decorators para Cliente
+- [GUIA_RAPIDO_CLIENTE_DECORATORS.md](GUIA_RAPIDO_CLIENTE_DECORATORS.md) - Guia prático com exemplos
+- [DIAGRAMA_CLIENTE_DECORATORS.md](DIAGRAMA_CLIENTE_DECORATORS.md) - Diagramas visuais e fluxos
+- [SUMARIO_CLIENTE_DECORATORS.md](SUMARIO_CLIENTE_DECORATORS.md) - Sumário de implementação
+- [ENTREGA_CLIENTE_DECORATORS.md](ENTREGA_CLIENTE_DECORATORS.md) - Status e checklist final
 
 ### 🔧 Detalhes Técnicos
 - [CAMADA_DOMAIN.md](CAMADA_DOMAIN.md) - Camada de Domínio (DDD)
@@ -30,6 +38,7 @@ Bem-vindo à documentação completa do Sistema ERP API. Aqui você encontrará 
 ### 🔐 Segurança e Autorização
 - [SEGURANCA.md](SEGURANCA.md) - Implementação de segurança
 - [AUTORIZACAO_ACESSO.md](AUTORIZACAO_ACESSO.md) - Sistema de autorização e controle de acesso
+- [AJUSTES_AUTORIZACAO_USUARIOS.md](AJUSTES_AUTORIZACAO_USUARIOS.md) - Ajustes de autorização para gerenciamento de usuários (NOVO)
 
 ### 📡 Comunicação e Integração
 - [WEBSOCKET.md](WEBSOCKET.md) - Documentação de WebSocket

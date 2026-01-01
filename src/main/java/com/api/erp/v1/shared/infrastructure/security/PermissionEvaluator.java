@@ -1,9 +1,7 @@
 package com.api.erp.v1.shared.infrastructure.security;
 
-import com.api.erp.v1.features.permissao.domain.service.PermissaoService;
+import com.api.erp.v1.features.permissao.domain.service.IPermissaoService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -15,8 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PermissionEvaluator {
 
-    private final PermissaoService permissaoService;
-    private static final Logger logger = LoggerFactory.getLogger(PermissionEvaluator.class);
+    private final IPermissaoService permissaoService;
 
     public boolean hasPermission(String permissaoCodigo) {
         return hasPermission(permissaoCodigo, Collections.emptyMap());
@@ -32,8 +29,6 @@ public class PermissionEvaluator {
         if (authentication == null || authentication.getDetails() == null) {
             throw new IllegalStateException("Usuário não autenticado ou sem usuárioId no contexto");
         }
-
-        logger.info(authentication.getDetails().toString());
 
         return Long.parseLong(authentication.getDetails().toString());
 

@@ -30,9 +30,10 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
     
-    public String generateToken(String email, String usuarioId) {
+    public String generateToken(String email, Long usuarioId, Long tenantId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("usuarioId", usuarioId);
+        claims.put("tenantId", tenantId);
         
         return createToken(claims, email);
     }
@@ -56,9 +57,14 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
     
-    public String getUsuarioIdFromToken(String token) {
+    public Long getUsuarioIdFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);
-        return (String) claims.get("usuarioId");
+        return ((Integer) claims.get("usuarioId")).longValue();
+    }
+
+    public Long getTenantIdFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return ((Integer) claims.get("tenantId")).longValue();
     }
     
     public boolean isTokenValid(String token) {

@@ -3,10 +3,13 @@ package com.api.erp.v1.features.permissao.presentation.controller;
 import com.api.erp.v1.features.permissao.application.dto.request.AssociarPermissaoRequest;
 import com.api.erp.v1.features.permissao.application.dto.request.CreateRoleRequest;
 import com.api.erp.v1.features.permissao.application.dto.response.RoleResponse;
+import com.api.erp.v1.features.permissao.application.mapper.RoleMapper;
+import com.api.erp.v1.features.permissao.domain.controller.IRoleController;
+import com.api.erp.v1.features.permissao.domain.entity.Role;
 import com.api.erp.v1.features.permissao.domain.entity.RolePermissions;
-import com.api.erp.v1.features.permissao.domain.service.GerenciamentoPermissaoService;
+import com.api.erp.v1.features.permissao.domain.service.IGerenciamentoPermissaoService;
 import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,23 +18,25 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/roles")
-@RequiredArgsConstructor
-public class RoleController {
+public class RoleController implements IRoleController {
 
-    private final GerenciamentoPermissaoService gerenciamentoPermissaoService;
+    @Autowired
+    private IGerenciamentoPermissaoService gerenciamentoPermissaoService;
+    @Autowired
+    private RoleMapper roleMapper;
 
     @PostMapping
     @RequiresPermission(RolePermissions.CRIAR)
     public ResponseEntity<RoleResponse> createRole(@RequestBody CreateRoleRequest request) {
-        RoleResponse response = gerenciamentoPermissaoService.createRole(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        Role role = gerenciamentoPermissaoService.createRole(request);
+        return new ResponseEntity<>(roleMapper.toResponse(role), HttpStatus.CREATED);
     }
-    
+
     @GetMapping
     @RequiresPermission(RolePermissions.VISUALIZAR)
     public ResponseEntity<List<RoleResponse>> getAllRoles() {
-        List<RoleResponse> response = gerenciamentoPermissaoService.getAllRoles();
-        return ResponseEntity.ok(response);
+        List<Role> roles = gerenciamentoPermissaoService.getAllRoles();
+        return ResponseEntity.ok(roleMapper.toResponseList(roles));
     }
 
     @PostMapping("/associar")

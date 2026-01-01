@@ -42,7 +42,6 @@ public class WebSocketDocController {
         """
     )
     @ApiResponse(responseCode = "200", description = "Documentação do WebSocket")
-    @SecurityRequirement(name = "bearerAuth")
     public void websocketInfo() {
         // endpoint fake apenas para documentação
     }

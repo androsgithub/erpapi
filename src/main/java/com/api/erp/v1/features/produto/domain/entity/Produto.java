@@ -1,6 +1,8 @@
 package com.api.erp.v1.features.produto.domain.entity;
 
 import com.api.erp.v1.features.unidademedida.domain.entity.UnidadeMedida;
+import com.api.erp.v1.shared.domain.valueobject.CustomData;
+import com.api.erp.v1.shared.infrastructure.persistence.converters.CustomDataAttributeConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -71,6 +73,10 @@ public class Produto {
     
     @Column(columnDefinition = "TEXT")
     private String descricaoDetalhada;
+
+    @Convert(converter = CustomDataAttributeConverter.class)
+    @Column(columnDefinition = "json")
+    private CustomData customData;
     
     @Column(nullable = false)
     @Builder.Default

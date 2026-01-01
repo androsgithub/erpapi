@@ -2,12 +2,14 @@ package com.api.erp.v1.shared.infrastructure.bootstrap;
 
 import com.api.erp.v1.features.unidademedida.domain.entity.UnidadeMedida;
 import com.api.erp.v1.features.unidademedida.domain.repository.UnidadeMedidaRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Slf4j
 @Component
 public class UnidadeMedidaSeed {
 
@@ -78,7 +80,7 @@ public class UnidadeMedidaSeed {
     );
 
     public void executar(UnidadeMedidaRepository repository) {
-        logger.info("Inicializando Unidades de Medida padrão...");
+        log.info("[UNIDADE MEDIDA SEED] Inicializando Unidades de Medida padrão...");
 
         for (UnidadePadrao unidade : UNIDADES_PADRAO) {
             repository.findBySigla(unidade.sigla())
@@ -94,6 +96,7 @@ public class UnidadeMedidaSeed {
                         );
                     });
         }
+        log.info("[UNIDADE MEDIDA SEED] Finalizado permissões e roles padrão...");
     }
 
     /* ===================== RECORD AUXILIAR ===================== */

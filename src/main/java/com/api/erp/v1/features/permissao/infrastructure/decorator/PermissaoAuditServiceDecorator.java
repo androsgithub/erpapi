@@ -1,6 +1,6 @@
 package com.api.erp.v1.features.permissao.infrastructure.decorator;
 
-import com.api.erp.v1.features.permissao.domain.service.PermissaoService;
+import com.api.erp.v1.features.permissao.domain.service.IPermissaoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,9 +8,9 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
-public class PermissaoAuditServiceDecorator implements PermissaoService {
+public class PermissaoAuditServiceDecorator implements IPermissaoService {
 
-    private final PermissaoService delegate;
+    private final IPermissaoService delegate;
 
     @Override
     public boolean hasPermission(Long usuarioId, String permissaoCodigo, Map<String, String> contexto) {

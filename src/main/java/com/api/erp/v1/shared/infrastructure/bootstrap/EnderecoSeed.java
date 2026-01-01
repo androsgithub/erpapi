@@ -2,22 +2,20 @@ package com.api.erp.v1.shared.infrastructure.bootstrap;
 
 import com.api.erp.v1.features.endereco.domain.entity.Endereco;
 import com.api.erp.v1.features.endereco.domain.repository.EnderecoRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class EnderecoSeed {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnderecoSeed.class);
-
     public Endereco executar(EnderecoRepository repository) {
         if (!repository.findAll().isEmpty()) {
-            logger.info("Endereço padrão já existe.");
+            log.info("[ENDERECO SEED] Endereço padrão já existe.");
             return repository.findAll().get(0);
         }
 
-        logger.info("Criando Endereço padrão...");
+        log.info("[ENDERECO SEED] Criando Endereço padrão...");
 
         Endereco endereco = new Endereco(
                 "Avenida Paulista",
@@ -25,11 +23,14 @@ public class EnderecoSeed {
                 "Centro",
                 "São Paulo",
                 "SP",
-                "01311100"
+                "01311100",
+                null
         );
         endereco.setComplemento("Sala 100");
 
-        return repository.save(endereco);
+        Endereco _end = repository.save(endereco);
+        log.info("[ENDERECO SEED] Endereço criado.");
+        return _end;
     }
 }
 

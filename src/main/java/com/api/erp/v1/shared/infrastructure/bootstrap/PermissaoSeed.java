@@ -1,8 +1,10 @@
 package com.api.erp.v1.shared.infrastructure.bootstrap;
 
+import com.api.erp.v1.features.camposcustom.domain.entity.CamposCustomPermissions;
+import com.api.erp.v1.features.cliente.domain.entity.ClientePermissions;
+import com.api.erp.v1.features.contato.domain.entity.ContatoPermissions;
 import com.api.erp.v1.features.empresa.domain.entity.EmpresaPermissions;
 import com.api.erp.v1.features.endereco.domain.entity.EnderecoPermissions;
-import com.api.erp.v1.features.permissao.domain.entity.*;
 import com.api.erp.v1.features.permissao.domain.entity.*;
 import com.api.erp.v1.features.permissao.domain.repository.PermissaoRepository;
 import com.api.erp.v1.features.permissao.domain.repository.RoleRepository;
@@ -12,13 +14,13 @@ import com.api.erp.v1.features.produto.domain.entity.ProdutoPermissions;
 import com.api.erp.v1.features.usuario.domain.entity.UsuarioPermissions;
 import com.api.erp.v1.shared.infrastructure.bootstrap.util.PermissionReflectionUtil;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PermissaoSeed {
@@ -31,17 +33,17 @@ public class PermissaoSeed {
             RolePermissions.class,
             ProdutoPermissions.class,
             ComposicaoPermissions.class,
-            ListaExpandidaPermissions.class
+            ListaExpandidaPermissions.class,
+            ContatoPermissions.class,
+            ClientePermissions.class,
+            CamposCustomPermissions.class
     );
-
-
-    private static final Logger logger = LoggerFactory.getLogger(PermissaoSeed.class);
 
     private final PermissaoRepository permissaoRepository;
     private final RoleRepository roleRepository;
 
     public void executar() {
-        logger.info("Inicializando permissões e roles padrão...");
+        log.info("[PERMISSAO SEED] Inicializando permissões e roles padrão...");
 
 
         /* ===================== PERMISSÕES ===================== */
@@ -67,7 +69,7 @@ public class PermissaoSeed {
                 Set.of()
         );
 
-        logger.info("Permissões e roles inicializadas com sucesso.");
+        log.info("[PERMISSAO SEED] Permissões e roles inicializadas com sucesso.");
     }
 
     /* ===================== MÉTODOS AUXILIARES ===================== */
@@ -75,7 +77,7 @@ public class PermissaoSeed {
     private Permissao criarPermissao(String codigo, String nome, String modulo, TipoAcao acao) {
         return permissaoRepository.findByCodigo(codigo)
                 .orElseGet(() -> {
-                    logger.info("Criando permissão: {}", codigo);
+                    log.info("[PERMISSAO SEED] Criando permissão: {}", codigo);
                     return permissaoRepository.save(
                             Permissao.builder()
                                     .codigo(codigo)
@@ -91,7 +93,7 @@ public class PermissaoSeed {
     private Role criarRole(String nome, Set<Permissao> permissoes) {
         return roleRepository.findByNome(nome)
                 .orElseGet(() -> {
-                    logger.info("Criando role: {}", nome);
+                    log.info("[PERMISSAO SEED] Criando role: {}", nome);
                     return roleRepository.save(
                             Role.builder()
                                     .nome(nome)
@@ -102,7 +104,6 @@ public class PermissaoSeed {
     }
 
     private void criarPermissoesDaClasse(Class<?> permissionClass) {
-
         List<String> codigos = PermissionReflectionUtil.extrairPermissoes(permissionClass);
 
         String modulo = extrairNomeModulo(permissionClass);
@@ -120,10 +121,12 @@ public class PermissaoSeed {
         }
 
     }
+
     private String extrairNomeModulo(Class<?> clazz) {
         return clazz.getSimpleName()
                 .replace("Permissions", "");
     }
+
     private TipoAcao extrairTipoAcao(String codigo) {
 
         if (codigo.endsWith(".criar")) return TipoAcao.CRIAR;
@@ -141,9 +144,6 @@ public class PermissaoSeed {
         return acao.substring(0, 1).toUpperCase() + acao.substring(1)
                 + " " + partes[0];
     }
-
-
-
 
 }
 
