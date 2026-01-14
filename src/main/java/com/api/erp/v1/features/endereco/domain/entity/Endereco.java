@@ -1,56 +1,47 @@
 package com.api.erp.v1.features.endereco.domain.entity;
 
+import com.api.erp.v1.shared.domain.entity.BaseEntity;
 import com.api.erp.v1.shared.domain.valueobject.CEP;
-import com.api.erp.v1.shared.domain.valueobject.CustomData;
-import com.api.erp.v1.shared.infrastructure.persistence.converters.CustomDataAttributeConverter;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
-import java.time.LocalDateTime;
-
-@Setter
-@Getter
 @Entity
-public class Endereco {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Table(name = "tb_endereco")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@SQLDelete(sql = "UPDATE tb_endereco SET deleted = true, deleted_at = now() WHERE id = ?")
+public class Endereco extends BaseEntity {
 
+    @Column(name = "rua", nullable = false, length = 255)
     private String rua;
+
+    @Column(name = "numero", nullable = false, length = 50)
     private String numero;
+
+    @Column(name = "complemento", length = 255)
     private String complemento;
+
+    @Column(name = "bairro", nullable = false, length = 100)
     private String bairro;
+
+    @Column(name = "cidade", nullable = false, length = 100)
     private String cidade;
+
+    @Column(name = "estado", nullable = false, length = 2)
     private String estado;
-    @Column(name = "cep")
+
+    @Column(name = "cep", nullable = false, length = 8)
     private CEP cep;
-    private LocalDateTime dataCriacao;
-    private LocalDateTime dataAtualizacao;
-    @Convert(converter = CustomDataAttributeConverter.class)
-    @Column(columnDefinition = "json")
-    private CustomData customData;
 
-    public Endereco() {
-        this.dataCriacao = LocalDateTime.now();
-        this.dataAtualizacao = LocalDateTime.now();
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false)
+    private EnderecoTipo tipo;
 
-    public Endereco(String rua, String numero, String bairro, String cidade, String estado, String cep, CustomData customData) {
-        this();
-        this.rua = rua;
-        this.numero = numero;
-        this.bairro = bairro;
-        this.cidade = cidade;
-        this.estado = estado;
-        this.cep = new CEP(cep);
-        this.customData = customData;
-    }
+    @Column(name = "principal", nullable = false)
+    private Boolean principal;
 
-    @Override
-    public String toString() {
-        return rua + ", " + numero +
-               (complemento != null ? ", " + complemento : "") +
-               " - " + bairro + " - " + cidade + "/" + estado + " - " + cep.getFormatado();
-    }
 }

@@ -6,9 +6,10 @@ import com.api.erp.v1.features.contato.application.mapper.IContatoMapper;
 import com.api.erp.v1.features.contato.domain.controller.IContatosController;
 import com.api.erp.v1.features.contato.domain.entity.ContatoPermissions;
 import com.api.erp.v1.features.contato.domain.service.IContatoService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ContatosController implements IContatosController {
 
     @Autowired
+    @Qualifier("contatoServiceProxy")
     private IContatoService contatoService;
     @Autowired
     private IContatoMapper contatoMapper;

@@ -16,14 +16,20 @@ import com.api.erp.v1.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.shared.domain.valueobject.CPF;
 import com.api.erp.v1.shared.domain.valueobject.RG;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
+@Service
 public class ClienteService implements IClienteService {
 
-    private final ClienteRepository repository;
-    private final IClienteValidator validator;
+    @Autowired
+    private ClienteRepository repository;
+    @Autowired
+    @Qualifier("clienteValidatorProxy")
+    private IClienteValidator validator;
 
     @Override
     public Page<Cliente> pegarTodos(Pageable pageable) {
@@ -39,7 +45,7 @@ public class ClienteService implements IClienteService {
 
     @Override
     public Cliente criar(CreateClienteDto clienteDto) {
-        validator.validarDTO(clienteDto);
+        validator.validarCriacao(clienteDto);
         Cliente cliente = new Cliente();
         cliente.setNome(clienteDto.nome());
         cliente.setStatus(clienteDto.status());
@@ -78,6 +84,7 @@ public class ClienteService implements IClienteService {
                 preferenciasDto.malaDireta()
         );
         cliente.setPreferencias(preferencias);
+        cliente.setCustomData(clienteDto.customData());
 
         return repository.save(cliente);
     }

@@ -2,19 +2,21 @@ package com.api.erp.v1.features.cliente.tenants.hece.validator;
 
 import com.api.erp.v1.features.cliente.application.dto.request.CreateClienteDto;
 import com.api.erp.v1.features.cliente.domain.validator.IClienteValidator;
+import com.api.erp.v1.features.cliente.infrastructure.proxy.ClienteValidatorProxy;
 import com.api.erp.v1.features.cliente.infrastructure.validator.ClienteValidatorDefault;
-import com.api.erp.v1.shared.domain.enums.TenantCode;
 import com.api.erp.v1.shared.domain.enums.TenantType;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
+@Component("clienteValidator_HECE")
 public class ClienteValidatorHece implements IClienteValidator {
 
-    private final ClienteValidatorDefault defaultValidator;
+    @Autowired
+    @Qualifier("clienteValidatorDefault")
+    private IClienteValidator defaultValidator;
 
     @Override
     public void validarCriacao(CreateClienteDto dto) {
@@ -65,20 +67,5 @@ public class ClienteValidatorHece implements IClienteValidator {
             throw new BusinessException(
                     "[HECE] Email deve ser do domínio @hece.com");
         }
-    }
-
-    @Override
-    public TenantCode getTenantCode() {
-        return TenantCode.HECE;
-    }
-
-    @Override
-    public TenantType getTenantType() {
-        return TenantType.HECE;
-    }
-
-    @Override
-    public int getPriority() {
-        return 10; // Alta prioridade
     }
 }

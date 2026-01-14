@@ -14,7 +14,7 @@ public interface UsuarioPermissaoRepository extends JpaRepository<UsuarioPermiss
 
     @Query(value = """
             SELECT COUNT(*)
-            FROM usuario_permissao up
+            FROM tb_usuario_permissao up
             LEFT JOIN usuario_permissao_direta upd 
                 ON upd.usuario_permissao_id = up.id
             LEFT JOIN permissao p1 

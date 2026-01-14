@@ -5,8 +5,7 @@ import com.api.erp.v1.features.unidademedida.application.dto.response.UnidadeMed
 import com.api.erp.v1.features.unidademedida.domain.controller.IUnidadeMedidaController;
 import com.api.erp.v1.features.unidademedida.domain.entity.UnidadeMedidaPermissions;
 import com.api.erp.v1.features.unidademedida.domain.service.IUnidadeMedidaService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
-import lombok.RequiredArgsConstructor;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

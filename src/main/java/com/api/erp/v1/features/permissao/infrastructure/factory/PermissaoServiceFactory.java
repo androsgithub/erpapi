@@ -7,8 +7,8 @@ import com.api.erp.v1.features.permissao.infrastructure.decorator.PermissaoAudit
 import com.api.erp.v1.features.permissao.infrastructure.decorator.PermissaoCacheServiceDecorator;
 import com.api.erp.v1.features.permissao.infrastructure.decorator.ValidationDecoratorPermissaoService;
 import com.api.erp.v1.features.permissao.infrastructure.service.PermissaoService;
-import com.api.erp.v1.features.empresa.domain.entity.PermissaoConfig;
-import com.api.erp.v1.features.empresa.domain.service.IEmpresaService;
+import com.api.erp.v1.features.tenant.domain.entity.PermissaoConfig;
+import com.api.erp.v1.features.tenant.domain.service.ITenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +18,7 @@ public class PermissaoServiceFactory {
 
     private final UsuarioPermissaoRepository usuarioPermissaoRepository;
     private final PermissaoCacheManager cacheManager;
-    private final IEmpresaService empresaService;
+    private final ITenantService tenantService;
 
     public IPermissaoService create() {
         log.info("[PERMISSAO FACTORY] Construindo PermissaoService com decorators");
@@ -56,7 +56,7 @@ public class PermissaoServiceFactory {
 
     private PermissaoConfig obterConfiguracao() {
         try {
-            return empresaService.getEmpresaConfig().getPermissaoConfig();
+            return tenantService.getTenantConfig(null).getPermissaoConfig();
         } catch (Exception e) {
             log.warn("[PERMISSAO FACTORY] Não foi possível obter PermissaoConfig, " +
                     "usando apenas serviço base. Erro: {}", e.getMessage());

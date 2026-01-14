@@ -7,19 +7,17 @@ import com.api.erp.v1.features.usuario.domain.repository.UsuarioRepository;
 import com.api.erp.v1.features.usuario.domain.service.IPasswordEncoder;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
 import com.api.erp.v1.shared.domain.valueobject.Email;
+import com.api.erp.v1.shared.infrastructure.config.datasource.TenantContext;
 import com.api.erp.v1.shared.infrastructure.security.JwtTokenProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class AuthenticationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
-
     private final UsuarioRepository usuarioRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -35,25 +33,25 @@ public class AuthenticationService {
     }
 
     public TokenResponse login(LoginRequest request) {
-        logger.info("Tentativa de login para email: {}", request.login());
+        log.info("Tenant: {}/{}; Tentativa de login para email: {}", TenantContext.getTenantId(), TenantContext.getTenantSlug(), request.login());
 
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(new Email(request.login()));
 
         if (usuarioOpt.isEmpty()) {
-            logger.warn("Usuário não encontrado: {}", request.login());
+            log.warn("Usuário não encontrado: {}", request.login());
             throw new BusinessException("Email ou senha inválidos");
         }
 
         Usuario usuario = usuarioOpt.get();
 
-        if (!passwordEncoder.matches(request.password(), usuario.getSenhaHash())) {
-            logger.warn("Senha inválida para usuário: {}", request.login());
+        if (!passwordEncoder.matches(request.password(), usuario.getSenha_hash())) {
+            log.warn("Senha inválida para usuário: {}", request.login());
             throw new BusinessException("Email ou senha inválidos");
         }
 
-        String token = jwtTokenProvider.generateToken(usuario.getEmail().getValor(), usuario.getId(), usuario.getTenantId());
+        String token = jwtTokenProvider.generateToken(usuario.getEmail().getValor(), usuario.getId().toString(), TenantContext.getTenantId(), TenantContext.getTenantSlug());
 
-        logger.info("Login bem-sucedido para usuário: {}", request.login());
+        log.info("Login bem-sucedido para usuário: {}", request.login());
 
         return new TokenResponse(token, "Bearer", 86400);
     }

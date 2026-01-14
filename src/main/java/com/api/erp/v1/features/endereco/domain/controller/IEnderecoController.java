@@ -1,7 +1,7 @@
 package com.api.erp.v1.features.endereco.domain.controller;
 
-import com.api.erp.v1.features.endereco.application.dto.CreateEnderecoRequest;
-import com.api.erp.v1.features.endereco.application.dto.EnderecoResponse;
+import com.api.erp.v1.features.endereco.application.dto.request.CreateEnderecoRequest;
+import com.api.erp.v1.features.endereco.application.dto.response.EnderecoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -1,5 +1,6 @@
 package com.api.erp.v1.features.contato.domain.entity;
 
+import com.api.erp.v1.shared.domain.entity.BaseEntity;
 import com.api.erp.v1.shared.domain.valueobject.CustomData;
 import com.api.erp.v1.shared.infrastructure.persistence.converters.CustomDataAttributeConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -20,47 +22,32 @@ import java.util.Set;
  * de contato de uma entidade do sistema.
  */
 @Entity
-@Table(name = "contatos")
+@Table(name = "tb_contatos")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Contato {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@SQLDelete(sql = "UPDATE tb_contatos SET deleted = true, deleted_at = now() WHERE id = ?")
+public class Contato extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "tipo", nullable = false)
     private TipoContato tipo;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "valor", nullable = false, length = 255)
     private String valor;
 
-    @Column(length = 255)
+    @Column(name = "descricao", length = 255)
     private String descricao;
 
-    @Column(nullable = false)
+    @Column(name = "principal", nullable = false)
     @Builder.Default
     private boolean principal = false;
 
-    @Column(nullable = false)
+    @Column(name = "ativo", nullable = false)
     @Builder.Default
     private boolean ativo = true;
-
-    @Convert(converter = CustomDataAttributeConverter.class)
-    @Column(columnDefinition = "json")
-    private CustomData customData;
-
-    @Column(nullable = false, updatable = false)
-    @Builder.Default
-    private LocalDateTime dataCriacao = LocalDateTime.now();
-
-    @Column(nullable = false)
-    @Builder.Default
-    private LocalDateTime dataAtualizacao = LocalDateTime.now();
 
     @OneToMany(
             mappedBy = "contato",
@@ -79,59 +66,7 @@ public class Contato {
         this.valor = valor;
         this.principal = false;
         this.ativo = true;
-        this.dataCriacao = LocalDateTime.now();
-        this.dataAtualizacao = LocalDateTime.now();
     }
 
-    /**
-     * Marca este contato como principal
-     */
-    public void marcarComoPrincipal() {
-        this.principal = true;
-        this.dataAtualizacao = LocalDateTime.now();
-    }
 
-    /**
-     * Desmarca este contato como principal
-     */
-    public void desmarcarComoPrincipal() {
-        this.principal = false;
-        this.dataAtualizacao = LocalDateTime.now();
-    }
-
-    /**
-     * Ativa o contato (soft delete inverso)
-     */
-    public void ativar() {
-        this.ativo = true;
-        this.dataAtualizacao = LocalDateTime.now();
-    }
-
-    /**
-     * Desativa o contato (soft delete)
-     */
-    public void desativar() {
-        this.ativo = false;
-        this.dataAtualizacao = LocalDateTime.now();
-    }
-
-    /**
-     * Verifica se o contato está ativo
-     */
-    public boolean estaAtivo() {
-        return this.ativo;
-    }
-
-    /**
-     * Verifica se o contato é o principal
-     */
-    public boolean ehPrincipal() {
-        return this.principal;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Contato {tipo=%s, valor=%s, principal=%s, ativo=%s}", 
-            tipo, valor, principal, ativo);
-    }
 }

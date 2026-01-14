@@ -1,5 +1,6 @@
 package com.api.erp.v1.features.cliente.domain.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
@@ -11,11 +12,16 @@ import lombok.*;
 @Builder
 public class ClientePreferencias {
 
+    @Column(name = "email_principal")
     private String emailPrincipal;
+
+    @Column(name = "email_nfe")
     private String emailNfe;
 
+    @Column(name = "enviar_email")
     private Boolean enviarEmail;
-    private Boolean malaDireta;
 
+    @Column(name = "mala_direta")
+    private Boolean malaDireta;
 }
 

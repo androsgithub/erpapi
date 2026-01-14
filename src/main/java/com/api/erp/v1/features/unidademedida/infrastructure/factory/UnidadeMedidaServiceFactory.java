@@ -1,7 +1,7 @@
 package com.api.erp.v1.features.unidademedida.infrastructure.factory;
 
-import com.api.erp.v1.features.empresa.domain.entity.UnidadeMedidaConfig;
-import com.api.erp.v1.features.empresa.domain.service.IEmpresaService;
+import com.api.erp.v1.features.tenant.domain.entity.UnidadeMedidaConfig;
+import com.api.erp.v1.features.tenant.domain.service.ITenantService;
 import com.api.erp.v1.features.unidademedida.domain.repository.UnidadeMedidaRepository;
 import com.api.erp.v1.features.unidademedida.domain.service.IUnidadeMedidaService;
 import com.api.erp.v1.features.unidademedida.domain.validator.UnidadeMedidaValidator;
@@ -13,17 +13,16 @@ import org.springframework.stereotype.Component;
 public class UnidadeMedidaServiceFactory {
     private final UnidadeMedidaRepository repository;
     private final UnidadeMedidaValidator validator;
-    private final IEmpresaService empresaService;
+    private final ITenantService tenantService;
 
-    public UnidadeMedidaServiceFactory(UnidadeMedidaRepository repository, UnidadeMedidaValidator validator, IEmpresaService empresaService) {
+    public UnidadeMedidaServiceFactory(UnidadeMedidaRepository repository, UnidadeMedidaValidator validator, ITenantService tenantService) {
         this.repository = repository;
         this.validator = validator;
-        this.empresaService = empresaService;
+        this.tenantService = tenantService;
     }
 
 
     public IUnidadeMedidaService create() {
-        UnidadeMedidaConfig unidadeMedidaConfig = empresaService.getEmpresaConfig().getUnidadeMedidaConfig();
         IUnidadeMedidaService service = new UnidadeMedidaService(repository, validator);
         return service;
     }

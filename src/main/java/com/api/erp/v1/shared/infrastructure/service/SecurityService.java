@@ -8,19 +8,39 @@ import org.springframework.stereotype.Component;
 @Component
 public class SecurityService {
 
-    public Long getAuthTenentId() {
+    public String getAuthTenantSlug() {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
-        BearerTokenAuthentication auth =
-                (BearerTokenAuthentication) authentication;
+        if (authentication == null || !(authentication instanceof BearerTokenAuthentication)) {
+            return null;
+        }
+
+        BearerTokenAuthentication auth = (BearerTokenAuthentication) authentication;
+
+        return auth.getPrincipal().getTenantSlug();
+    }
+
+    public String getAuthTenantId() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication instanceof BearerTokenAuthentication)) {
+            return null;
+        }
+
+        BearerTokenAuthentication auth = (BearerTokenAuthentication) authentication;
 
         return auth.getPrincipal().getTenantId();
     }
 
-    public Long getAuthUsuarioId() {
+    public String getAuthUsuarioId() {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication instanceof BearerTokenAuthentication)) {
+            return null;
+        }
 
         BearerTokenAuthentication auth =
                 (BearerTokenAuthentication) authentication;

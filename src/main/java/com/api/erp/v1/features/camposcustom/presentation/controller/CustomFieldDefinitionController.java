@@ -7,9 +7,7 @@ import com.api.erp.v1.features.camposcustom.application.dto.response.CustomField
 import com.api.erp.v1.features.camposcustom.domain.controller.ICustomFieldDefinitionController;
 import com.api.erp.v1.features.camposcustom.domain.entity.CamposCustomPermissions;
 import com.api.erp.v1.features.camposcustom.infrastructure.service.CustomFieldDefinitionService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,56 +22,58 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
 
     /* ===================== LIST ===================== */
 
-    @GetMapping
+    @GetMapping("/{tenantId}")
     @RequiresPermission(CamposCustomPermissions.VISUALIZAR)
     public List<CustomFieldResponse> getCustomFields(
+            @PathVariable Long tenantId,
             @RequestParam String table
     ) {
-        return service.listByTable(table);
+        return service.listByTable(tenantId, table);
     }
 
     /* ===================== CREATE ===================== */
 
-    @PostMapping
+    @PostMapping("/{tenantId}")
     @RequiresPermission(CamposCustomPermissions.CRIAR)
     public CustomFieldResponse create(
+            @PathVariable Long tenantId,
             @RequestBody CreateCustomFieldRequest request
     ) {
-        return service.create(request);
+        return service.create(tenantId, request);
     }
 
     /* ===================== UPDATE ===================== */
 
-    @PutMapping("/{id}")
+    @PutMapping("/{tenantId}/{id}")
     @RequiresPermission(CamposCustomPermissions.ATUALIZAR)
     public CustomFieldResponse update(
+            @PathVariable Long tenantId,
             @PathVariable Long id,
             @RequestBody UpdateCustomFieldRequest request
     ) {
-        Long tenantId = null; // resolvido no service
-        return service.update(id, tenantId, request);
+        return service.update(tenantId, id, request);
     }
 
     /* ===================== ENABLE / DISABLE ===================== */
 
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{tenantId}/{id}/status")
     @RequiresPermission(CamposCustomPermissions.ATUALIZAR)
     public CustomFieldResponse changeStatus(
+            @PathVariable Long tenantId,
             @PathVariable Long id,
             @RequestBody ChangeCustomFieldStatusRequest request
     ) {
-        Long tenantId = null;
-        return service.changeStatus(id, tenantId, request);
+        return service.changeStatus(tenantId, id, request);
     }
 
     /* ===================== DELETE ===================== */
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{tenantId}/{id}")
     @RequiresPermission(CamposCustomPermissions.DELETAR)
     public void delete(
+            @PathVariable Long tenantId,
             @PathVariable Long id
     ) {
-        Long tenantId = null;
-        service.delete(id, tenantId);
+        service.delete(tenantId, id);
     }
 }

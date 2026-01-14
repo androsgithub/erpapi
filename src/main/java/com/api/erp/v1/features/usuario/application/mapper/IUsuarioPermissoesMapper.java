@@ -30,21 +30,21 @@ public interface IUsuarioPermissoesMapper {
         if (usuarioContatos == null || usuarioContatos.isEmpty()) {
             return Set.of();
         }
-        
+
         return usuarioContatos.stream()
-            .filter(uc -> uc.getContato() != null)
-            .map(uc -> new ContatoResponse(
-                uc.getContato().getId(),
-                uc.getContato().getTipo() != null ? uc.getContato().getTipo().toString() : null,
-                uc.getContato().getValor(),
-                uc.getContato().getDescricao(),
-                uc.getContato().isPrincipal(),
-                uc.getContato().isAtivo(),
-                uc.getContato().getCustomData(),
-                uc.getContato().getDataCriacao(),
-                uc.getContato().getDataAtualizacao()
-            ))
-            .collect(Collectors.toSet());
+                .filter(uc -> uc.getContato() != null)
+                .map(uc -> new ContatoResponse(
+                        uc.getContato().getId(),
+                        uc.getContato().getTipo() != null ? uc.getContato().getTipo().toString() : null,
+                        uc.getContato().getValor(),
+                        uc.getContato().getDescricao(),
+                        uc.getContato().isPrincipal(),
+                        uc.getContato().isAtivo(),
+                        uc.getContato().getCustomData(),
+                        uc.getContato().getCreatedAt().toLocalDateTime(),
+                        uc.getContato().getUpdatedAt().toLocalDateTime()
+                ))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -55,20 +55,20 @@ public interface IUsuarioPermissoesMapper {
         if (usuarioPermissoes == null || usuarioPermissoes.isEmpty()) {
             return Set.of();
         }
-        
+
         return usuarioPermissoes.stream()
-            .filter(up -> up.getPermissoesDiretas() != null && !up.getPermissoesDiretas().isEmpty())
-            .flatMap(up -> up.getPermissoesDiretas().stream())
-            .map(permissao -> new PermissaoResponse(
-                permissao.getId(),
-                permissao.getCodigo(),
-                permissao.getNome(),
-                permissao.getModulo(),
-                permissao.getAcao(),
-                permissao.getContexto(),
-                permissao.isAtivo()
-            ))
-            .collect(Collectors.toSet());
+                .filter(up -> up.getPermissoesDiretas() != null && !up.getPermissoesDiretas().isEmpty())
+                .flatMap(up -> up.getPermissoesDiretas().stream())
+                .map(permissao -> new PermissaoResponse(
+                        permissao.getId(),
+                        permissao.getCodigo(),
+                        permissao.getNome(),
+                        permissao.getModulo(),
+                        permissao.getAcao(),
+                        permissao.getContexto(),
+                        permissao.isAtivo()
+                ))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -79,16 +79,16 @@ public interface IUsuarioPermissoesMapper {
         if (permissoes == null || permissoes.isEmpty()) {
             return Set.of();
         }
-        
+
         return permissoes.stream()
-            .filter(up -> up.getRoles() != null && !up.getRoles().isEmpty())
-            .flatMap(up -> up.getRoles().stream())
-            .map(role -> new RoleResponse(
-                role.getId(),
-                role.getNome(),
-                role.getPermissoes()
-            ))
-            .collect(Collectors.toSet());
+                .filter(up -> up.getRoles() != null && !up.getRoles().isEmpty())
+                .flatMap(up -> up.getRoles().stream())
+                .map(role -> new RoleResponse(
+                        role.getId(),
+                        role.getNome(),
+                        role.getPermissoes()
+                ))
+                .collect(Collectors.toSet());
     }
 }
 

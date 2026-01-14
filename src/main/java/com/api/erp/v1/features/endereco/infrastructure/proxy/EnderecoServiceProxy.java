@@ -1,58 +1,79 @@
 package com.api.erp.v1.features.endereco.infrastructure.proxy;
 
-import com.api.erp.v1.features.endereco.application.dto.CreateEnderecoRequest;
+import com.api.erp.v1.features.endereco.application.dto.request.CreateEnderecoRequest;
+import com.api.erp.v1.features.tenant.domain.entity.Tenant;
+import com.api.erp.v1.features.tenant.domain.entity.EnderecoConfig;
+import com.api.erp.v1.features.tenant.domain.service.ITenantService;
 import com.api.erp.v1.features.endereco.domain.entity.Endereco;
 import com.api.erp.v1.features.endereco.domain.service.IEnderecoService;
-import lombok.RequiredArgsConstructor;
+import com.api.erp.v1.features.endereco.infrastructure.decorator.EnderecoServiceApplyDecorate;
+import com.api.erp.v1.features.endereco.infrastructure.service.EnderecoService;
+import com.api.erp.v1.shared.infrastructure.service.SecurityService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Proxy de EnderecoService que delega para EnderecoServiceHolder.
- * 
- * Este proxy é injetado como bean primary de IEnderecoService.
- * Ele sempre delega para o serviço atual no holder, permitindo
- * que o serviço seja trocado dinamicamente sem reiniciar a aplicação.
- * 
- * FUNCIONAMENTO:
- * 1. Componentes injetam EnderecoServiceProxy (que é um IEnderecoService)
- * 2. Proxy chama holder.getService() para obter a instância atual
- * 3. Delega a chamada para o serviço com decorators atualizados
- * 4. Se configurações mudam, holder.updateService() é chamado
- * 5. Próximas chamadas já usam os novos decorators
- * 
- * THREAD-SAFE: Sim, o holder gerencia a sincronização
- * 
- * TRANSAÇÕES: Seguro, pois obtém o serviço antes da transação
- * iniciar e o mantém durante toda operação
- */
-@RequiredArgsConstructor
+@Slf4j
+@Service
 public class EnderecoServiceProxy implements IEnderecoService {
+    @Autowired
+    private ApplicationContext applicationContext;
+    @Autowired
+    private EnderecoService enderecoServiceDefault;
+    @Autowired
+    private SecurityService securityService;
+    @Autowired
+    private ITenantService tenantService;
 
-    private final EnderecoServiceHolder holder;
+    private IEnderecoService resolverService() {
+        IEnderecoService response = enderecoServiceDefault;
+        EnderecoConfig enderecoConfig = new EnderecoConfig();
+        try {
+            String strTenantId = securityService.getAuthTenantId();
+            Long tenantId = Long.valueOf(strTenantId);
+            Tenant tenant = tenantService.getDadosTenant(tenantId);
+            String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
+            String beanName = "enderecoService_" + tenantType;
+            enderecoConfig = tenant.getConfig().getEnderecoConfig();
+
+            try {
+                IEnderecoService service = applicationContext.getBean(beanName, IEnderecoService.class);
+                log.debug("[CLIENTE SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
+                response = service;
+            } catch (Exception e) {
+                log.debug("[CLIENTE SERVICE] Service {} não encontrado, usando padrão", beanName);
+            }
+        } catch (Exception e) {
+            log.debug("[CLIENTE SERVICE] Erro ao resolver tenant, usando padrão: {}", e.getMessage());
+        }
+        return EnderecoServiceApplyDecorate.aplicarDecorators(response, enderecoConfig);
+    }
 
     @Override
     public Endereco criar(CreateEnderecoRequest request) {
-        return holder.getService().criar(request);
+        return resolverService().criar(request);
     }
 
     @Override
     public Endereco buscarPorId(Long id) {
-        return holder.getService().buscarPorId(id);
+        return resolverService().buscarPorId(id);
     }
 
     @Override
     public List<Endereco> buscarTodos() {
-        return holder.getService().buscarTodos();
+        return resolverService().buscarTodos();
     }
 
     @Override
     public Endereco atualizar(Long id, CreateEnderecoRequest request) {
-        return holder.getService().atualizar(id, request);
+        return resolverService().atualizar(id, request);
     }
 
     @Override
     public void deletar(Long id) {
-        holder.getService().deletar(id);
+        resolverService().deletar(id);
     }
 }

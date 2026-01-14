@@ -4,7 +4,7 @@ import com.api.erp.v1.features.cliente.application.dto.response.ClienteCompleteR
 import com.api.erp.v1.features.cliente.domain.entity.Cliente;
 import com.api.erp.v1.features.contato.application.dto.response.ContatoResponse;
 import com.api.erp.v1.features.contato.domain.entity.ClienteContato;
-import com.api.erp.v1.features.endereco.application.dto.EnderecoResponse;
+import com.api.erp.v1.features.endereco.application.dto.response.EnderecoResponse;
 import com.api.erp.v1.features.endereco.domain.entity.ClienteEndereco;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -39,8 +39,8 @@ public interface IClienteCompleteMapper {
                         uc.getContato().isPrincipal(),
                         uc.getContato().isAtivo(),
                         uc.getCliente().getCustomData(),
-                        uc.getContato().getDataCriacao(),
-                        uc.getContato().getDataAtualizacao())).collect(Collectors.toSet());
+                        uc.getContato().getCreatedAt().toLocalDateTime(),
+                        uc.getContato().getUpdatedAt().toLocalDateTime())).collect(Collectors.toSet());
     }
 
     default Set<EnderecoResponse> mapearEnderecos(Set<ClienteEndereco> clienteEnderecos) {
@@ -60,9 +60,13 @@ public interface IClienteCompleteMapper {
                         uc.getEndereco().getCidade(),
                         uc.getEndereco().getEstado(),
                         uc.getEndereco().getCep(),
+                        uc.getEndereco().getTipo(),
+                        uc.getEndereco().getPrincipal(),
                         uc.getEndereco().getCustomData(),
-                        uc.getEndereco().getDataCriacao(),
-                        uc.getEndereco().getDataAtualizacao())).collect(Collectors.toSet());
+                        uc.getEndereco().getCreatedAt(),
+                        uc.getEndereco().getUpdatedAt(),
+                        uc.getEndereco().getCreatedBy(),
+                        uc.getEndereco().getUpdatedBy())).collect(Collectors.toSet());
     }
 
     default Page<ClienteCompleteResponseDto> toResponsePage(Page<Cliente> page) {

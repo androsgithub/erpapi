@@ -1,35 +1,46 @@
 package com.api.erp.v1.features.endereco.infrastructure.service;
 
-import com.api.erp.v1.features.endereco.application.dto.CreateEnderecoRequest;
+import com.api.erp.v1.features.endereco.application.dto.request.CreateEnderecoRequest;
 import com.api.erp.v1.features.endereco.domain.entity.Endereco;
 import com.api.erp.v1.features.endereco.domain.repository.EnderecoRepository;
 import com.api.erp.v1.features.endereco.domain.service.IEnderecoService;
-import com.api.erp.v1.features.endereco.domain.validator.EnderecoValidator;
+import com.api.erp.v1.features.endereco.domain.validator.IEnderecoValidator;
 import com.api.erp.v1.shared.domain.exception.NotFoundException;
 import com.api.erp.v1.shared.domain.valueobject.CEP;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
 public class EnderecoService implements IEnderecoService {
+
     private final EnderecoRepository enderecoRepository;
+    private final IEnderecoValidator validator;
 
     public Endereco criar(CreateEnderecoRequest request) {
-        EnderecoValidator.validarEndereco(request.rua(), request.numero(), request.bairro(), request.cidade(), request.estado(), request.cep());
+        validator.validarCriacao(request);
 
-        Endereco endereco = new Endereco(request.rua(), request.numero(), request.bairro(), request.cidade(), request.estado(), request.cep(), request.customData());
-
-        if (request.complemento() != null && !request.complemento().isBlank()) {
-            endereco.setComplemento(request.complemento());
-        }
+        Endereco endereco = Endereco.builder()
+                .rua(request.rua())
+                .numero(request.numero())
+                .complemento(request.complemento())
+                .bairro(request.bairro())
+                .cidade(request.cidade())
+                .estado(request.estado())
+                .cep(new CEP(request.cep()))
+                .tipo(request.tipo())
+                .principal(request.principal())
+                .build();
 
         return enderecoRepository.save(endereco);
     }
 
     public Endereco buscarPorId(Long id) {
-        return enderecoRepository.findById(id).orElseThrow(() -> new NotFoundException("Endereço não encontrado com id: " + id));
+        validator.validarId(id);
+        return enderecoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Endereço não encontrado com id: " + id));
     }
 
     public List<Endereco> buscarTodos() {
@@ -37,9 +48,10 @@ public class EnderecoService implements IEnderecoService {
     }
 
     public Endereco atualizar(Long id, CreateEnderecoRequest request) {
-        Endereco endereco = enderecoRepository.findById(id).orElseThrow(() -> new NotFoundException("Endereço não encontrado com id: " + id));
+        validator.validarAtualizacao(id, request);
 
-        EnderecoValidator.validarEndereco(request.rua(), request.numero(), request.bairro(), request.cidade(), request.estado(), request.cep());
+        Endereco endereco = enderecoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Endereço não encontrado com id: " + id));
 
         endereco.setRua(request.rua());
         endereco.setNumero(request.numero());
@@ -48,15 +60,16 @@ public class EnderecoService implements IEnderecoService {
         endereco.setCidade(request.cidade());
         endereco.setEstado(request.estado());
         endereco.setCep(new CEP(request.cep()));
-        endereco.setDataAtualizacao(LocalDateTime.now());
+        endereco.setTipo(request.tipo());
+        endereco.setPrincipal(request.principal());
 
         return enderecoRepository.save(endereco);
     }
 
     public void deletar(Long id) {
-        enderecoRepository.findById(id).orElseThrow(() -> new NotFoundException("Endereço não encontrado com id: " + id));
+        validator.validarId(id);
+        enderecoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Endereço não encontrado com id: " + id));
         enderecoRepository.deleteById(id);
     }
-
-
 }

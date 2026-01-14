@@ -4,8 +4,9 @@ import com.api.erp.v1.features.produto.application.dto.ListaExpandidaResponseDTO
 import com.api.erp.v1.features.produto.domain.controller.IListaExpandidaController;
 import com.api.erp.v1.features.produto.domain.entity.ListaExpandidaPermissions;
 import com.api.erp.v1.features.produto.domain.service.IListaExpandidaService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 public class ListaExpandidaController implements IListaExpandidaController {
 
     @Autowired
+    @Qualifier("listaExpandidaServiceProxy")
     private IListaExpandidaService service;
 
     @GetMapping("/produto/{produtoId}")

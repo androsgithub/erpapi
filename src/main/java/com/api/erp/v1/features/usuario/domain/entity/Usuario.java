@@ -24,10 +24,10 @@ public class Usuario {
     private Long id;
 
     @Column(nullable = false)
-    private Long tenantId;
+    private String tenant_id;
 
     @Column(nullable = false)
-    private String nomeCompleto;
+    private String nome_completo;
 
     @Column(name = "email", nullable = false, unique = true)
     private Email email;
@@ -36,20 +36,23 @@ public class Usuario {
     private CPF cpf;
 
     @Column(nullable = false)
-    private String senhaHash;
+    private String senha_hash;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusUsuario status;
 
-    private Long aprovadoPor;
-    private LocalDateTime dataAprovacao;
+    @Column(name = "aprovado_por")
+    private Long aprovado_por;
+
+    @Column
+    private LocalDateTime data_aprovacao;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
+    private LocalDateTime data_criacao;
 
     @Column(nullable = false)
-    private LocalDateTime dataAtualizacao;
+    private LocalDateTime data_atualizacao;
 
     @OneToMany(
             mappedBy = "usuario",
@@ -76,13 +79,13 @@ public class Usuario {
             return this;
         }
 
-        public Builder tenantId(Long tenantId) {
-            usuario.tenantId = tenantId;
+        public Builder tenantId(String tenantId) {
+            usuario.tenant_id = tenantId;
             return this;
         }
 
         public Builder nomeCompleto(String nome) {
-            usuario.nomeCompleto = nome;
+            usuario.nome_completo = nome;
             return this;
         }
 
@@ -97,7 +100,7 @@ public class Usuario {
         }
 
         public Builder senhaHash(String senhaHash) {
-            usuario.senhaHash = senhaHash;
+            usuario.senha_hash = senhaHash;
             return this;
         }
 
@@ -108,8 +111,8 @@ public class Usuario {
 
         public Usuario build() {
             usuario.status = usuario.status != null ? usuario.status : StatusUsuario.ATIVO;
-            usuario.dataCriacao = LocalDateTime.now();
-            usuario.dataAtualizacao = LocalDateTime.now();
+            usuario.data_criacao = LocalDateTime.now();
+            usuario.data_atualizacao = LocalDateTime.now();
             return usuario;
         }
     }
@@ -124,9 +127,9 @@ public class Usuario {
             throw new IllegalStateException("Usuário não está pendente de aprovação");
         }
         this.status = StatusUsuario.ATIVO;
-        this.aprovadoPor = gestorId;
-        this.dataAprovacao = LocalDateTime.now();
-        this.dataAtualizacao = LocalDateTime.now();
+        this.aprovado_por = gestorId;
+        this.data_aprovacao = LocalDateTime.now();
+        this.data_atualizacao = LocalDateTime.now();
     }
 
     public void rejeitar() {
@@ -134,12 +137,12 @@ public class Usuario {
             throw new IllegalStateException("Usuário não está pendente de aprovação");
         }
         this.status = StatusUsuario.REJEITADO;
-        this.dataAtualizacao = LocalDateTime.now();
+        this.data_atualizacao = LocalDateTime.now();
     }
 
     public void inativar() {
         this.status = StatusUsuario.INATIVO;
-        this.dataAtualizacao = LocalDateTime.now();
+        this.data_atualizacao = LocalDateTime.now();
     }
 
     public boolean isPendente() {

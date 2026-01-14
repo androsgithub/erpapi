@@ -65,19 +65,4 @@ public class ClienteValidatorDefault implements IClienteValidator {
             throw new BusinessException("ID do cliente inválido");
         }
     }
-
-    @Override
-    public TenantCode getTenantCode() {
-        return TenantCode.DEFAULT;
-    }
-
-    @Override
-    public TenantType getTenantType() {
-        return TenantType.DEFAULT;
-    }
-
-    @Override
-    public int getPriority() {
-        return 999; // Menor prioridade (fallback)
-    }
 }

@@ -7,8 +7,9 @@ import com.api.erp.v1.features.produto.domain.exception.ProdutoException;
 import com.api.erp.v1.features.produto.domain.repository.ProdutoRepository;
 import com.api.erp.v1.features.produto.domain.service.IListaExpandidaProducaoService;
 import com.api.erp.v1.features.produto.domain.service.IListaExpandidaService;
-import com.api.erp.v1.features.produto.infrastructure.service.ListaExpandidaProducaoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,23 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Serviço de Aplicação para Lista Expandida de Produção
- * 
- * Responsabilidades:
- * - Orquestrar cálculos de lista expandida
- * - Transformar resultados do domínio em DTOs
- * - Coordenar com serviço de domínio
- * 
- * SRP: Lógica de aplicação para lista expandida
- * DIP: Depende de abstrações (repositório, serviço de domínio)
- */
-@RequiredArgsConstructor
+@Service
 @Transactional(readOnly = true)
 public class ListaExpandidaService implements IListaExpandidaService {
-    
-    private final ProdutoRepository produtoRepository;
-    private final IListaExpandidaProducaoService domainService;
+    @Autowired
+    private ProdutoRepository produtoRepository;
+    @Autowired
+    @Qualifier("listaExpandidaProducaoServiceProxy")
+    private IListaExpandidaProducaoService domainService;
     
     /**
      * Gera a lista expandida de produção para um produto

@@ -12,27 +12,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Serviço de Domínio para cálculo de lista expandida de produção
- * 
- * Responsabilidades:
- * - Calcular composição expandida de produtos fabricáveis
- * - Tratar composições aninhadas
- * - Acumular quantidades corretamente
- * - Evitar duplicidades
- * 
- * SRP: Lógica de domínio para cálculo de BOM expandida
- * DIP: Depende de abstração (repositório)
- * 
- * Exemplo de funcionamento:
- * Produto A
- *   → Produto B (2x)
- *     → Produto C (3x)
- * 
- * Lista Expandida do Produto A:
- *   - Produto C: 6x (2 x 3)
- *   - Produto B: 2x
- */
+@Service
 @RequiredArgsConstructor
 public class ListaExpandidaProducaoService implements IListaExpandidaProducaoService {
     

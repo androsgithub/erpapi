@@ -22,7 +22,7 @@ public class NotificacaoService implements INotificacaoService {
         webSocketService.notificarGestores(
                 new NotificacaoDTO(
                         "Novo usuário pendente",
-                        "Usuário " + usuario.getNomeCompleto() + " aguarda aprovação",
+                        "Usuário " + usuario.getNome_completo() + " aguarda aprovação",
                         "USUARIO_PENDENTE",
                         LocalDateTime.now()
                 )

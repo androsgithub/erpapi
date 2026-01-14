@@ -20,19 +20,28 @@ import com.api.erp.v1.shared.domain.exception.BusinessException;
 import com.api.erp.v1.shared.domain.exception.NotFoundException;
 import com.api.erp.v1.shared.domain.valueobject.CPF;
 import com.api.erp.v1.shared.domain.valueobject.Email;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
+@Service
 public class UsuarioService implements IUsuarioService {
-    private final UsuarioRepository repository;
-    private final IUsuarioValidator validator;
-    private final IPasswordEncoder passwordEncoder;
-    private final PermissaoRepository permissaoRepository;
-    private final RoleRepository roleRepository;
-    private final UsuarioPermissaoRepository usuarioPermissaoRepository;
+    @Autowired
+    private UsuarioRepository repository;
+    @Autowired
+    private IPasswordEncoder passwordEncoder;
+    @Autowired
+    private PermissaoRepository permissaoRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private UsuarioPermissaoRepository usuarioPermissaoRepository;
+    @Autowired
+    @Qualifier("usuarioValidatorProxy")
+    private IUsuarioValidator validator;
 
 
     @Override
@@ -72,7 +81,7 @@ public class UsuarioService implements IUsuarioService {
                     .nomeCompleto(request.getNomeCompleto())
                     .email(usuario.getEmail())
                     .cpf(usuario.getCpf())
-                    .senhaHash(usuario.getSenhaHash())
+                    .senhaHash(usuario.getSenha_hash())
                     .status(usuario.getStatus())
                     .build();
         }

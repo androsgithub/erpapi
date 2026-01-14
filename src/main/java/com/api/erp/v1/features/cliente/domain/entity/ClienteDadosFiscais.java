@@ -17,7 +17,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClienteDadosFiscais {
+    @Column(name = "razao_social")
     private String razaoSocial;
+
+    @Column(name = "nome_fantasia")
     private String nomeFantasia;
 
     @Column(name = "cnpj", length = 14)
@@ -29,15 +32,26 @@ public class ClienteDadosFiscais {
     @Column(name = "rg", length = 9)
     private RG rg;
 
+    @Column(name = "inscricao_estadual")
     private String inscricaoEstadual;
+
+    @Column(name = "inscricao_municipal")
     private String inscricaoMunicipal;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "regime_tributario")
     private RegimeTributario regimeTributario;
 
+    @Column(name = "icms_contribuinte")
     private Boolean icmsContribuinte;
+
+    @Column(name = "aliquota_icms")
     private Double aliquotaIcms;
+
+    @Column(name = "cnae_principal")
     private String cnaePrincipal;
+
+    @Column(name = "consumidor_final")
     private Boolean consumidorFinal;
 }
 

@@ -40,8 +40,8 @@ public interface IUsuarioMapper {
                 uc.getContato().isPrincipal(),
                 uc.getContato().isAtivo(),
                 uc.getContato().getCustomData(),
-                uc.getContato().getDataCriacao(),
-                uc.getContato().getDataAtualizacao()
+                uc.getContato().getCreatedAt().toLocalDateTime(),
+                uc.getContato().getUpdatedAt().toLocalDateTime()
             ))
             .collect(Collectors.toSet());
     }

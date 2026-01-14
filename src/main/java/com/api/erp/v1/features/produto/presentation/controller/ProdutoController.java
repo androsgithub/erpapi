@@ -8,11 +8,12 @@ import com.api.erp.v1.features.produto.domain.entity.Produto;
 import com.api.erp.v1.features.produto.domain.entity.ProdutoPermissions;
 import com.api.erp.v1.features.produto.domain.entity.TipoProduto;
 import com.api.erp.v1.features.produto.domain.service.IProdutoService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/produtos")
 public class ProdutoController implements IProdutoController {
     @Autowired
+    @Qualifier("produtoServiceProxy")
     private IProdutoService service;
     @Autowired
     private IProdutoMapper produtoMapper;

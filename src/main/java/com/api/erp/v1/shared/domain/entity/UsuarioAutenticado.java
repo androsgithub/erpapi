@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class UsuarioAutenticado {
-    private final Long usuarioId;
-    private final Long tenantId;
+    private final String usuarioId;
+    private final String tenantId;
+    private final String tenantSlug;
 }

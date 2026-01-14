@@ -11,16 +11,20 @@ import com.api.erp.v1.features.usuario.domain.entity.Usuario;
 import com.api.erp.v1.features.usuario.domain.service.INotificacaoService;
 import com.api.erp.v1.features.usuario.domain.service.IUsuarioService;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 
 public class GestorAprovacaoServiceDecorator implements IUsuarioService {
     private final IUsuarioService wrapped;
-    private final INotificacaoService notificacaoService;
 
-    public GestorAprovacaoServiceDecorator(IUsuarioService wrapped, INotificacaoService notificacaoService) {
+    @Autowired
+    @Qualifier("notificacaoService")
+    private INotificacaoService notificacaoService;
+
+    public GestorAprovacaoServiceDecorator(IUsuarioService wrapped) {
         this.wrapped = wrapped;
-        this.notificacaoService = notificacaoService;
     }
 
     @Override
@@ -29,7 +33,7 @@ public class GestorAprovacaoServiceDecorator implements IUsuarioService {
         Usuario usuario = wrapped.criar(request);
 
         // ADICIONA comportamento: muda status para pendente
-        usuario.setStatus(StatusUsuario.PENDENTE_APROVACAO);
+
 
         // Notifica gestores para aprovação
         notificacaoService.notificarGestores(usuario);
@@ -87,7 +91,7 @@ public class GestorAprovacaoServiceDecorator implements IUsuarioService {
 
     @Override
     public void removerRole(Long usuarioId, Long roleId) {
-        wrapped.removerRole(usuarioId,roleId);
+        wrapped.removerRole(usuarioId, roleId);
     }
 
     @Override

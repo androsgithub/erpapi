@@ -5,7 +5,9 @@ import com.api.erp.v1.features.cliente.domain.validator.IClienteValidator;
 import com.api.erp.v1.shared.domain.enums.TenantCode;
 import com.api.erp.v1.shared.domain.enums.TenantType;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 
+@Component
 public class NoOpClienteValidator implements IClienteValidator {
     @Override
     public void validarCriacao(CreateClienteDto dto) {
@@ -30,20 +32,5 @@ public class NoOpClienteValidator implements IClienteValidator {
     @Override
     public void validarId(Long id) {
 
-    }
-
-    @Override
-    public TenantCode getTenantCode() {
-        return TenantCode.NOOP;
-    }
-
-    @Override
-    public TenantType getTenantType() {
-        return TenantType.DEFAULT;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
     }
 }

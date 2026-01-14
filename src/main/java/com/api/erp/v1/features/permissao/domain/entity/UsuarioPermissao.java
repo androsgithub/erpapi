@@ -15,25 +15,26 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "usuario_permissao")
+@Table(name = "tb_usuario_permissao")
 public class UsuarioPermissao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
     @JsonIgnore
     private Usuario usuario;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "usuario_permissao_direta",
-            joinColumns = @JoinColumn(name = "usuario_permissao_id"),
-            inverseJoinColumns = @JoinColumn(name = "permissao_id")
-    )
-    private Set<Permissao> permissoesDiretas = new HashSet<>();
+    @Column(name = "data_inicio", nullable = false)
+    private LocalDateTime dataInicio;
+
+    @Column(name = "data_fim")
+    private LocalDateTime dataFim;
+
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -43,7 +44,11 @@ public class UsuarioPermissao {
     )
     private Set<Role> roles = new HashSet<>();
 
-    private LocalDateTime dataInicio;
-
-    private LocalDateTime dataFim;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "usuario_permissao_direta",
+            joinColumns = @JoinColumn(name = "usuario_permissao_id"),
+            inverseJoinColumns = @JoinColumn(name = "permissao_id")
+    )
+    private Set<Permissao> permissoesDiretas = new HashSet<>();
 }

@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  * SRP: Lógica de aplicação para Produto
  * DIP: Depende de abstrações (repositórios, validadores)
  */
+@Service
 @RequiredArgsConstructor
 @Transactional
 public class ProdutoService implements IProdutoService {
@@ -75,7 +76,6 @@ public class ProdutoService implements IProdutoService {
         }
 
         validator.validarCriacao(produtoModificado.getCodigo(), produtoModificado.getDescricao());
-        produto.atualizarDataAtualizacao();
         return repository.save(produto);
     }
 

@@ -12,8 +12,4 @@ public interface IClienteValidator {
     void validarPageable(Pageable pageable);
     void validarDTO(CreateClienteDto clienteDto);
     void validarId(Long id);
-    TenantCode getTenantCode();
-
-    TenantType getTenantType();
-    int getPriority(); // Menor = maior prioridade
 }

@@ -6,7 +6,7 @@ import com.api.erp.v1.features.cliente.application.dto.ClientePreferenciasDto;
 import com.api.erp.v1.features.cliente.domain.entity.ClienteStatus;
 import com.api.erp.v1.features.cliente.domain.entity.TipoCliente;
 import com.api.erp.v1.features.contato.application.dto.response.ContatoResponse;
-import com.api.erp.v1.features.endereco.application.dto.EnderecoResponse;
+import com.api.erp.v1.features.endereco.application.dto.response.EnderecoResponse;
 import com.api.erp.v1.shared.domain.valueobject.CustomData;
 
 import java.time.LocalDateTime;

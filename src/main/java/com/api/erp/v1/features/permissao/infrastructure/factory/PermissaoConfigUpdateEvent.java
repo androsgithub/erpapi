@@ -1,13 +1,13 @@
 package com.api.erp.v1.features.permissao.infrastructure.factory;
 
-import com.api.erp.v1.features.empresa.domain.entity.PermissaoConfig;
+import com.api.erp.v1.features.tenant.domain.entity.PermissaoConfig;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
  * Evento publicado quando a configuração de Permissao é atualizada.
  * 
- * Este evento é publicado pelo EmpresaService.updatePermissaoConfig()
+ * Este evento é publicado pelo TenantService.updatePermissaoConfig()
  * e capturado pelo PermissaoConfigUpdateListener para recarregar os decorators.
  */
 @Getter

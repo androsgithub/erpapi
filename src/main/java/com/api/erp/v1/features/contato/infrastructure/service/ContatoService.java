@@ -8,15 +8,19 @@ import com.api.erp.v1.features.contato.domain.service.IContatoService;
 import com.api.erp.v1.features.contato.domain.validator.ContatoValidator;
 import com.api.erp.v1.shared.domain.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@RequiredArgsConstructor
+@Service
 public class ContatoService implements IContatoService {
 
-    private final ContatoRepository contatoRepository;
+    @Autowired
+    private ContatoRepository contatoRepository;
 
     @Transactional
     public Contato criar(CreateContatoRequest request) {
@@ -89,7 +93,7 @@ public class ContatoService implements IContatoService {
         ContatoValidator.validarDescricao(request.descricao());
 
         // Se está marcando como principal, remover principal dos outros
-        if (request.principal() && !contato.ehPrincipal()) {
+        if (request.principal() && !contato.isPrincipal()) {
             removerPrincipalExistente();
         }
 
@@ -99,7 +103,6 @@ public class ContatoService implements IContatoService {
         contato.setValor(request.valor());
         contato.setDescricao(request.descricao());
         contato.setPrincipal(request.principal());
-        contato.setDataAtualizacao(LocalDateTime.now());
         contato.setCustomData(request.customData());
 
         return contatoRepository.save(contato);
@@ -110,7 +113,7 @@ public class ContatoService implements IContatoService {
         Contato contato = contatoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Contato não encontrado com id: " + id));
 
-        contato.ativar();
+        contato.setAtivo(true);
         return contatoRepository.save(contato);
     }
 
@@ -118,13 +121,11 @@ public class ContatoService implements IContatoService {
     public Contato desativar(Long id) {
         Contato contato = contatoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Contato não encontrado com id: " + id));
-
-        // Se era principal, remover marcação de principal
-        if (contato.ehPrincipal()) {
-            contato.desmarcarComoPrincipal();
+        if (contato.isPrincipal()) {
+            contato.setPrincipal(false);
         }
 
-        contato.desativar();
+        contato.setAtivo(false);
         return contatoRepository.save(contato);
     }
 
@@ -140,7 +141,7 @@ public class ContatoService implements IContatoService {
     private void removerPrincipalExistente() {
         var principal = contatoRepository.findPrincipal();
         if (principal.isPresent()) {
-            principal.get().desmarcarComoPrincipal();
+            principal.get().setPrincipal(false);
             contatoRepository.save(principal.get());
         }
     }

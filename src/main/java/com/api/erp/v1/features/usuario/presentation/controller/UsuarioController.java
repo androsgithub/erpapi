@@ -13,10 +13,11 @@ import com.api.erp.v1.features.usuario.domain.entity.Usuario;
 import com.api.erp.v1.features.usuario.domain.entity.UsuarioPermissions;
 import com.api.erp.v1.features.usuario.domain.service.IUsuarioService;
 import com.api.erp.v1.features.usuario.infrastructure.service.AuthenticationService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import com.api.erp.v1.shared.infrastructure.service.SecurityService;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,7 @@ public class UsuarioController implements IUsuarioController {
     @Autowired
     private IUsuarioPermissoesMapper usuarioPermissoesMapper;
     @Autowired
+    @Qualifier("usuarioServiceProxy")
     private IUsuarioService usuarioService;
     @Autowired
     private SecurityService securityService;
@@ -44,7 +46,7 @@ public class UsuarioController implements IUsuarioController {
 
     @GetMapping("/me")
     public UsuarioPermissoesResponse obterDadosAtualizados() {
-        Long usuarioId = securityService.getAuthUsuarioId();
+        Long usuarioId = Long.valueOf(securityService.getAuthUsuarioId());
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
         return usuarioPermissoesMapper.toResponse(usuario);
     }

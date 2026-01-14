@@ -13,17 +13,22 @@ import com.api.erp.v1.features.contato.domain.service.IGerenciamentoContatoServi
 import com.api.erp.v1.features.usuario.domain.entity.Usuario;
 import com.api.erp.v1.features.usuario.domain.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 
-@RequiredArgsConstructor
+@Service
 public class GerenciamentoContatoService implements IGerenciamentoContatoService {
 
-    private final UsuarioContatoRepository usuarioContatoRepository;
-    private final ContatoRepository contatoRepository;
-    private final UsuarioRepository usuarioRepository;
+    @Autowired
+    private UsuarioContatoRepository usuarioContatoRepository;
+    @Autowired
+    private ContatoRepository contatoRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Override
     @Transactional
@@ -125,9 +130,9 @@ public class GerenciamentoContatoService implements IGerenciamentoContatoService
 
         for (UsuarioContato uc : usuarioContatos) {
             if (uc.getContato().getId().equals(contatoId)) {
-                uc.getContato().marcarComoPrincipal();
+                uc.getContato().setPrincipal(false);
             } else {
-                uc.getContato().desmarcarComoPrincipal();
+                uc.getContato().setPrincipal(true);
             }
             usuarioContatoRepository.save(uc);
         }
@@ -145,7 +150,7 @@ public class GerenciamentoContatoService implements IGerenciamentoContatoService
         Contato contato = contatoRepository.findById(contatoId)
                 .orElseThrow(() -> new IllegalArgumentException("Contato não encontrado"));
 
-        contato.desativar();
+        contato.setAtivo(false);
         return contatoRepository.save(contato);
     }
 
@@ -158,7 +163,7 @@ public class GerenciamentoContatoService implements IGerenciamentoContatoService
         Contato contato = contatoRepository.findById(contatoId)
                 .orElseThrow(() -> new IllegalArgumentException("Contato não encontrado"));
 
-        contato.ativar();
+        contato.setAtivo(false);
         return contatoRepository.save(contato);
     }
 }

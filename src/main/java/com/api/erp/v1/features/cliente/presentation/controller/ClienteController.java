@@ -9,8 +9,9 @@ import com.api.erp.v1.features.cliente.domain.controller.IClienteController;
 import com.api.erp.v1.features.cliente.domain.entity.Cliente;
 import com.api.erp.v1.features.cliente.domain.entity.ClientePermissions;
 import com.api.erp.v1.features.cliente.domain.service.IClienteService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class ClienteController implements IClienteController {
 
     @Autowired
+    @Qualifier("clienteServiceProxy")
     private IClienteService clienteService;
     @Autowired
     private IClienteCompleteMapper clienteCompleteMapper;

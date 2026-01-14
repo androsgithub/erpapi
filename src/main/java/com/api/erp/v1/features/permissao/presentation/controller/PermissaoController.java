@@ -6,7 +6,7 @@ import com.api.erp.v1.features.permissao.application.mapper.PermissaoMapper;
 import com.api.erp.v1.features.permissao.domain.controller.IPermissaoController;
 import com.api.erp.v1.features.permissao.domain.entity.PermissaoPermissions;
 import com.api.erp.v1.features.permissao.domain.service.IGerenciamentoPermissaoService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

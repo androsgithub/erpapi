@@ -3,7 +3,9 @@ package com.api.erp.v1.features.usuario.application.validator;
 import com.api.erp.v1.features.usuario.application.dto.request.CreateUsuarioRequest;
 import com.api.erp.v1.features.usuario.domain.validator.IUsuarioValidator;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BasicUsuarioValidator implements IUsuarioValidator {
     
     @Override

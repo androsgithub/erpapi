@@ -8,7 +8,7 @@ import com.api.erp.v1.features.camposcustom.application.mapper.ICustomFieldDefin
 import com.api.erp.v1.features.camposcustom.domain.entity.CustomFieldDefinition;
 import com.api.erp.v1.features.camposcustom.domain.repository.CustomFieldDefinitionRepository;
 import com.api.erp.v1.features.camposcustom.infrastructure.validator.CustomFieldDefinitionValidator;
-import com.api.erp.v1.features.empresa.infrastructure.service.EmpresaService;
+import com.api.erp.v1.features.tenant.infrastructure.service.TenantService;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
 import com.api.erp.v1.shared.infrastructure.service.SecurityService;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +21,12 @@ import java.util.List;
 public class CustomFieldDefinitionService {
 
     private final CustomFieldDefinitionRepository cfdRepository;
-    private final EmpresaService empresaService;
+    private final TenantService tenantService;
     private final ICustomFieldDefinitionMapper cfdMapper;
     private final CustomFieldDefinitionValidator cfdValidator;
     private final SecurityService securityService;
 
-    public List<CustomFieldDefinition> getFieldsForTable(String tableName) {
-        Long tenantId = empresaService.getDadosEmpresa().getId();
+    public List<CustomFieldDefinition> getFieldsForTable(Long tenantId, String tableName) {
         return cfdRepository.findByTenantIdAndTableNameAndActiveTrueOrderByFieldOrder(
                 tenantId,
                 tableName
@@ -37,9 +36,7 @@ public class CustomFieldDefinitionService {
 
     /* ===================== CREATE ===================== */
 
-    public CustomFieldResponse create(CreateCustomFieldRequest request) {
-        Long tenantId = Long.valueOf(securityService.getAuthTenentId());
-
+    public CustomFieldResponse create(Long tenantId, CreateCustomFieldRequest request) {
         cfdValidator.validateCreate(request, tenantId);
 
         CustomFieldDefinition field = new CustomFieldDefinition();
@@ -62,8 +59,8 @@ public class CustomFieldDefinitionService {
     /* ===================== UPDATE ===================== */
 
     public CustomFieldResponse update(
-            Long fieldId,
             Long tenantId,
+            Long fieldId,
             UpdateCustomFieldRequest request
     ) {
         CustomFieldDefinition field = cfdRepository
@@ -96,8 +93,8 @@ public class CustomFieldDefinitionService {
     /* ===================== ENABLE / DISABLE ===================== */
 
     public CustomFieldResponse changeStatus(
-            Long fieldId,
             Long tenantId,
+            Long fieldId,
             ChangeCustomFieldStatusRequest request
     ) {
         CustomFieldDefinition field = cfdRepository
@@ -115,7 +112,7 @@ public class CustomFieldDefinitionService {
 
     /* ===================== DELETE ===================== */
 
-    public void delete(Long fieldId, Long tenantId) {
+    public void delete(Long tenantId, Long fieldId) {
         CustomFieldDefinition field = cfdRepository
                 .findByIdAndTenantId(fieldId, tenantId)
                 .orElseThrow(() -> new BusinessException("Campo não encontrado"));
@@ -129,9 +126,9 @@ public class CustomFieldDefinitionService {
     /* ===================== QUERY ===================== */
 
     public List<CustomFieldResponse> listByTable(
+            Long tenantId,
             String tableName
     ) {
-        Long tenantId = empresaService.getDadosEmpresa().getId();
         List<CustomFieldDefinition> customFieldDefinitions = cfdRepository
                 .findByTenantIdAndTableNameAndActiveTrueOrderByFieldOrder(
                         tenantId,

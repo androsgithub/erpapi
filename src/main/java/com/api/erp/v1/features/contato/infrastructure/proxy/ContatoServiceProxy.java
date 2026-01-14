@@ -3,86 +3,108 @@ package com.api.erp.v1.features.contato.infrastructure.proxy;
 import com.api.erp.v1.features.contato.application.dto.CreateContatoRequest;
 import com.api.erp.v1.features.contato.domain.entity.Contato;
 import com.api.erp.v1.features.contato.domain.service.IContatoService;
-import lombok.RequiredArgsConstructor;
+import com.api.erp.v1.features.contato.infrastructure.decorator.ContatoServiceApplyDecorate;
+import com.api.erp.v1.features.contato.infrastructure.service.ContatoService;
+import com.api.erp.v1.features.tenant.domain.entity.ContatoConfig;
+import com.api.erp.v1.features.tenant.domain.entity.Tenant;
+import com.api.erp.v1.features.tenant.domain.service.ITenantService;
+import com.api.erp.v1.shared.infrastructure.service.SecurityService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Proxy de ContatoService que delega para ContatoServiceHolder.
- * 
- * Este proxy é injetado como bean primary de IContatoService.
- * Ele sempre delega para o serviço atual no holder, permitindo
- * que o serviço seja trocado dinamicamente sem reiniciar a aplicação.
- * 
- * FUNCIONAMENTO:
- * 1. Componentes injetam ContatoServiceProxy (que é um IContatoService)
- * 2. Proxy chama holder.getService() para obter a instância atual
- * 3. Delega a chamada para o serviço com decorators atualizados
- * 4. Se configurações mudam, holder.updateService() é chamado
- * 5. Próximas chamadas já usam os novos decorators
- * 
- * THREAD-SAFE: Sim, o holder gerencia a sincronização
- * 
- * TRANSAÇÕES: Seguro, pois obtém o serviço antes da transação
- * iniciar e o mantém durante toda operação
- */
-@RequiredArgsConstructor
+@Service
+@Slf4j
 public class ContatoServiceProxy implements IContatoService {
+    @Autowired
+    private ApplicationContext applicationContext;
+    @Autowired
+    private ContatoService contatoServiceDefault;
+    @Autowired
+    private SecurityService securityService;
+    @Autowired
+    private ITenantService tenantService;
 
-    private final ContatoServiceHolder holder;
+    private IContatoService resolverService() {
+        IContatoService response = contatoServiceDefault;
+        ContatoConfig contatoConfig = new ContatoConfig();
+        try {
+            String strTenantId = securityService.getAuthTenantId();
+            Long tenantId = Long.valueOf(strTenantId);
+            Tenant tenant = tenantService.getDadosTenant(tenantId);
+            String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
+            String beanName = "contatoService_" + tenantType;
+
+            contatoConfig = tenant.getConfig().getContatoConfig();
+
+            try {
+                IContatoService service = applicationContext.getBean(beanName, IContatoService.class);
+                log.debug("[CLIENTE SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
+                response = service;
+            } catch (Exception e) {
+                log.debug("[CLIENTE SERVICE] Service {} não encontrado, usando padrão", beanName);
+            }
+        } catch (Exception e) {
+            log.debug("[CLIENTE SERVICE] Erro ao resolver tenant, usando padrão: {}", e.getMessage());
+        }
+        return ContatoServiceApplyDecorate.aplicarDecorators(response, contatoConfig);
+    }
 
     @Override
     public Contato criar(CreateContatoRequest request) {
-        return holder.getService().criar(request);
+        return resolverService().criar(request);
     }
 
     @Override
     public Contato buscarPorId(Long id) {
-        return holder.getService().buscarPorId(id);
+        return resolverService().buscarPorId(id);
     }
 
     @Override
     public List<Contato> buscarTodos() {
-        return holder.getService().buscarTodos();
+        return resolverService().buscarTodos();
     }
 
     @Override
     public List<Contato> buscarAtivos() {
-        return holder.getService().buscarAtivos();
+        return resolverService().buscarAtivos();
     }
 
     @Override
     public List<Contato> buscarInativos() {
-        return holder.getService().buscarInativos();
+        return resolverService().buscarInativos();
     }
 
     @Override
     public List<Contato> buscarPorTipo(String tipo) {
-        return holder.getService().buscarPorTipo(tipo);
+        return resolverService().buscarPorTipo(tipo);
     }
 
     @Override
     public Contato buscarPrincipal() {
-        return holder.getService().buscarPrincipal();
+        return resolverService().buscarPrincipal();
     }
 
     @Override
     public Contato atualizar(Long id, CreateContatoRequest request) {
-        return holder.getService().atualizar(id, request);
+        return resolverService().atualizar(id, request);
     }
 
     @Override
     public Contato ativar(Long id) {
-        return holder.getService().ativar(id);
+        return resolverService().ativar(id);
     }
 
     @Override
     public Contato desativar(Long id) {
-        return holder.getService().desativar(id);
+        return resolverService().desativar(id);
     }
 
     @Override
     public void deletar(Long id) {
-        holder.getService().deletar(id);
+        resolverService().deletar(id);
     }
 }

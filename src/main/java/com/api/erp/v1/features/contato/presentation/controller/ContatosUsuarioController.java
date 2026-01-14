@@ -10,7 +10,7 @@ import com.api.erp.v1.features.contato.application.mapper.UsuarioContatoMapper;
 import com.api.erp.v1.features.contato.domain.controller.IContatosUsuarioController;
 import com.api.erp.v1.features.contato.domain.entity.ContatoPermissions;
 import com.api.erp.v1.features.contato.domain.service.IGerenciamentoContatoService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

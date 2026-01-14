@@ -1,10 +1,13 @@
 package com.api.erp.v1.features.produto.domain.entity;
 
 import com.api.erp.v1.features.unidademedida.domain.entity.UnidadeMedida;
+import com.api.erp.v1.shared.domain.entity.BaseEntity;
 import com.api.erp.v1.shared.domain.valueobject.CustomData;
 import com.api.erp.v1.shared.infrastructure.persistence.converters.CustomDataAttributeConverter;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -26,18 +29,15 @@ import java.time.LocalDateTime;
  * SRP: Representar e gerenciar o estado de um produto
  */
 @Entity
-@Table(name = "produto")
+@Table(name = "tb_produto")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Produto {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+@SQLDelete(sql = "UPDATE tb_produto SET deleted = true, deleted_at = now() WHERE id = ?")
+public class Produto extends BaseEntity {
+
     @Column(nullable = false, unique = true, length = 50)
     private String codigo;
     
@@ -74,80 +74,31 @@ public class Produto {
     @Column(columnDefinition = "TEXT")
     private String descricaoDetalhada;
 
-    @Convert(converter = CustomDataAttributeConverter.class)
-    @Column(columnDefinition = "json")
-    private CustomData customData;
-    
-    @Column(nullable = false)
-    @Builder.Default
-    private LocalDateTime dataCriacao = LocalDateTime.now();
-    
-    @Column(nullable = false)
-    @Builder.Default
-    private LocalDateTime dataAtualizacao = LocalDateTime.now();
-    
-    /**
-     * Ativa o produto
-     */
     public void ativar() {
         this.status = StatusProduto.ATIVO;
-        atualizarDataAtualizacao();
     }
-    
-    /**
-     * Desativa o produto
-     */
+
     public void desativar() {
         this.status = StatusProduto.INATIVO;
-        atualizarDataAtualizacao();
     }
-    
-    /**
-     * Bloqueia o produto para uso
-     */
+
     public void bloquear() {
         this.status = StatusProduto.BLOQUEADO;
-        atualizarDataAtualizacao();
     }
-    
-    /**
-     * Descontinua o produto
-     */
+
     public void descontinuar() {
         this.status = StatusProduto.DESCONTINUADO;
-        atualizarDataAtualizacao();
     }
-    
-    /**
-     * Verifica se o produto pode ser utilizado
-     */
+
     public boolean podeSerUtilizado() {
         return this.status.podeSerUtilizado();
     }
-    
-    /**
-     * Verifica se é um produto fabricável
-     */
+
     public boolean ehFabricavel() {
         return this.tipo == TipoProduto.FABRICAVEL;
     }
-    
-    /**
-     * Verifica se é um produto comprado
-     */
+
     public boolean ehComprado() {
         return this.tipo == TipoProduto.COMPRADO;
-    }
-    
-    /**
-     * Atualiza a data de atualização
-     */
-    public void atualizarDataAtualizacao() {
-        this.dataAtualizacao = LocalDateTime.now();
-    }
-    
-    @PreUpdate
-    protected void onUpdate() {
-        dataAtualizacao = LocalDateTime.now();
     }
 }

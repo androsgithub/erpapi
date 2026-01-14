@@ -6,21 +6,12 @@ import com.api.erp.v1.features.permissao.infrastructure.cache.PermissaoCacheMana
 import com.api.erp.v1.features.permissao.infrastructure.factory.PermissaoServiceFactory;
 import com.api.erp.v1.features.permissao.infrastructure.factory.PermissaoServiceHolder;
 import com.api.erp.v1.features.permissao.infrastructure.factory.PermissaoServiceProxy;
-import com.api.erp.v1.features.empresa.domain.service.IEmpresaService;
+import com.api.erp.v1.features.tenant.domain.service.ITenantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-/**
- * Configuração centralizada para o serviço de Permissão.
- * 
- * Responsável por:
- * - Criar Factory com dependências corretas
- * - Inicializar Holder com serviço base
- * - Registrar Proxy como bean principal (@Primary)
- * - Configurar listener de eventos de atualização
- */
 @Slf4j
 @Configuration
 public class PermissaoServiceConfiguration {
@@ -29,9 +20,9 @@ public class PermissaoServiceConfiguration {
     public PermissaoServiceFactory permissaoServiceFactory(
             UsuarioPermissaoRepository usuarioPermissaoRepository,
             PermissaoCacheManager cacheManager,
-            IEmpresaService empresaService) {
+            ITenantService tenantService) {
         log.info("[PERMISSAO CONFIG] Criando PermissaoServiceFactory");
-        return new PermissaoServiceFactory(usuarioPermissaoRepository, cacheManager, empresaService);
+        return new PermissaoServiceFactory(usuarioPermissaoRepository, cacheManager, tenantService);
     }
 
     @Bean

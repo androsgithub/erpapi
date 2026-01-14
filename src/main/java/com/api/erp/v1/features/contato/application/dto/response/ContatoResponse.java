@@ -11,8 +11,8 @@ public record ContatoResponse(
         String descricao,
         boolean principal,
         boolean ativo,
-        CustomData customData,
-        LocalDateTime dataCriacao,
-        LocalDateTime dataAtualizacao
+        CustomData custom_data,
+        LocalDateTime create_At,
+        LocalDateTime updated_at
 ) {
 }

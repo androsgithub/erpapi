@@ -1,6 +1,6 @@
 package com.api.erp.v1.features.endereco.domain.service;
 
-import com.api.erp.v1.features.endereco.application.dto.CreateEnderecoRequest;
+import com.api.erp.v1.features.endereco.application.dto.request.CreateEnderecoRequest;
 import com.api.erp.v1.features.endereco.domain.entity.Endereco;
 
 import java.util.List;
@@ -15,5 +15,5 @@ public interface IEnderecoService {
 
     public Endereco atualizar(Long id, CreateEnderecoRequest request);
 
-    public void deletar(Long id) ;
+    public void deletar(Long id);
 }

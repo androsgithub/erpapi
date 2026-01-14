@@ -5,7 +5,7 @@ import com.api.erp.v1.features.produto.application.dto.ComposicaoResponseDTO;
 import com.api.erp.v1.features.produto.domain.controller.IComposicaoController;
 import com.api.erp.v1.features.produto.domain.entity.ComposicaoPermissions;
 import com.api.erp.v1.features.produto.infrastructure.service.ComposicaoService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

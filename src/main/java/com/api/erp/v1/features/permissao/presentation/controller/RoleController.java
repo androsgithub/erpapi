@@ -8,7 +8,7 @@ import com.api.erp.v1.features.permissao.domain.controller.IRoleController;
 import com.api.erp.v1.features.permissao.domain.entity.Role;
 import com.api.erp.v1.features.permissao.domain.entity.RolePermissions;
 import com.api.erp.v1.features.permissao.domain.service.IGerenciamentoPermissaoService;
-import com.api.erp.v1.shared.infrastructure.security.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

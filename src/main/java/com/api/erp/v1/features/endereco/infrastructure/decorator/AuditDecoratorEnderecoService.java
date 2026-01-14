@@ -1,6 +1,6 @@
 package com.api.erp.v1.features.endereco.infrastructure.decorator;
 
-import com.api.erp.v1.features.endereco.application.dto.CreateEnderecoRequest;
+import com.api.erp.v1.features.endereco.application.dto.request.CreateEnderecoRequest;
 import com.api.erp.v1.features.endereco.domain.entity.Endereco;
 import com.api.erp.v1.features.endereco.domain.service.IEnderecoService;
 import lombok.RequiredArgsConstructor;
