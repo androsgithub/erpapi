@@ -104,20 +104,6 @@ CREATE TABLE
     );
 
 -- ==================================================================================
--- Tabela: tb_usuario
--- ==================================================================================
-CREATE TABLE
-    IF NOT EXISTS tb_usuario (
-        id BIGINT PRIMARY KEY AUTO_INCREMENT,
-        tenant_id BIGINT NOT NULL,
-        nome VARCHAR(255) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        status VARCHAR(50) NOT NULL DEFAULT 'ATIVO',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-
--- ==================================================================================
 -- Tabela: tb_produto
 -- ==================================================================================
 CREATE TABLE
@@ -206,7 +192,5 @@ CREATE INDEX idx_unidade_tenant ON tb_unidade_medida (tenant_id);
 CREATE INDEX idx_role_tenant ON tb_role (tenant_id);
 
 CREATE INDEX idx_permissao_tenant ON tb_permissao (tenant_id);
-
-CREATE INDEX idx_usuario_tenant ON tb_usuario (tenant_id);
 
 CREATE INDEX idx_produto_tenant ON tb_produto (tenant_id);

@@ -57,25 +57,35 @@ CREATE TABLE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- ==================================================================================
--- Tabela: usuarios (atualizada de tb_usuario)
+-- Tabela: tb_usuario
 -- ==================================================================================
-CREATE TABLE
-    IF NOT EXISTS usuarios (
-        id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        tenant_id VARCHAR(255) NOT NULL,
-        nome_completo VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        cpf VARCHAR(11),
-        senha_hash VARCHAR(255),
-        status VARCHAR(50) NOT NULL DEFAULT 'ATIVO',
-        aprovado_por BIGINT,
-        data_aprovacao DATETIME,
-        data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        data_atualizacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_email (email),
-        INDEX idx_cpf (cpf),
-        INDEX idx_tenant_id (tenant_id)
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS tb_usuario (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    tenant_id BIGINT NOT NULL,
+    nome_completo VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    cpf VARCHAR(11),
+    senha_hash VARCHAR(255),
+    status VARCHAR(50) NOT NULL DEFAULT 'ATIVO',
+    aprovado_por BIGINT,
+    approved_at DATETIME,
+    custom_data JSON,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at DATETIME,
+    version BIGINT DEFAULT 0,
+    UNIQUE KEY uk_email_tenant (email, tenant_id),
+    INDEX idx_email (email),
+    INDEX idx_cpf (cpf),
+    INDEX idx_tenant_id (tenant_id),
+    INDEX idx_deleted (deleted),
+    INDEX idx_status (status)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+CREATE INDEX idx_usuario_tenant_status ON tb_usuario (tenant_id, status);
+CREATE INDEX idx_usuario_tenant_deleted ON tb_usuario (tenant_id, deleted);
 
 -- ==================================================================================
 -- Tabela: tb_usuario_permissao
@@ -87,7 +97,7 @@ CREATE TABLE
         data_inicio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         data_fim DATETIME,
         ativo BOOLEAN NOT NULL DEFAULT TRUE,
-        CONSTRAINT fk_usuario_permissao_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE,
+        CONSTRAINT fk_usuario_permissao_usuario FOREIGN KEY (usuario_id) REFERENCES tb_usuario (id) ON DELETE CASCADE,
         INDEX idx_usuario_permissao_usuario (usuario_id),
         INDEX idx_usuario_permissao_ativo (ativo)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
@@ -148,10 +158,10 @@ CREATE TABLE
 -- Tabela: usuario_contato
 -- ==================================================================================
 CREATE TABLE
-    IF NOT EXISTS usuario_contato (
+    IF NOT EXISTS tb_usuario_contato (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
         usuario_id BIGINT NOT NULL,
         contato_id BIGINT NOT NULL,
-        PRIMARY KEY (usuario_id, contato_id),
-        CONSTRAINT fk_usuario_contato_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE,
+        CONSTRAINT fk_usuario_contato_usuario FOREIGN KEY (usuario_id) REFERENCES tb_usuario (id) ON DELETE CASCADE,
         CONSTRAINT fk_usuario_contato_contato FOREIGN KEY (contato_id) REFERENCES tb_contatos (id) ON DELETE CASCADE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

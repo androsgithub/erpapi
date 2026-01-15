@@ -19,27 +19,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import javax.sql.DataSource;
 import java.util.Map;
 
-/**
- * TenantsConfiguration
- * 
- * Configuração de Multi-Tenancy com suporte a:
- * 1. DATABASE per TENANT: cada tenant tem seu próprio banco de dados
- * 2. ROW-based discrimination: tenantId discrimina dados dentro do banco
- * 
- * Estratégia (DATABASE-per-TENANT puro):
- * - MultiTenantRoutingDataSource roteia para o banco correto baseado em tenantSlug
- * - Cada tenant tem seu próprio datasource configurado na tabela tenant_datasource
- * - Sem necessidade de SCHEMA multitenancy do Hibernate
- */
 @Configuration
 public class TenantsConfiguration {
-    /**
-     * DataSource padrão (Master Database) para Flyway e operações no banco master.
-     * Este DataSource NÃO é @Primary, apenas usado explicitamente pelo Flyway.
-     * 
-     * @param environment Environment para ler propriedades
-     * @return DataSource padrão do aplicação
-     */
     @Bean(name = "defaultDataSource")
     public DataSource defaultDataSource(Environment environment) {
         HikariConfig config = new HikariConfig();
@@ -55,20 +36,13 @@ public class TenantsConfiguration {
         return new HikariDataSource(config);
     }
 
-    /**
-     * MultiTenantRoutingDataSource - roteia para o banco correto de cada tenant
-     * 
-     * Este é o datasource principal que substitui o datasource padrão do Spring.
-     * Ele roteia conexões para o banco correto baseado no TenantContext.
-     * 
-     * @Lazy previne ciclo: entityManagerFactory -> multiTenant -> dataSourceFactory -> 
-     *                       tenantDatasourceRepository -> entityManagerFactory
-     */
     @Bean
     @Primary
     @Lazy
-    public MultiTenantRoutingDataSource multiTenantRoutingDataSource(DataSourceFactory dataSourceFactory) {
-        return new MultiTenantRoutingDataSource(dataSourceFactory);
+    public MultiTenantRoutingDataSource multiTenantRoutingDataSource(
+            DataSourceFactory dataSourceFactory,
+            @Qualifier("defaultDataSource") DataSource defaultDataSource) {
+        return new MultiTenantRoutingDataSource(dataSourceFactory, defaultDataSource);
     }
 
     @Bean
@@ -78,10 +52,10 @@ public class TenantsConfiguration {
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(
-            @Qualifier("defaultDataSource") DataSource defaultDataSource) {
+            MultiTenantRoutingDataSource multiTenantRoutingDataSource) {
         final var entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
-        // Usa defaultDataSource para inicialização, evitando lazy loading issues
-        entityManagerFactoryBean.setDataSource(defaultDataSource);
+        // Usa MultiTenantRoutingDataSource para rotear requisições dinamicamente por tenant
+        entityManagerFactoryBean.setDataSource(multiTenantRoutingDataSource);
         entityManagerFactoryBean.setPackagesToScan(
                 ApplicationContext.class.getPackageName(),
                 "com.api.erp.v1.features.tenant.domain.entity",

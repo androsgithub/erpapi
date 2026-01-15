@@ -1,11 +1,5 @@
-package com.api.erp.v1.shared.exception;
+package com.api.erp.v1.shared.infrastructure.exception;
 
-/**
- * Exceção lançada quando um tenant tenta acessar dados
- * mas seu datasource não está configurado.
- * 
- * Garante que cada tenant só acesse seu próprio banco de dados.
- */
 public class DataSourceNotConfiguredException extends RuntimeException {
     
     public DataSourceNotConfiguredException(Long tenantId) {

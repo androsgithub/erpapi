@@ -38,6 +38,13 @@ public class UsuarioServiceProxy implements IUsuarioService {
         UsuarioConfig usuarioConfig = new UsuarioConfig();
 
         String strTenantId = securityService.getAuthTenantId();
+        
+        // Se não tem autenticação, usa serviço padrão
+        if (strTenantId == null || strTenantId.isEmpty()) {
+            log.debug("[SERVICE] Sem autenticação, usando serviço padrão");
+            return usuarioServiceDefault;
+        }
+        
         Long tenantId = Long.valueOf(strTenantId);
         Tenant tenant = tenantService.getDadosTenant(tenantId);
         String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();

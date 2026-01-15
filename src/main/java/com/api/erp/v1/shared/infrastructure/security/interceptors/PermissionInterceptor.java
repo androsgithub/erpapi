@@ -1,7 +1,7 @@
 package com.api.erp.v1.shared.infrastructure.security.interceptors;
 
-import com.api.erp.v1.shared.infrastructure.security.PermissionEvaluator;
 import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
+import com.api.erp.v1.shared.infrastructure.security.util.PermissionEvaluator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

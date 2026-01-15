@@ -2,8 +2,8 @@ package com.api.erp.v1.features.usuario.infrastructure.service;
 
 import com.api.erp.v1.features.usuario.domain.entity.Usuario;
 import com.api.erp.v1.features.usuario.domain.service.INotificacaoService;
-import com.api.erp.v1.shared.websocket.WebSocketNotificacaoService;
-import com.api.erp.v1.shared.websocket.dto.NotificacaoDTO;
+import com.api.erp.v1.shared.infrastructure.messaging.WebSocketNotificacaoService;
+import com.api.erp.v1.shared.infrastructure.messaging.dto.NotificacaoDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

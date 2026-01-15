@@ -250,10 +250,8 @@ public class TenantService implements ITenantService {
         // Configurar TenantConfig com o tipo de tenant
         InternalTenantConfig tenantConfig = new InternalTenantConfig();
         tenantConfig.setTenantType(request.tenantType());
-        tenantConfig.setTenantSlug(request.tenantSlug());
         tenantConfig.setTenantSubdomain(request.tenantSubdomain() != null ? request.tenantSubdomain() : request.tenantType().getCode());
         tenantConfig.setTenantFeaturesEnabled(true);
-        tenantConfig.setTenantSlug(request.tenantSlug());
         empresaConfig.setInternalTenantConfig(tenantConfig);
 
         // Adicionar outras configurações padrão

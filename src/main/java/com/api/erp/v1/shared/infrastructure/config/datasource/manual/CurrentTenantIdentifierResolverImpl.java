@@ -10,9 +10,9 @@ public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentif
 
     @Override
     public String resolveCurrentTenantIdentifier() {
-        String tenantSlug = TenantContext.getTenantSlug();
-        if (!StringUtils.isEmpty(tenantSlug)) {
-            return tenantSlug;
+        Long tenantId = TenantContext.getTenantId();
+        if (tenantId != null) {
+            return String.valueOf(tenantId);
         } else {
             return "BOOTSTRAP";
         }

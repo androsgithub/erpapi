@@ -12,7 +12,8 @@ INSERT IGNORE INTO tb_tenant (
     dados_fiscais_cnpj,
     dados_fiscais_razao_social,
     dados_fiscais_nome_fantasia,
-    dados_fiscais_regime_tributario
+    dados_fiscais_regime_tributario,
+    tenant_slug
 )
 VALUES
     (
@@ -24,7 +25,8 @@ VALUES
         '81901548000104',
         'HECE Distribuidora LTDA',
         'HECE',
-        'LUCRO_PRESUMIDO'
+        'LUCRO_PRESUMIDO',
+        'ERPAPI_HECE'
     );
 
 -- Tenant 2: Tech Solutions
@@ -37,7 +39,8 @@ INSERT IGNORE INTO tb_tenant (
     dados_fiscais_cnpj,
     dados_fiscais_razao_social,
     dados_fiscais_nome_fantasia,
-    dados_fiscais_regime_tributario
+    dados_fiscais_regime_tributario,
+    tenant_slug
 )
 VALUES
     (
@@ -49,7 +52,8 @@ VALUES
         '17380471000175',
         'Tech Solutions Brazil LTDA',
         'Tech Solutions',
-        'SIMPLES_NACIONAL'
+        'SIMPLES_NACIONAL',
+        'ERPAPI_SHARED'
     );
 
 -- Tenant 3: Logística Global
@@ -62,7 +66,8 @@ INSERT IGNORE INTO tb_tenant (
     dados_fiscais_cnpj,
     dados_fiscais_razao_social,
     dados_fiscais_nome_fantasia,
-    dados_fiscais_regime_tributario
+    dados_fiscais_regime_tributario,
+    tenant_slug
 )
 VALUES
     (
@@ -74,7 +79,8 @@ VALUES
         '80297991000155',
         'Logística Global Express LTDA',
         'Logística Global',
-        'LUCRO_PRESUMIDO'
+        'LUCRO_PRESUMIDO',
+        'ERPAPI_SHARED'
     );
 
 -- Tenant 4: Varejo Express
@@ -87,7 +93,8 @@ INSERT IGNORE INTO tb_tenant (
     dados_fiscais_cnpj,
     dados_fiscais_razao_social,
     dados_fiscais_nome_fantasia,
-    dados_fiscais_regime_tributario
+    dados_fiscais_regime_tributario,
+    tenant_slug
 )
 VALUES
     (
@@ -99,5 +106,6 @@ VALUES
         '58071930000116',
         'Varejo Express Distribution LTDA',
         'Varejo Express',
-        'SIMPLES_NACIONAL'
+        'SIMPLES_NACIONAL',
+        'ERPAPI_SHARED'
     );

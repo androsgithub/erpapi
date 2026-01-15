@@ -3,9 +3,6 @@ package com.api.erp.v1.features.tenant.application.dto;
 import com.api.erp.v1.shared.domain.enums.ContribuinteICMS;
 import com.api.erp.v1.shared.domain.enums.RegimeTributario;
 import com.api.erp.v1.shared.domain.enums.TenantType;
-import com.api.erp.v1.shared.domain.valueobject.CNPJ;
-import com.api.erp.v1.shared.domain.valueobject.Email;
-import com.api.erp.v1.shared.domain.valueobject.Telefone;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -54,14 +51,6 @@ public record CriarTenantRequest(
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
         TenantType tenantType,
-
-        @Schema(
-                description = "Slug único do tenant",
-                example = "hece-distribuidora",
-                requiredMode = Schema.RequiredMode.REQUIRED
-        )
-        String tenantSlug,
-
         @Schema(
                 description = "Subdomínio do tenant",
                 example = "hece",

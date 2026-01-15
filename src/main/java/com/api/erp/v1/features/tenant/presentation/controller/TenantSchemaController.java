@@ -5,7 +5,7 @@ import com.api.erp.v1.features.tenant.application.dto.TenantDatasourceRequest;
 import com.api.erp.v1.features.tenant.application.dto.TenantDatasourceResponse;
 import com.api.erp.v1.features.tenant.domain.controller.ITenantDatabaseController;
 import com.api.erp.v1.features.tenant.domain.entity.TenantPermissions;
-import com.api.erp.v1.features.tenant.domain.service.ITenantSchemaService;
+import com.api.erp.v1.features.tenant.domain.service.ITenantDatasourceService;
 import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/tenant/database")
 public class TenantSchemaController implements ITenantDatabaseController {
     @Autowired
-    private ITenantSchemaService tenantDataSourceService;
+    private ITenantDatasourceService tenantDataSourceService;
 
     @PostMapping("/{tenantSlug}/datasource")
     @RequiresPermission(TenantPermissions.ATUALIZAR)

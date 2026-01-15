@@ -8,5 +8,4 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioAutenticado {
     private final String usuarioId;
     private final String tenantId;
-    private final String tenantSlug;
 }

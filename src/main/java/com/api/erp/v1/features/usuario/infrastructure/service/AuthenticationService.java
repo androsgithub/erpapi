@@ -8,7 +8,7 @@ import com.api.erp.v1.features.usuario.domain.service.IPasswordEncoder;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
 import com.api.erp.v1.shared.domain.valueobject.Email;
 import com.api.erp.v1.shared.infrastructure.config.datasource.TenantContext;
-import com.api.erp.v1.shared.infrastructure.security.JwtTokenProvider;
+import com.api.erp.v1.shared.infrastructure.security.jwt.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class AuthenticationService {
     }
 
     public TokenResponse login(LoginRequest request) {
-        log.info("Tenant: {}/{}; Tentativa de login para email: {}", TenantContext.getTenantId(), TenantContext.getTenantSlug(), request.login());
+        log.info("Tenant id: {}; Tentativa de login para email: {}", TenantContext.getTenantId(), request.login());
 
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(new Email(request.login()));
 
@@ -49,7 +49,7 @@ public class AuthenticationService {
             throw new BusinessException("Email ou senha inválidos");
         }
 
-        String token = jwtTokenProvider.generateToken(usuario.getEmail().getValor(), usuario.getId().toString(), TenantContext.getTenantId(), TenantContext.getTenantSlug());
+        String token = jwtTokenProvider.generateToken(usuario.getEmail().getValor(), usuario.getId().toString(), TenantContext.getTenantId());
 
         log.info("Login bem-sucedido para usuário: {}", request.login());
 

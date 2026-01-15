@@ -13,73 +13,102 @@ import java.util.Map;
 /**
  * MultiTenantRoutingDataSource
  * 
- * DataSource que roteia conexões para o banco correto baseado no tenantSlug.
+ * DataSource que roteia conexões para o banco correto baseado no tenantId.
  * 
  * Fluxo:
- * 1. Requisição chega com tenantSlug no header ou JWT
- * 2. TenantContext.setTenantSlug(slug)
- * 3. MultiTenantRoutingDataSource obtém tenantSlug do contexto
+ * 1. Requisição chega com tenantId no header ou JWT
+ * 2. TenantContext.setTenantId(id)
+ * 3. MultiTenantRoutingDataSource obtém tenantId do contexto
  * 4. Busca datasource correspondente no cache
  * 5. Retorna conexão para o banco do tenant
  */
 @Slf4j
 public class MultiTenantRoutingDataSource extends AbstractDataSource {
 
-    private final Map<String, DataSource> dataSources = new HashMap<>();
+    private final Map<Long, DataSource> dataSources = new HashMap<>();
     private final DataSourceFactory dataSourceFactory;
+    private final DataSource defaultDataSource;
 
-    public MultiTenantRoutingDataSource(DataSourceFactory dataSourceFactory) {
+    public MultiTenantRoutingDataSource(DataSourceFactory dataSourceFactory, DataSource defaultDataSource) {
         this.dataSourceFactory = dataSourceFactory;
+        this.defaultDataSource = defaultDataSource;
     }
 
     /**
      * Registra um novo datasource no cache
      */
+    public void addDataSource(Long tenantId, DataSource dataSource) {
+        log.info("Registrando datasource para tenant: {}", tenantId);
+        dataSources.put(tenantId, dataSource);
+    }
+
+    /**
+     * Registra um novo datasource no cache usando slug (converte para Long se necessário)
+     */
     public void addDataSource(String tenantSlug, DataSource dataSource) {
-        log.info("Registrando datasource para tenant: {}", tenantSlug);
-        dataSources.put(tenantSlug, dataSource);
+        log.info("Registrando datasource para tenant slug: {}", tenantSlug);
+        // Tenta usar o slug como Long se possível
+        try {
+            Long tenantId = Long.parseLong(tenantSlug);
+            dataSources.put(tenantId, dataSource);
+        } catch (NumberFormatException e) {
+            // Se não for um número, você pode querer armazenar de forma diferente
+            // Por enquanto, vamos apenas registrar um aviso
+            log.warn("Tenant slug não é numérico: {}. Não foi armazenado no cache de datasources.", tenantSlug);
+        }
     }
 
     /**
      * Remove datasource do cache (ex: quando tenant é deletado)
      */
-    public void removeDataSource(String tenantSlug) {
-        log.info("Removendo datasource para tenant: {}", tenantSlug);
-        dataSources.remove(tenantSlug);
+    public void removeDataSource(Long tenantId) {
+        log.info("Removendo datasource para tenant: {}", tenantId);
+        dataSources.remove(tenantId);
     }
 
     /**
      * Obtém conexão para o banco do tenant
+     * 
+     * Se TenantContext estiver vazio (inicialização da app), usa defaultDataSource (master)
      */
     @Override
     public Connection getConnection() throws SQLException {
-        String tenantSlug = TenantContext.getTenantSlug();
+        Long tenantId = TenantContext.getTenantId();
+        log.info("🔌 [MultiTenantRoutingDataSource.getConnection] Tentando obter conexão. TenantContext.tenantId = {}", tenantId);
         
-        if (tenantSlug == null || tenantSlug.isEmpty()) {
-            log.error("❌ TenantSlug não definido no TenantContext!");
-            throw new SQLException("TenantSlug não definido no contexto");
+        // Fallback para defaultDataSource quando TenantContext está vazio
+        // Isso acontece durante a inicialização da aplicação (startup/migrations)
+        if (tenantId == null) {
+            log.warn("⚠️ [MultiTenantRoutingDataSource] TenantId NÃO DEFINIDO em TenantContext! Usando defaultDataSource (banco MASTER) como fallback");
+            return defaultDataSource.getConnection();
         }
 
-        log.debug("🔍 Buscando DataSource em cache para tenant slug: '{}'", tenantSlug);
-        DataSource dataSource = dataSources.get(tenantSlug);
+        log.debug("🔍 [MultiTenantRoutingDataSource] Buscando DataSource em cache para tenant ID: '{}'", tenantId);
+        DataSource dataSource = dataSources.get(tenantId);
         
         if (dataSource == null) {
-            log.info("📊 DataSource NÃO está em cache para slug '{}'. Tentando criar/obter do banco de dados...", tenantSlug);
-            dataSource = dataSourceFactory.createDataSource(tenantSlug);
+            log.info("📊 [MultiTenantRoutingDataSource] DataSource NÃO está em cache para tenant '{}'. Criando novo...", tenantId);
+            dataSource = dataSourceFactory.createDataSource(tenantId);
             
             if (dataSource == null) {
-                log.error("❌ ERRO: DataSource não pode ser criado para tenant slug: '{}' - Verifique se existe registro em tenant_datasource!", tenantSlug);
-                throw new SQLException("Banco de dados não configurado para tenant: " + tenantSlug);
+                log.error("❌ [MultiTenantRoutingDataSource] ERRO CRÍTICO: DataSource não pode ser criado para tenant ID: '{}'\n" +
+                        "   VERIFIQUE:\n" +
+                        "   1) SELECT COUNT(*) FROM tenant_datasource WHERE tenant_id = {} AND is_active = true\n" +
+                        "   2) Existe tenant com ID='{}' em tb_tenant?\n" +
+                        "   3) Existe linha em tenant_datasource apontando para esse tenant?\n" +
+                        "   4) is_active=true?",
+                        tenantId, tenantId, tenantId);
+                throw new SQLException("Banco de dados não configurado para tenant: " + tenantId);
             }
             
             // Cache do datasource para próximas requisições
-            log.info("✅ Datasource criado e armazenado em cache para tenant: '{}'", tenantSlug);
-            addDataSource(tenantSlug, dataSource);
+            log.info("✅ [MultiTenantRoutingDataSource] DataSource criado e cacheado para tenant: '{}'", tenantId);
+            addDataSource(tenantId, dataSource);
         } else {
-            log.debug("✅ DataSource já estava em cache para slug: '{}'", tenantSlug);
+            log.debug("✅ [MultiTenantRoutingDataSource] DataSource já estava em cache para tenant ID: '{}'", tenantId);
         }
 
-        log.info("🔗 Obtendo conexão do DataSource para tenant slug: '{}'", tenantSlug);
+        log.info("🔗 [MultiTenantRoutingDataSource] Obtendo conexão do DataSource | tenant ID: '{}' | banco específico (NÃO master!)", tenantId);
         return dataSource.getConnection();
     }
 
@@ -94,7 +123,7 @@ public class MultiTenantRoutingDataSource extends AbstractDataSource {
     /**
      * Retorna lista de datasources registrados (para DEBUG)
      */
-    public Map<String, DataSource> getAllDataSources() {
+    public Map<Long, DataSource> getAllDataSources() {
         return new HashMap<>(dataSources);
     }
 

@@ -1,7 +1,7 @@
 package com.api.erp.v1.features.usuario.application.dto.request;
 
 public record CreateUsuarioRequest(
-        String tenantId,
+        Long tenantId,
         String nomeCompleto,
         String email,
         String cpf,

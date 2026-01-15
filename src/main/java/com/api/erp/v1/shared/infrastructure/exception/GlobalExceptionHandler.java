@@ -1,4 +1,4 @@
-package com.api.erp.v1.shared.exception;
+package com.api.erp.v1.shared.infrastructure.exception;
 
 import com.api.erp.v1.shared.domain.exception.BusinessException;
 import com.api.erp.v1.shared.domain.exception.NotFoundException;

@@ -1,7 +1,9 @@
-package com.api.erp.v1.shared.infrastructure.security.filters;
+package com.api.erp.v1.shared.infrastructure.security.filter;
 
+import com.api.erp.v1.features.tenant.domain.service.ITenantService;
 import com.api.erp.v1.shared.common.constant.HeaderConst;
 import com.api.erp.v1.shared.domain.entity.UsuarioAutenticado;
+import com.api.erp.v1.shared.infrastructure.config.datasource.TenantContext;
 import com.api.erp.v1.shared.infrastructure.security.jwt.BearerTokenAuthentication;
 import com.api.erp.v1.shared.infrastructure.security.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
@@ -42,10 +44,18 @@ public class BearerTokenFilter extends OncePerRequestFilter {
                 String email = jwtTokenProvider.getEmailFromToken(token);
                 String usuarioId = jwtTokenProvider.getUsuarioIdFromToken(token);
                 String tenantId = jwtTokenProvider.getTenantIdFromToken(token);
-                String tenantSlug = jwtTokenProvider.getTenantSlugFromToken(token);
+
+                log.debug("🔍 JWT Claims | email: {} | usuarioId: {} | tenantId: {}", email, usuarioId, tenantId);
+
+                // Validação: se usuarioId é null/vazio, não processa
+                if (usuarioId == null || usuarioId.isEmpty()) {
+                    log.warn("⚠️ JWT válido mas usuarioId está vazio! Claims: email={}, tenantId={}", email, tenantId);
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
                 UsuarioAutenticado usuario =
-                        new UsuarioAutenticado(usuarioId, tenantId, tenantSlug);
+                        new UsuarioAutenticado(usuarioId, tenantId);
 
                 BearerTokenAuthentication authentication =
                         new BearerTokenAuthentication(token, email, usuario);
@@ -54,10 +64,15 @@ public class BearerTokenFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext()
                         .setAuthentication(authentication);
+
+                // ✅ CRITICAL: Set TenantContext for DataSource routing
+                if (tenantId != null && !tenantId.isEmpty()) {
+                    TenantContext.setTenantId(tenantId);
+                    log.debug("✅ TenantContext setado do JWT | tenantId: {}", tenantId);
+                }
             }
         }
 
         filterChain.doFilter(request, response);
     }
 }
-

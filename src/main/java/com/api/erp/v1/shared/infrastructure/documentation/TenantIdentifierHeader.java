@@ -1,6 +1,6 @@
 package com.api.erp.v1.shared.infrastructure.documentation;
 
-import com.api.erp.v1.shared.constants.HeaderConst;
+import com.api.erp.v1.shared.common.constant.HeaderConst;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -18,12 +18,6 @@ import java.lang.annotation.Target;
                 in = ParameterIn.HEADER,
                 required = true,
                 description = "Identificador do tenant"
-        ),
-        @Parameter(
-                name = HeaderConst.TENANT_SLUG_HEADER,
-                in = ParameterIn.HEADER,
-                required = true,
-                description = "Slug do tenant"
         )
 })
 public @interface TenantIdentifierHeader {

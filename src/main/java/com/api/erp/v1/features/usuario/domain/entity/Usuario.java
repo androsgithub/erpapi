@@ -2,12 +2,14 @@ package com.api.erp.v1.features.usuario.domain.entity;
 
 import com.api.erp.v1.features.contato.domain.entity.UsuarioContato;
 import com.api.erp.v1.features.permissao.domain.entity.UsuarioPermissao;
+import com.api.erp.v1.shared.domain.entity.BaseEntity;
 import com.api.erp.v1.shared.domain.valueobject.CPF;
 import com.api.erp.v1.shared.domain.valueobject.Email;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -16,15 +18,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "usuarios")
-public class Usuario {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String tenant_id;
+@Table(name = "tb_usuario")
+@Filter(name = "tenantIdFilter", condition = "tenant_id = :tenantId")
+public class Usuario extends BaseEntity {
 
     @Column(nullable = false)
     private String nome_completo;
@@ -46,13 +42,7 @@ public class Usuario {
     private Long aprovado_por;
 
     @Column
-    private LocalDateTime data_aprovacao;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime data_criacao;
-
-    @Column(nullable = false)
-    private LocalDateTime data_atualizacao;
+    private LocalDateTime approved_at;
 
     @OneToMany(
             mappedBy = "usuario",
@@ -75,12 +65,12 @@ public class Usuario {
         private Usuario usuario = new Usuario();
 
         public Builder id(Long id) {
-            usuario.id = id;
+            usuario.setId(id);
             return this;
         }
 
-        public Builder tenantId(String tenantId) {
-            usuario.tenant_id = tenantId;
+        public Builder tenantId(Long tenantId) {
+            usuario.setTenantId(tenantId);
             return this;
         }
 
@@ -111,8 +101,6 @@ public class Usuario {
 
         public Usuario build() {
             usuario.status = usuario.status != null ? usuario.status : StatusUsuario.ATIVO;
-            usuario.data_criacao = LocalDateTime.now();
-            usuario.data_atualizacao = LocalDateTime.now();
             return usuario;
         }
     }
@@ -128,8 +116,6 @@ public class Usuario {
         }
         this.status = StatusUsuario.ATIVO;
         this.aprovado_por = gestorId;
-        this.data_aprovacao = LocalDateTime.now();
-        this.data_atualizacao = LocalDateTime.now();
     }
 
     public void rejeitar() {
@@ -137,12 +123,10 @@ public class Usuario {
             throw new IllegalStateException("Usuário não está pendente de aprovação");
         }
         this.status = StatusUsuario.REJEITADO;
-        this.data_atualizacao = LocalDateTime.now();
     }
 
     public void inativar() {
         this.status = StatusUsuario.INATIVO;
-        this.data_atualizacao = LocalDateTime.now();
     }
 
     public boolean isPendente() {

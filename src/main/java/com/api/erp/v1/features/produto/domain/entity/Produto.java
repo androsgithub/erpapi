@@ -6,6 +6,7 @@ import com.api.erp.v1.shared.domain.valueobject.CustomData;
 import com.api.erp.v1.shared.infrastructure.persistence.converters.CustomDataAttributeConverter;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
 
 import java.math.BigDecimal;
@@ -36,6 +37,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE tb_produto SET deleted = true, deleted_at = now() WHERE id = ?")
+@Filter(name = "tenantIdFilter", condition = "tenant_id = :tenantId")
 public class Produto extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 50)

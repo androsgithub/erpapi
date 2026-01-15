@@ -6,7 +6,7 @@ import com.api.erp.v1.features.tenant.domain.entity.Tenant;
 import com.api.erp.v1.features.tenant.domain.entity.TenantDatasource;
 import com.api.erp.v1.features.tenant.domain.repository.TenantDatasourceRepository;
 import com.api.erp.v1.features.tenant.domain.repository.TenantRepository;
-import com.api.erp.v1.features.tenant.domain.service.ITenantSchemaService;
+import com.api.erp.v1.features.tenant.domain.service.ITenantDatasourceService;
 import com.api.erp.v1.shared.infrastructure.config.datasource.routing.DataSourceFactory;
 import com.api.erp.v1.shared.infrastructure.config.datasource.routing.MultiTenantRoutingDataSource;
 import com.zaxxer.hikari.HikariDataSource;
@@ -35,7 +35,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TenantSchemaService implements ITenantSchemaService {
+public class TenantDatasourceService implements ITenantDatasourceService {
 
     private final TenantRepository tenantRepository;
     private final TenantDatasourceRepository tenantDatasourceRepository;

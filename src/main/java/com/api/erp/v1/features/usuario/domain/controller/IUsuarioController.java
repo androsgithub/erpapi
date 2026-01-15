@@ -1,6 +1,5 @@
 package com.api.erp.v1.features.usuario.domain.controller;
 
-
 import com.api.erp.v1.features.permissao.domain.entity.Permissao;
 import com.api.erp.v1.features.permissao.domain.entity.Role;
 import com.api.erp.v1.features.usuario.application.dto.request.*;
@@ -36,7 +35,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
             @ApiResponse(responseCode = "401", description = "Não autenticado")
     })
-    @TenantIdentifierHeader
     UsuarioResponse criar(CreateUsuarioRequest request);
 
     @Operation(summary = "Buscar usuário por ID", description = "Busca um usuário específico (requer autenticação)")
@@ -45,13 +43,11 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
             @ApiResponse(responseCode = "401", description = "Não autenticado")
     })
-    @TenantIdentifierHeader
     UsuarioPermissoesResponse buscar(
             @Parameter(description = "ID do usuário") Long id);
 
     @Operation(summary = "Listar usuários do sistema", description = "Lista todos os usuários (requer autenticação)")
     @ApiResponse(responseCode = "200", description = "Lista de usuários")
-    @TenantIdentifierHeader
     List<UsuarioResponse> listar();
 
     @Operation(summary = "Aprovar usuário pendente", description = "Aprova um usuário que está pendente de aprovação (requer autenticação)")
@@ -60,7 +56,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "400", description = "Usuário não está pendente de aprovação"),
             @ApiResponse(responseCode = "401", description = "Não autenticado")
     })
-    @TenantIdentifierHeader
     UsuarioPermissoesResponse aprovar(
             @Parameter(description = "ID do usuário") Long id,
             @RequestParam @Parameter(description = "ID do gestor") Long gestorId);
@@ -71,7 +66,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "400", description = "Usuário não está pendente de aprovação"),
             @ApiResponse(responseCode = "401", description = "Não autenticado")
     })
-    @TenantIdentifierHeader
     UsuarioPermissoesResponse rejeitar(
             @Parameter(description = "ID do usuário") Long id,
             @RequestParam @Parameter(description = "ID do gestor") Long gestorId,
@@ -83,7 +77,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
             @ApiResponse(responseCode = "401", description = "Não autenticado")
     })
-    @TenantIdentifierHeader
     UsuarioPermissoesResponse atualizar(
             @Parameter(description = "ID do usuário") Long id,
             UpdateUsuarioRequest request);
@@ -94,11 +87,8 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
             @ApiResponse(responseCode = "401", description = "Não autenticado")
     })
-    @TenantIdentifierHeader
     void inativar(
             @Parameter(description = "ID do usuário") Long id);
-
-    // NOVOS ENDPOINTS PARA GERENCIAMENTO DE PERMISSÕES
 
     @Operation(summary = "Adicionar permissões a usuário",
             description = "Adiciona uma ou mais permissões a um usuário")
@@ -107,7 +97,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário ou permissão não encontrada"),
             @ApiResponse(responseCode = "403", description = "Sem permissão para realizar esta ação")
     })
-    @TenantIdentifierHeader
     ResponseEntity<Void> adicionarPermissoes(
             @Parameter(description = "ID do usuário") Long usuarioId,
             AdicionarPermissoesRequest request);
@@ -119,7 +108,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário ou permissão não encontrada"),
             @ApiResponse(responseCode = "403", description = "Sem permissão para realizar esta ação")
     })
-    @TenantIdentifierHeader
     ResponseEntity<Void> removerPermissao(
             @Parameter(description = "ID do usuário") Long usuarioId,
             @Parameter(description = "ID da permissão") Long permissaoId);
@@ -131,7 +119,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "200", description = "Lista de permissões do usuário"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @TenantIdentifierHeader
     ResponseEntity<List<Permissao>> listarPermissoes(
             @Parameter(description = "ID do usuário") Long usuarioId);
 
@@ -145,7 +132,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário ou role não encontrada"),
             @ApiResponse(responseCode = "403", description = "Sem permissão para realizar esta ação")
     })
-    @TenantIdentifierHeader
     ResponseEntity<Void> adicionarRoles(
             @Parameter(description = "ID do usuário") Long usuarioId,
             AdicionarRolesRequest request);
@@ -157,7 +143,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário ou role não encontrada"),
             @ApiResponse(responseCode = "403", description = "Sem permissão para realizar esta ação")
     })
-    @TenantIdentifierHeader
     ResponseEntity<Void> removerRole(
             @Parameter(description = "ID do usuário") Long usuarioId,
             @Parameter(description = "ID da role") Long roleId);
@@ -168,7 +153,6 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "200", description = "Lista de roles do usuário"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @TenantIdentifierHeader
     ResponseEntity<List<Role>> listarRoles(
             @Parameter(description = "ID do usuário") Long usuarioId);
 
@@ -178,6 +162,5 @@ public interface IUsuarioController {
             @ApiResponse(responseCode = "200", description = "Informações do usuario"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @TenantIdentifierHeader
     public UsuarioPermissoesResponse obterDadosAtualizados();
 }
