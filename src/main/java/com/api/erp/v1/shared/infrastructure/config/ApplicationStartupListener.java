@@ -1,10 +1,15 @@
 package com.api.erp.v1.shared.infrastructure.config;
 
+import com.api.erp.v1.tenant.infrastructure.config.TenantMigrationService;
+import lombok.extern.slf4j.Slf4j;
+import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
 
 /**
  * Listener que executa migrações de tenant quando a aplicação está pronta.
@@ -23,10 +28,8 @@ import org.springframework.stereotype.Component;
  * - Depois todos os tenants são migrados
  */
 @Component
+@Slf4j
 public class ApplicationStartupListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationStartupListener.class);
-    
     private final TenantMigrationService tenantMigrationService;
 
     public ApplicationStartupListener(TenantMigrationService tenantMigrationService) {
@@ -45,39 +48,39 @@ public class ApplicationStartupListener {
      */
     @EventListener(ApplicationReadyEvent.class)
     public void runMigrationsOnStartup() {
-        logger.info("");
-        logger.info("╔════════════════════════════════════════════════════════════════╗");
-        logger.info("║      INICIANDO MIGRAÇÕES DE TENANTS NA STARTUP DA APLICAÇÃO      ║");
-        logger.info("╚════════════════════════════════════════════════════════════════╝");
-        logger.info("");
-        
+        log.info("");
+        log.info("╔════════════════════════════════════════════════════════════════╗");
+        log.info("║      INICIANDO MIGRAÇÕES DE TENANTS NA STARTUP DA APLICAÇÃO      ║");
+        log.info("╚════════════════════════════════════════════════════════════════╝");
+        log.info("");
+
         try {
             // Executa migrações de todos os tenants
             var report = tenantMigrationService.migrateAllTenants();
             
-            logger.info("");
-            logger.info("╔════════════════════════════════════════════════════════════════╗");
-            logger.info("║                   MIGRAÇÕES CONCLUÍDAS COM SUCESSO              ║");
-            logger.info("╚════════════════════════════════════════════════════════════════╝");
+            log.info("");
+            log.info("╔════════════════════════════════════════════════════════════════╗");
+            log.info("║                   MIGRAÇÕES CONCLUÍDAS COM SUCESSO              ║");
+            log.info("╚════════════════════════════════════════════════════════════════╝");
             
             if (report.hasFailures()) {
-                logger.warn("⚠️ Algumas migrações falharam, verifique os logs acima");
+                log.warn("⚠️ Algumas migrações falharam, verifique os logs acima");
             } else {
-                logger.info("✅ Todos os tenants foram migrados com sucesso!");
+                log.info("✅ Todos os tenants foram migrados com sucesso!");
             }
             
         } catch (Exception e) {
-            logger.error("");
-            logger.error("╔════════════════════════════════════════════════════════════════╗");
-            logger.error("║           ❌ ERRO CRÍTICO AO EXECUTAR MIGRAÇÕES                ║");
-            logger.error("╚════════════════════════════════════════════════════════════════╝");
-            logger.error("Erro: {}", e.getMessage(), e);
+            log.error("");
+            log.error("╔════════════════════════════════════════════════════════════════╗");
+            log.error("║           ❌ ERRO CRÍTICO AO EXECUTAR MIGRAÇÕES                ║");
+            log.error("╚════════════════════════════════════════════════════════════════╝");
+            log.error("Erro: {}", e.getMessage(), e);
             
             // Não relança exceção para permitir que a aplicação continue
             // Se isso é crítico para seu caso de uso, mude este comportamento
-            logger.warn("⚠️ A aplicação continuará rodando apesar do erro de migração");
+            log.warn("⚠️ A aplicação continuará rodando apesar do erro de migração");
         }
         
-        logger.info("");
+        log.info("");
     }
 }

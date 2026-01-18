@@ -2,9 +2,9 @@ package com.api.erp.v1.features.usuario.infrastructure.proxy;
 
 import com.api.erp.v1.features.permissao.domain.entity.Permissao;
 import com.api.erp.v1.features.permissao.domain.entity.Role;
-import com.api.erp.v1.features.tenant.domain.entity.Tenant;
-import com.api.erp.v1.features.tenant.domain.entity.UsuarioConfig;
-import com.api.erp.v1.features.tenant.domain.service.ITenantService;
+import com.api.erp.v1.tenant.domain.entity.Tenant;
+import com.api.erp.v1.tenant.domain.entity.UsuarioConfig;
+import com.api.erp.v1.tenant.domain.service.ITenantService;
 import com.api.erp.v1.features.usuario.application.dto.request.AdicionarPermissoesRequest;
 import com.api.erp.v1.features.usuario.application.dto.request.AdicionarRolesRequest;
 import com.api.erp.v1.features.usuario.application.dto.request.CreateUsuarioRequest;

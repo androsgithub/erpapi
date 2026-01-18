@@ -6,7 +6,7 @@ import com.api.erp.v1.features.permissao.infrastructure.cache.PermissaoCacheMana
 import com.api.erp.v1.features.permissao.infrastructure.factory.PermissaoServiceFactory;
 import com.api.erp.v1.features.permissao.infrastructure.factory.PermissaoServiceHolder;
 import com.api.erp.v1.features.permissao.infrastructure.factory.PermissaoServiceProxy;
-import com.api.erp.v1.features.tenant.domain.service.ITenantService;
+import com.api.erp.v1.tenant.domain.service.ITenantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -8,7 +8,7 @@ import com.api.erp.v1.features.camposcustom.application.mapper.ICustomFieldDefin
 import com.api.erp.v1.features.camposcustom.domain.entity.CustomFieldDefinition;
 import com.api.erp.v1.features.camposcustom.domain.repository.CustomFieldDefinitionRepository;
 import com.api.erp.v1.features.camposcustom.infrastructure.validator.CustomFieldDefinitionValidator;
-import com.api.erp.v1.features.tenant.infrastructure.service.TenantService;
+import com.api.erp.v1.tenant.infrastructure.service.TenantService;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
 import com.api.erp.v1.shared.infrastructure.service.SecurityService;
 import lombok.RequiredArgsConstructor;

@@ -80,9 +80,8 @@ CREATE TABLE
         unidade_medida_cache_enabled BOOLEAN DEFAULT FALSE,
         unidade_medida_system VARCHAR(100) DEFAULT 'METRIC',
         tenant_custom_code VARCHAR(100),
-        tenant_slug VARCHAR(100),
         tenant_subdomain VARCHAR(100),
-        tenant_type VARCHAR(100),
+        tenant_type VARCHAR(100) NOT NULL DEFAULT 'DEFAULT',
         tenant_features_enabled BOOLEAN DEFAULT FALSE,
         INDEX idx_tb_tenant_nome (nome),
         INDEX idx_tb_tenant_ativa (ativa),
@@ -90,10 +89,10 @@ CREATE TABLE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- ==================================================================================
--- Tabela: tenant_datasource
+-- Tabela: tb_tenant_datasource
 -- ==================================================================================
 CREATE TABLE
-    IF NOT EXISTS tenant_datasource (
+    IF NOT EXISTS tb_tenant_datasource (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
         tenant_id BIGINT NOT NULL UNIQUE,
         -- Configurações de conexão
@@ -116,7 +115,7 @@ CREATE TABLE
         KEY idx_tenant_id (tenant_id),
         KEY idx_is_active (is_active),
         UNIQUE INDEX idx_tenant_id_active (tenant_id, is_active),
-        CONSTRAINT fk_tenant_datasource_tenant FOREIGN KEY (tenant_id) REFERENCES tb_tenant (id) ON DELETE CASCADE ON UPDATE CASCADE
+        CONSTRAINT fk_tb_tenant_datasource_tenant FOREIGN KEY (tenant_id) REFERENCES tb_tenant (id) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- ==================================================================================

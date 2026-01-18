@@ -1,7 +1,7 @@
 package com.api.erp.v1.shared.infrastructure.security.filter;
 
 import com.api.erp.v1.shared.common.constant.HeaderConst;
-import com.api.erp.v1.shared.infrastructure.config.datasource.TenantContext;
+import com.api.erp.v1.tenant.infrastructure.config.datasource.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

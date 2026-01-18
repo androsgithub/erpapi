@@ -1,6 +1,6 @@
 package com.api.erp.v1.features.permissao.infrastructure.factory;
 
-import com.api.erp.v1.features.tenant.domain.entity.PermissaoConfig;
+import com.api.erp.v1.tenant.domain.entity.PermissaoConfig;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 

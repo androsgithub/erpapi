@@ -1,12 +1,7 @@
 package com.api.erp.v1.features.contato.infrastructure.decorator;
 
-import com.api.erp.v1.features.cliente.domain.service.IClienteService;
-import com.api.erp.v1.features.cliente.infrastructure.decorator.AuditDecoratorClienteService;
-import com.api.erp.v1.features.cliente.infrastructure.decorator.CacheDecoratorClienteService;
-import com.api.erp.v1.features.cliente.infrastructure.decorator.NotificationDecoratorClienteService;
 import com.api.erp.v1.features.contato.domain.service.IContatoService;
-import com.api.erp.v1.features.tenant.domain.entity.ClienteConfig;
-import com.api.erp.v1.features.tenant.domain.entity.ContatoConfig;
+import com.api.erp.v1.tenant.domain.entity.ContatoConfig;
 import lombok.extern.slf4j.Slf4j;
 
 

@@ -1,7 +1,7 @@
 package com.api.erp.v1.shared.infrastructure.persistence.listeners;
 
 import com.api.erp.v1.shared.domain.entity.BaseEntity;
-import com.api.erp.v1.shared.infrastructure.config.datasource.TenantContext;
+import com.api.erp.v1.tenant.infrastructure.config.datasource.TenantContext;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;

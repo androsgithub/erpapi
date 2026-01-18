@@ -9,6 +9,9 @@ public final class UsuarioPermissions {
     public static final String CRIAR = PREFIX + ".criar";
     public static final String ATUALIZAR = PREFIX + ".atualizar";
     public static final String LISTAR = PREFIX + ".listar";
+    public static final String LISTAR_ROLES = PREFIX + ".listar_roles";
+    public static final String LISTAR_PERMISSOES = PREFIX + ".listar_permissoes";
+    public static final String VISUALIZAR_OUTRO_USUARIO = PREFIX + ".view_outro_usuario";
     public static final String DELETAR = PREFIX + ".deletar";
     public static final String ATIVAR = PREFIX + ".ativar";
     public static final String DESATIVAR = PREFIX + ".desativar";

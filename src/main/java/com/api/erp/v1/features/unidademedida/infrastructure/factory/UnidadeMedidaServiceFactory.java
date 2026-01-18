@@ -1,12 +1,10 @@
 package com.api.erp.v1.features.unidademedida.infrastructure.factory;
 
-import com.api.erp.v1.features.tenant.domain.entity.UnidadeMedidaConfig;
-import com.api.erp.v1.features.tenant.domain.service.ITenantService;
+import com.api.erp.v1.tenant.domain.service.ITenantService;
 import com.api.erp.v1.features.unidademedida.domain.repository.UnidadeMedidaRepository;
 import com.api.erp.v1.features.unidademedida.domain.service.IUnidadeMedidaService;
 import com.api.erp.v1.features.unidademedida.domain.validator.UnidadeMedidaValidator;
 import com.api.erp.v1.features.unidademedida.infrastructure.service.UnidadeMedidaService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component

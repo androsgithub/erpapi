@@ -1,9 +1,8 @@
 package com.api.erp.v1.shared.infrastructure.security.filter;
 
-import com.api.erp.v1.features.tenant.domain.service.ITenantService;
 import com.api.erp.v1.shared.common.constant.HeaderConst;
 import com.api.erp.v1.shared.domain.entity.UsuarioAutenticado;
-import com.api.erp.v1.shared.infrastructure.config.datasource.TenantContext;
+import com.api.erp.v1.tenant.infrastructure.config.datasource.TenantContext;
 import com.api.erp.v1.shared.infrastructure.security.jwt.BearerTokenAuthentication;
 import com.api.erp.v1.shared.infrastructure.security.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
@@ -12,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

@@ -1,6 +1,6 @@
 package com.api.erp.v1.shared.infrastructure.persistence.filter;
 
-import com.api.erp.v1.shared.infrastructure.config.datasource.TenantContext;
+import com.api.erp.v1.tenant.infrastructure.config.datasource.TenantContext;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Filter;
 import org.hibernate.Session;

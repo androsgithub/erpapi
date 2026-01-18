@@ -1,8 +1,8 @@
 package com.api.erp.v1.features.produto.infrastructure.proxy;
 
-import com.api.erp.v1.features.tenant.domain.entity.Tenant;
-import com.api.erp.v1.features.tenant.domain.entity.ProdutoConfig;
-import com.api.erp.v1.features.tenant.domain.service.ITenantService;
+import com.api.erp.v1.tenant.domain.entity.Tenant;
+import com.api.erp.v1.tenant.domain.entity.ProdutoConfig;
+import com.api.erp.v1.tenant.domain.service.ITenantService;
 import com.api.erp.v1.features.produto.application.dto.ProdutoRequestDTO;
 import com.api.erp.v1.features.produto.domain.entity.Produto;
 import com.api.erp.v1.features.produto.domain.entity.TipoProduto;

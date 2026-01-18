@@ -34,17 +34,6 @@ CREATE TABLE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- ==================================================================================
--- Tabela: role
--- ==================================================================================
-CREATE TABLE
-    IF NOT EXISTS role (
-        id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        nome VARCHAR(255) NOT NULL UNIQUE,
-        ativo BOOLEAN NOT NULL DEFAULT TRUE,
-        INDEX idx_nome (nome)
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-
--- ==================================================================================
 -- Tabela: role_permissao
 -- ==================================================================================
 CREATE TABLE
@@ -52,7 +41,7 @@ CREATE TABLE
         role_id BIGINT NOT NULL,
         permissao_id BIGINT NOT NULL,
         PRIMARY KEY (role_id, permissao_id),
-        CONSTRAINT fk_role_permissao_role FOREIGN KEY (role_id) REFERENCES role (id) ON DELETE CASCADE,
+        CONSTRAINT fk_role_permissao_role FOREIGN KEY (role_id) REFERENCES tb_role (id) ON DELETE CASCADE,
         CONSTRAINT fk_role_permissao_permissao FOREIGN KEY (permissao_id) REFERENCES permissao (id) ON DELETE CASCADE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
@@ -111,7 +100,7 @@ CREATE TABLE
         usuario_permissao_id BIGINT NOT NULL,
         role_id BIGINT NOT NULL,
         CONSTRAINT fk_usuario_role_usuario_permissao FOREIGN KEY (usuario_permissao_id) REFERENCES tb_usuario_permissao (id) ON DELETE CASCADE,
-        CONSTRAINT fk_usuario_role_role FOREIGN KEY (role_id) REFERENCES role (id) ON DELETE CASCADE,
+        CONSTRAINT fk_usuario_role_role FOREIGN KEY (role_id) REFERENCES tb_role (id) ON DELETE CASCADE,
         UNIQUE KEY uk_usuario_role (usuario_permissao_id, role_id),
         INDEX idx_usuario_role_role (role_id)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

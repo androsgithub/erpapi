@@ -7,8 +7,8 @@ import com.api.erp.v1.features.permissao.infrastructure.decorator.PermissaoAudit
 import com.api.erp.v1.features.permissao.infrastructure.decorator.PermissaoCacheServiceDecorator;
 import com.api.erp.v1.features.permissao.infrastructure.decorator.ValidationDecoratorPermissaoService;
 import com.api.erp.v1.features.permissao.infrastructure.service.PermissaoService;
-import com.api.erp.v1.features.tenant.domain.entity.PermissaoConfig;
-import com.api.erp.v1.features.tenant.domain.service.ITenantService;
+import com.api.erp.v1.tenant.domain.entity.PermissaoConfig;
+import com.api.erp.v1.tenant.domain.service.ITenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

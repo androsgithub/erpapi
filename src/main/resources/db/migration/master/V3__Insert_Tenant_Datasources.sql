@@ -3,7 +3,7 @@
 -- DESCRIÇÃO: Insere configuração de datasources para cada tenant
 -- ==================================================================================
 -- Datasource para Tenant 1 (HECE) - banco dedicado
-INSERT IGNORE INTO tenant_datasource (
+INSERT IGNORE INTO tb_tenant_datasource (
     tenant_id,
     host,
     port,
@@ -28,7 +28,7 @@ VALUES
     );
 
 -- Datasource para Tenant 2 (Tech Solutions) - banco compartilhado
-INSERT IGNORE INTO tenant_datasource (
+INSERT IGNORE INTO tb_tenant_datasource (
     tenant_id,
     host,
     port,
@@ -53,7 +53,7 @@ VALUES
     );
 
 -- Datasource para Tenant 3 (Logística Global) - banco compartilhado
-INSERT IGNORE INTO tenant_datasource (
+INSERT IGNORE INTO tb_tenant_datasource (
     tenant_id,
     host,
     port,
@@ -78,7 +78,7 @@ VALUES
     );
 
 -- Datasource para Tenant 4 (Varejo Express) - banco compartilhado
-INSERT IGNORE INTO tenant_datasource (
+INSERT IGNORE INTO tb_tenant_datasource (
     tenant_id,
     host,
     port,

@@ -1,6 +1,6 @@
 package com.api.erp.v1.shared.infrastructure.security.interceptors;
 
-import com.api.erp.v1.shared.infrastructure.config.datasource.TenantContext;
+import com.api.erp.v1.tenant.infrastructure.config.datasource.TenantContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

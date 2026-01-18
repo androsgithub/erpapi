@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public interface ICustomFieldDefinitionController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
             @ApiResponse(responseCode = "400", description = "Tabela inválida ou não informada")
     })
-    List<CustomFieldResponse> getCustomFields(Long tenantId, String table);
+    List<CustomFieldResponse> getCustomFields(String table);
 
 
     @Operation(
@@ -39,7 +38,7 @@ public interface ICustomFieldDefinitionController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos ou campo já existente"),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     })
-    CustomFieldResponse create(Long tenantId, CreateCustomFieldRequest request);
+    CustomFieldResponse create(CreateCustomFieldRequest request);
 
 
     @Operation(
@@ -51,7 +50,7 @@ public interface ICustomFieldDefinitionController {
             @ApiResponse(responseCode = "400", description = "Campo não encontrado ou dados inválidos"),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     })
-    CustomFieldResponse update(Long tenantId, Long id, UpdateCustomFieldRequest request);
+    CustomFieldResponse update(Long id, UpdateCustomFieldRequest request);
 
 
     @Operation(
@@ -63,7 +62,7 @@ public interface ICustomFieldDefinitionController {
             @ApiResponse(responseCode = "400", description = "Campo não encontrado ou status inválido"),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     })
-    CustomFieldResponse changeStatus(Long tenantId, Long id, ChangeCustomFieldStatusRequest request);
+    CustomFieldResponse changeStatus(Long id, ChangeCustomFieldStatusRequest request);
 
 
     @Operation(
@@ -75,5 +74,5 @@ public interface ICustomFieldDefinitionController {
             @ApiResponse(responseCode = "400", description = "Campo não encontrado"),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     })
-    void delete(Long tenantId, Long id);
+    void delete(Long id);
 }

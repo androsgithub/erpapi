@@ -7,7 +7,7 @@ import com.api.erp.v1.features.usuario.domain.repository.UsuarioRepository;
 import com.api.erp.v1.features.usuario.domain.service.IPasswordEncoder;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
 import com.api.erp.v1.shared.domain.valueobject.Email;
-import com.api.erp.v1.shared.infrastructure.config.datasource.TenantContext;
+import com.api.erp.v1.tenant.infrastructure.config.datasource.TenantContext;
 import com.api.erp.v1.shared.infrastructure.security.jwt.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

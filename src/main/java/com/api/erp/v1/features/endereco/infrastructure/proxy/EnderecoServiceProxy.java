@@ -1,9 +1,9 @@
 package com.api.erp.v1.features.endereco.infrastructure.proxy;
 
 import com.api.erp.v1.features.endereco.application.dto.request.CreateEnderecoRequest;
-import com.api.erp.v1.features.tenant.domain.entity.Tenant;
-import com.api.erp.v1.features.tenant.domain.entity.EnderecoConfig;
-import com.api.erp.v1.features.tenant.domain.service.ITenantService;
+import com.api.erp.v1.tenant.domain.entity.Tenant;
+import com.api.erp.v1.tenant.domain.entity.EnderecoConfig;
+import com.api.erp.v1.tenant.domain.service.ITenantService;
 import com.api.erp.v1.features.endereco.domain.entity.Endereco;
 import com.api.erp.v1.features.endereco.domain.service.IEnderecoService;
 import com.api.erp.v1.features.endereco.infrastructure.decorator.EnderecoServiceApplyDecorate;
