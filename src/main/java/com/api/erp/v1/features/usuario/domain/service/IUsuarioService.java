@@ -7,7 +7,7 @@ import com.api.erp.v1.features.usuario.application.dto.request.AdicionarRolesReq
 import com.api.erp.v1.features.usuario.application.dto.request.CreateUsuarioRequest;
 import com.api.erp.v1.features.usuario.application.dto.request.UpdateUsuarioRequest;
 import com.api.erp.v1.features.usuario.domain.entity.Usuario;
-import com.api.erp.v1.observability.application.annotation.TrackFlow;
+import com.dros.observability.application.annotation.TrackFlow;
 
 import java.util.List;
 

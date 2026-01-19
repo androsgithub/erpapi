@@ -171,6 +171,11 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.dros</groupId>
+            <artifactId>observability</artifactId>
+            <version>0.0.1</version>
+        </dependency>
 
     </dependencies>
     <build>

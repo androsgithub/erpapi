@@ -1,6 +1,6 @@
 package com.api.erp.v1.shared.infrastructure.security.annotations;
 
-import com.api.erp.v1.observability.application.annotation.TrackFlow;
+
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.lang.annotation.ElementType;
