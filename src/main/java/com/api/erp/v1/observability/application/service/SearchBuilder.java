@@ -1,6 +1,5 @@
 package com.api.erp.v1.observability.application.service;
 
-import com.api.erp.v1.observability.domain.FlowStatus;
 import com.api.erp.v1.observability.presentation.dto.ObservabilityFilter;
 import org.springframework.data.domain.Sort;
 

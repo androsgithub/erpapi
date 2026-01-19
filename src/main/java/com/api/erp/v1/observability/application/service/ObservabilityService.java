@@ -1,10 +1,8 @@
 package com.api.erp.v1.observability.application.service;
 
-import com.api.erp.v1.observability.domain.FlowStatus;
-import com.api.erp.v1.observability.domain.entity.FlowEventEntity;
-import com.api.erp.v1.observability.domain.repository.FlowEventRepository;
 import com.api.erp.v1.observability.presentation.dto.*;
-import org.springframework.data.domain.PageRequest;
+import com.dros.observability.domain.entity.FlowEventEntity;
+import com.dros.observability.domain.repository.FlowEventRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +14,13 @@ import java.util.stream.Collectors;
 
 /**
  * Service para consulta de eventos de observability.
- * 
+ * <p>
  * Responsável por:
  * - Buscar eventos pelo trace ID
  * - Obter estatísticas de observability
  * - Filtrar eventos por período
  * - Encontrar erros recentes
- * 
+ * <p>
  * SOLID: Single Responsibility - apenas gerencia dados de observability
  * DDD: Application Service que orquestra domain e infrastructure
  */
@@ -38,199 +36,199 @@ public class ObservabilityService {
 
     /**
      * Busca todos os eventos de um trace ID.
-     * 
+     *
      * @param traceId identificador único da requisição
      * @return lista de eventos do trace
      */
     public List<FlowEventDto> findEventsByTraceId(String traceId) {
         return flowEventRepository.findByTraceIdOrderByTimestamp(traceId)
-            .stream()
-            .map(this::toDto)
-            .collect(Collectors.toList());
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
      * Busca eventos entre dois momentos no tempo.
-     * 
+     *
      * @param startHoursAgo horas no passado para começar
-     * @param endHoursAgo horas no passado para terminar
+     * @param endHoursAgo   horas no passado para terminar
      * @return lista de eventos no período
      */
     public List<FlowEventDto> findEventsBetween(int startHoursAgo, int endHoursAgo) {
         Instant end = Instant.now().minus(endHoursAgo, ChronoUnit.HOURS);
         Instant start = Instant.now().minus(startHoursAgo, ChronoUnit.HOURS);
-        
+
         return flowEventRepository.findEventsBetween(start, end)
-            .stream()
-            .map(this::toDto)
-            .collect(Collectors.toList());
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
      * Busca eventos com erro entre dois momentos.
-     * 
+     *
      * @param startHoursAgo horas no passado para começar
-     * @param endHoursAgo horas no passado para terminar
+     * @param endHoursAgo   horas no passado para terminar
      * @return lista de eventos com erro
      */
     public List<FlowEventDto> findErrorsBetween(int startHoursAgo, int endHoursAgo) {
         Instant end = Instant.now().minus(endHoursAgo, ChronoUnit.HOURS);
         Instant start = Instant.now().minus(startHoursAgo, ChronoUnit.HOURS);
-        
+
         return flowEventRepository.findErrorsBetween(start, end)
-            .stream()
-            .map(this::toDto)
-            .collect(Collectors.toList());
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
      * Obtém estatísticas de observability das últimas horas.
-     * 
+     *
      * @param hoursAgo quantas horas no passado considerar
      * @return estatísticas de observability
      */
     public ObservabilityStatsDto getStats(int hoursAgo) {
         Instant start = Instant.now().minus(hoursAgo, ChronoUnit.HOURS);
-        
+
         List<FlowEventDto> events = flowEventRepository
-            .findEventsBetween(start, Instant.now())
-            .stream()
-            .map(this::toDto)
-            .collect(Collectors.toList());
+                .findEventsBetween(start, Instant.now())
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
 
         long totalEvents = events.size();
         long totalErrors = events.stream()
-            .filter(e -> e.status().contains("Erro"))
-            .count();
-        
-        long successRate = totalEvents > 0 
-            ? ((totalEvents - totalErrors) * 100) / totalEvents 
-            : 0;
+                .filter(e -> e.status().contains("Erro"))
+                .count();
+
+        long successRate = totalEvents > 0
+                ? ((totalEvents - totalErrors) * 100) / totalEvents
+                : 0;
 
         Map<String, Long> errorsByType = events.stream()
-            .filter(e -> e.status().contains("Erro"))
-            .collect(Collectors.groupingBy(
-                FlowEventDto::status,
-                Collectors.counting()
-            ));
+                .filter(e -> e.status().contains("Erro"))
+                .collect(Collectors.groupingBy(
+                        FlowEventDto::status,
+                        Collectors.counting()
+                ));
 
         long averageExecutionTime = (long) events.stream()
-            .mapToLong(FlowEventDto::executionTimeMs)
-            .average()
-            .orElse(0);
+                .mapToLong(FlowEventDto::executionTimeMs)
+                .average()
+                .orElse(0);
 
         List<FlowEventDto> recent = events.stream()
-            .sorted((a, b) -> b.timestamp().compareTo(a.timestamp()))
-            .limit(10)
-            .collect(Collectors.toList());
+                .sorted((a, b) -> b.timestamp().compareTo(a.timestamp()))
+                .limit(10)
+                .collect(Collectors.toList());
 
         return new ObservabilityStatsDto(
-            totalEvents,
-            totalErrors,
-            successRate,
-            errorsByType,
-            averageExecutionTime,
-            recent
+                totalEvents,
+                totalErrors,
+                successRate,
+                errorsByType,
+                averageExecutionTime,
+                recent
         );
     }
 
     /**
      * Busca eventos recentes.
-     * 
+     *
      * @param limit quantidade máxima de eventos
      * @return lista de eventos recentes
      */
     public List<FlowEventDto> getRecentEvents(int limit) {
         Instant oneDayAgo = Instant.now().minus(1, ChronoUnit.DAYS);
-        
+
         return flowEventRepository.findEventsBetween(oneDayAgo, Instant.now())
-            .stream()
-            .limit(limit)
-            .map(this::toDto)
-            .collect(Collectors.toList());
+                .stream()
+                .limit(limit)
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
      * Busca eventos com paginação e filtros.
-     * 
+     * <p>
      * Exemplo:
      * SearchBuilder builder = SearchBuilder.create()
-     *     .withStatus("ERROR")
-     *     .withStepName("validateUser")
-     *     .withPage(0, 20)
-     *     .withSort("timestamp", "DESC");
-     * 
+     * .withStatus("ERROR")
+     * .withStepName("validateUser")
+     * .withPage(0, 20)
+     * .withSort("timestamp", "DESC");
+     * <p>
      * PageableResponse<FlowEventDto> response = searchEvents(builder);
-     * 
+     *
      * @param searchBuilder builder com filtros e paginação
      * @return resposta paginada com eventos filtrados
      */
     public PageableResponse<FlowEventDto> searchEvents(SearchBuilder searchBuilder) {
         ObservabilityFilter filter = searchBuilder.buildFilter();
-        
+
         // Buscar eventos com filtro de período
         Instant start = searchBuilder.getStartInstant();
         Instant end = searchBuilder.getEndInstant();
-        
+
         List<FlowEventEntity> allEvents = searchBuilder.isErrorsOnly()
-            ? flowEventRepository.findErrorsBetween(start, end)
-            : flowEventRepository.findEventsBetween(start, end);
-        
+                ? flowEventRepository.findErrorsBetween(start, end)
+                : flowEventRepository.findEventsBetween(start, end);
+
         // Aplicar filtros adicionais
         List<FlowEventEntity> filtered = allEvents.stream()
-            .filter(e -> {
-                if (!filter.hasStatus()) return true;
-                if (e.getStatus() == null) return false;
-                // Comparar código numérico do status
-                Integer statusCode = filter.getStatusCode();
-                return statusCode >= 0 && e.getStatus().equals(statusCode);
-            })
-            .filter(e -> filter.hasStepName() ? e.getStepName() != null && e.getStepName().contains(filter.getStepName()) : true)
-            .filter(e -> filter.hasTraceId() ? e.getTraceId() != null && e.getTraceId().equals(filter.getTraceId()) : true)
-            .filter(e -> filter.getMinExecutionTime() != null && e.getExecutionTimeMs() != null ? e.getExecutionTimeMs() >= filter.getMinExecutionTime() : true)
-            .filter(e -> filter.getMaxExecutionTime() != null && e.getExecutionTimeMs() != null ? e.getExecutionTimeMs() <= filter.getMaxExecutionTime() : true)
-            .collect(Collectors.toList());
-        
+                .filter(e -> {
+                    if (!filter.hasStatus()) return true;
+                    if (e.getStatus() == null) return false;
+                    // Comparar código numérico do status
+                    Integer statusCode = filter.getStatusCode();
+                    return statusCode >= 0 && e.getStatus().equals(statusCode);
+                })
+                .filter(e -> filter.hasStepName() ? e.getStepName() != null && e.getStepName().contains(filter.getStepName()) : true)
+                .filter(e -> filter.hasTraceId() ? e.getTraceId() != null && e.getTraceId().equals(filter.getTraceId()) : true)
+                .filter(e -> filter.getMinExecutionTime() != null && e.getExecutionTimeMs() != null ? e.getExecutionTimeMs() >= filter.getMinExecutionTime() : true)
+                .filter(e -> filter.getMaxExecutionTime() != null && e.getExecutionTimeMs() != null ? e.getExecutionTimeMs() <= filter.getMaxExecutionTime() : true)
+                .collect(Collectors.toList());
+
         long totalElements = filtered.size();
-        
+
         // Aplicar ordenação e paginação
         List<FlowEventDto> page = filtered.stream()
-            .sorted((a, b) -> {
-                int comparison = 0;
-                if ("timestamp".equals(searchBuilder.getSortBy())) {
-                    comparison = b.getTimestamp().compareTo(a.getTimestamp());
-                } else if ("executionTimeMs".equals(searchBuilder.getSortBy())) {
-                    comparison = Integer.compare(b.getExecutionTimeMs(), a.getExecutionTimeMs());
-                } else if ("stepName".equals(searchBuilder.getSortBy())) {
-                    comparison = b.getStepName().compareTo(a.getStepName());
-                } else if ("status".equals(searchBuilder.getSortBy())) {
-                    comparison = b.getStatus().compareTo(a.getStatus());
-                }
-                
-                if (searchBuilder.getSortDirection().isAscending()) {
-                    comparison = -comparison;
-                }
-                return comparison;
-            })
-            .skip((long) searchBuilder.getPage() * searchBuilder.getPageSize())
-            .limit(searchBuilder.getPageSize())
-            .map(this::toDto)
-            .collect(Collectors.toList());
-        
+                .sorted((a, b) -> {
+                    int comparison = 0;
+                    if ("timestamp".equals(searchBuilder.getSortBy())) {
+                        comparison = b.getTimestamp().compareTo(a.getTimestamp());
+                    } else if ("executionTimeMs".equals(searchBuilder.getSortBy())) {
+                        comparison = Integer.compare(b.getExecutionTimeMs(), a.getExecutionTimeMs());
+                    } else if ("stepName".equals(searchBuilder.getSortBy())) {
+                        comparison = b.getStepName().compareTo(a.getStepName());
+                    } else if ("status".equals(searchBuilder.getSortBy())) {
+                        comparison = b.getStatus().compareTo(a.getStatus());
+                    }
+
+                    if (searchBuilder.getSortDirection().isAscending()) {
+                        comparison = -comparison;
+                    }
+                    return comparison;
+                })
+                .skip((long) searchBuilder.getPage() * searchBuilder.getPageSize())
+                .limit(searchBuilder.getPageSize())
+                .map(this::toDto)
+                .collect(Collectors.toList());
+
         return PageableResponse.of(page, searchBuilder.getPage(), searchBuilder.getPageSize(), totalElements);
     }
 
     /**
      * Busca eventos com paginação simples.
-     * 
+     *
      * @param pageableRequest requisição com paginação
      * @return resposta paginada com eventos
      */
     public PageableResponse<FlowEventDto> searchEvents(PageableRequest pageableRequest) {
         SearchBuilder builder = SearchBuilder.create()
-            .withPage(pageableRequest.getPage(), pageableRequest.getPageSize())
-            .withSort(pageableRequest.getSortBy(), pageableRequest.getSortDirection());
-        
+                .withPage(pageableRequest.getPage(), pageableRequest.getPageSize())
+                .withSort(pageableRequest.getSortBy(), pageableRequest.getSortDirection());
+
         // Aplicar filtros dinâmicos
         Map<String, Object> filters = pageableRequest.getFilters();
         if (filters != null) {
@@ -258,22 +256,22 @@ public class ObservabilityService {
                 builder.errorsOnly();
             }
         }
-        
+
         return searchEvents(builder);
     }
 
     /**
      * Busca eventos com filtro específico e paginação.
-     * 
-     * @param filter filtro de observabilidade
+     *
+     * @param filter     filtro de observabilidade
      * @param pageNumber número da página (começando em 0)
-     * @param pageSize tamanho da página
+     * @param pageSize   tamanho da página
      * @return resposta paginada com eventos filtrados
      */
     public PageableResponse<FlowEventDto> findWithFilter(ObservabilityFilter filter, int pageNumber, int pageSize) {
         SearchBuilder builder = SearchBuilder.create()
-            .withPage(pageNumber, pageSize);
-        
+                .withPage(pageNumber, pageSize);
+
         if (filter.hasStatus()) {
             builder.withStatus(filter.getStatus());
         }
@@ -293,13 +291,13 @@ public class ObservabilityService {
         if (filter.getErrorsOnly()) {
             builder.errorsOnly();
         }
-        
+
         return searchEvents(builder);
     }
 
     /**
      * Busca todas as páginas de eventos.
-     * 
+     *
      * @param pageSize tamanho da página
      * @return resposta paginada com todos os eventos da primeira página
      */
@@ -309,17 +307,17 @@ public class ObservabilityService {
 
     /**
      * Busca erros recentes.
-     * 
+     *
      * @param hoursAgo quantas horas no passado considerar
      * @return lista de erros recentes
      */
     public List<FlowEventDto> getRecentErrors(int hoursAgo) {
         Instant start = Instant.now().minus(hoursAgo, ChronoUnit.HOURS);
-        
+
         return flowEventRepository.findErrorsBetween(start, Instant.now())
-            .stream()
-            .map(this::toDto)
-            .collect(Collectors.toList());
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -327,12 +325,12 @@ public class ObservabilityService {
      */
     private FlowEventDto toDto(FlowEventEntity entity) {
         return FlowEventDto.of(
-            entity.getId(),
-            entity.getTraceId(),
-            entity.getStepName(),
-            entity.getStatus(),
-            entity.getExecutionTimeMs(),
-            entity.getTimestamp()
+                entity.getId(),
+                entity.getTraceId(),
+                entity.getStepName(),
+                entity.getStatus(),
+                entity.getExecutionTimeMs(),
+                entity.getTimestamp()
         );
     }
 }

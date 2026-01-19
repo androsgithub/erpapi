@@ -1,6 +1,7 @@
 package com.api.erp.v1.observability.presentation.dto;
 
-import com.api.erp.v1.observability.domain.FlowStatus;
+import com.dros.observability.domain.FlowStatus;
+
 import java.time.Instant;
 
 /**

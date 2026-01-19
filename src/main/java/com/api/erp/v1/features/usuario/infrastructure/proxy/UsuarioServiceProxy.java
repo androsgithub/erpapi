@@ -14,6 +14,7 @@ import com.api.erp.v1.features.usuario.domain.service.IUsuarioService;
 import com.api.erp.v1.features.usuario.infrastructure.decorator.UsuarioServiceApplyDecorate;
 import com.api.erp.v1.features.usuario.infrastructure.service.UsuarioService;
 import com.api.erp.v1.shared.infrastructure.service.SecurityService;
+import com.dros.observability.application.annotation.TrackFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -63,71 +64,85 @@ public class UsuarioServiceProxy implements IUsuarioService {
     }
 
     @Override
+    @TrackFlow("SRVC_CREATE_USER")
     public Usuario criar(CreateUsuarioRequest request) {
         return resolverService().criar(request);
     }
 
     @Override
+    @TrackFlow("SRVC_UPDATE_USER")
     public Usuario atualizar(Long id, UpdateUsuarioRequest request) {
         return resolverService().atualizar(id, request);
     }
 
     @Override
+    @TrackFlow("SRVC_SEARCHBYID_USER")
     public Usuario buscarPorId(Long id) {
         return resolverService().buscarPorId(id);
     }
 
     @Override
+    @TrackFlow("SRVC_LIST_USER")
     public List<Usuario> listarTodos() {
         return resolverService().listarTodos();
     }
 
     @Override
+    @TrackFlow("SRVC_LIST_PENDING_USER")
     public List<Usuario> listarPendentes() {
         return resolverService().listarPendentes();
     }
 
     @Override
+    @TrackFlow("SRVC_DISABLE_USER")
     public void inativar(Long id) {
-
+//        return resolverService().inativar(id);
     }
 
     @Override
+    @TrackFlow("SRVC_APROVE_USER")
     public Usuario aprovar(Long usuarioId, Long gestorId) {
         return resolverService().aprovar(usuarioId, gestorId);
     }
 
     @Override
+    @TrackFlow("SRVC_REJECT_USER")
     public Usuario rejeitar(Long usuarioId, Long gestorId, String motivo) {
         return resolverService().rejeitar(usuarioId, gestorId, motivo);
     }
 
     @Override
+    @TrackFlow("SRVC_ADD_USER_PERMS")
     public void adicionarPermissoes(Long usuarioId, AdicionarPermissoesRequest request) {
         resolverService().adicionarPermissoes(usuarioId, request);
     }
 
     @Override
+    @TrackFlow("SRVC_REMOVE_USER_PERMS")
     public void removerPermissao(Long usuarioId, Long permissaoId) {
         resolverService().removerPermissao(usuarioId, permissaoId);
     }
 
     @Override
+    @TrackFlow("SRVC_LIST_USER_PERMS")
     public List<Permissao> listarPermissoes(Long usuarioId) {
         return resolverService().listarPermissoes(usuarioId);
     }
 
     @Override
+    @TrackFlow("SRVC_ADD_USER_ROLES")
     public void adicionarRoles(Long usuarioId, AdicionarRolesRequest request) {
         resolverService().adicionarRoles(usuarioId, request);
     }
 
     @Override
+    @TrackFlow("SRVC_REMOVE_USER_ROLE")
     public void removerRole(Long usuarioId, Long roleId) {
         resolverService().removerRole(usuarioId, roleId);
     }
 
     @Override
+    @TrackFlow("SRVC_LIST_USER_ROLES")
     public List<Role> listarRoles(Long usuarioId) {
         return resolverService().listarRoles(usuarioId);
     }

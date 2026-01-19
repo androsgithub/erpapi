@@ -1,7 +1,8 @@
-package com.api.erp.v1.observability.application.mapper.strategy;
+package com.api.erp.v1.observability.strategy;
 
-import com.api.erp.v1.observability.domain.FlowStatus;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
+import com.dros.observability.application.mapper.strategy.ErrorMappingStrategy;
+import com.dros.observability.domain.FlowStatus;
 
 /**
  * Estratégia para mapeamento de erros de negócio.

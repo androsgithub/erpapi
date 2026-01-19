@@ -1,5 +1,6 @@
 package com.api.erp.v1.observability.presentation.dto;
 
+import com.dros.observability.domain.FlowStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -151,8 +152,8 @@ public class ObservabilityFilter {
     public Integer getStatusCode() {
         if (!hasStatus()) return -1;
         try {
-            com.api.erp.v1.observability.domain.FlowStatus flowStatus = 
-                com.api.erp.v1.observability.domain.FlowStatus.valueOf(status.toUpperCase());
+            FlowStatus flowStatus =
+                FlowStatus.valueOf(status.toUpperCase());
             return flowStatus.getCode();
         } catch (IllegalArgumentException e) {
             return -1;
@@ -165,7 +166,7 @@ public class ObservabilityFilter {
     public boolean isStatusValid() {
         if (!hasStatus()) return false;
         try {
-            com.api.erp.v1.observability.domain.FlowStatus.valueOf(status.toUpperCase());
+            FlowStatus.valueOf(status.toUpperCase());
             return true;
         } catch (IllegalArgumentException e) {
             return false;

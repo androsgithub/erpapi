@@ -1,8 +1,8 @@
 package com.api.erp.v1.observability.application.mapper.strategy;
 
 import com.api.erp.v1.observability.domain.FlowStatus;
+import com.api.erp.v1.observability.strategy.ValidationErrorMappingStrategy;
 import com.api.erp.v1.shared.domain.exception.ValidationException;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
