@@ -47,7 +47,7 @@ public class TenantController implements ITenantController {
     }
 
     @GetMapping("/listar")
-    @RequiresPermission(TenantPermissions.BUSCAR)
+//    @RequiresPermission(TenantPermissions.BUSCAR)
     public ResponseEntity<List<TenantResponse>> listar() {
         log.info("[EMPRESA CONTROLLER] Listando todas as tenants");
         List<Tenant> tenants = tenantService.listarTenants();

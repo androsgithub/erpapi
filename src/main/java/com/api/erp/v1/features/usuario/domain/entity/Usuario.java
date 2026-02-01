@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -19,7 +21,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "tb_usuario")
-@Filter(name = "tenantIdFilter", condition = "tenant_id = :tenantId")
 public class Usuario extends BaseEntity {
 
     @Column(nullable = false)

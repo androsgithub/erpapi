@@ -32,7 +32,6 @@ public class GerenciamentoPermissaoService implements IGerenciamentoPermissaoSer
                 .nome(request.nome())
                 .modulo(request.modulo())
                 .acao(request.acao())
-                .ativo(request.ativo())
                 .build();
         return permissaoRepository.save(permissao);
     }

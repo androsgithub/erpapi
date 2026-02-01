@@ -1,6 +1,6 @@
 package com.api.erp.v1.features.usuario.infrastructure.decorator;
 
-import com.api.erp.v1.tenant.domain.entity.UsuarioConfig;
+import com.api.erp.v1.tenant.domain.entity.configs.UsuarioConfig;
 import com.api.erp.v1.features.usuario.domain.validator.IUsuarioValidator;
 
 public class UsuarioValidatorApplyDecorate {

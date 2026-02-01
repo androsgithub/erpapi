@@ -22,11 +22,6 @@ public interface UnidadeMedidaRepository extends JpaRepository<UnidadeMedida, Lo
     Optional<UnidadeMedida> findBySigla(String sigla);
     
     /**
-     * Busca todas as unidades de medida ativas
-     */
-    List<UnidadeMedida> findByAtivoTrue();
-    
-    /**
      * Verifica se existe uma unidade com a sigla informada
      */
     boolean existsBySigla(String sigla);

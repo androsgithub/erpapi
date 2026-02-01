@@ -2,16 +2,18 @@ package com.api.erp.v1.tenant.infrastructure.service;
 
 import com.api.erp.v1.features.endereco.domain.repository.EnderecoRepository;
 import com.api.erp.v1.features.permissao.infrastructure.factory.PermissaoConfigUpdateEvent;
-import com.api.erp.v1.tenant.application.dto.*;
-import com.api.erp.v1.tenant.domain.entity.*;
-import com.api.erp.v1.tenant.domain.repository.TenantRepository;
-import com.api.erp.v1.tenant.domain.repository.TenantSchemaRepository;
-import com.api.erp.v1.tenant.domain.service.ITenantService;
 import com.api.erp.v1.shared.domain.exception.NotFoundException;
 import com.api.erp.v1.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.shared.domain.valueobject.Email;
 import com.api.erp.v1.shared.domain.valueobject.Telefone;
 import com.api.erp.v1.shared.infrastructure.service.SecurityService;
+import com.api.erp.v1.tenant.application.dto.*;
+import com.api.erp.v1.tenant.domain.entity.Tenant;
+import com.api.erp.v1.tenant.domain.entity.TenantDadosFiscais;
+import com.api.erp.v1.tenant.domain.entity.configs.*;
+import com.api.erp.v1.tenant.domain.repository.TenantDatasourceRepository;
+import com.api.erp.v1.tenant.domain.repository.TenantRepository;
+import com.api.erp.v1.tenant.domain.service.ITenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class TenantService implements ITenantService {
     @Autowired
     private TenantRepository tenantRepository;
     private final EnderecoRepository enderecoRepository;
-    private final TenantSchemaRepository tenantDatasourceRepository;
+    private final TenantDatasourceRepository tenantDatasourceRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final SecurityService securityService;
 
@@ -294,7 +296,7 @@ public class TenantService implements ITenantService {
         tenantRepository.save(empresa);
 
         // Também desativar o datasource associado
-        tenantDatasourceRepository.findByTenantIdAndIsActiveTrue(tenantId)
+        tenantDatasourceRepository.findByTenant_IdAndIsActive(tenantId, true)
                 .ifPresent(tenantDs -> {
                     tenantDs.setIsActive(false);
                     tenantDatasourceRepository.save(tenantDs);

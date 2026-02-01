@@ -46,7 +46,7 @@ public class UsuarioPermissao {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "usuario_permissao_direta",
+            name = "tb_usuario_permissao_direta",
             joinColumns = @JoinColumn(name = "usuario_permissao_id"),
             inverseJoinColumns = @JoinColumn(name = "permissao_id")
     )

@@ -64,9 +64,7 @@ public interface IUsuarioPermissoesMapper {
                         permissao.getCodigo(),
                         permissao.getNome(),
                         permissao.getModulo(),
-                        permissao.getAcao(),
-                        permissao.getContexto(),
-                        permissao.isAtivo()
+                        permissao.getAcao()
                 ))
                 .collect(Collectors.toSet());
     }

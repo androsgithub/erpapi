@@ -17,7 +17,7 @@ import java.util.Map;
 public class ContextoPermissao implements Serializable {
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "permissao_contexto", joinColumns = @JoinColumn(name = "permissao_id"))
+    @CollectionTable(name = "tb_permissao_contexto", joinColumns = @JoinColumn(name = "permissao_id"))
     @MapKeyColumn(name = "contexto_chave")
     @Column(name = "contexto_valor")
     private Map<String, String> contexto;

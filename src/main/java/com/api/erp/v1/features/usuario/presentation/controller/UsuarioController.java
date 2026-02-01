@@ -15,7 +15,7 @@ import com.api.erp.v1.features.usuario.domain.service.IUsuarioService;
 import com.api.erp.v1.features.usuario.infrastructure.service.AuthenticationService;
 import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import com.api.erp.v1.shared.infrastructure.service.SecurityService;
-import com.dros.observability.application.annotation.TrackFlow;
+import com.dros.observability.core.annotation.TrackFlow;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -71,8 +71,8 @@ public class UsuarioController implements IUsuarioController {
     }
 
     @GetMapping
-    @RequiresPermission(UsuarioPermissions.LISTAR)
-    @TrackFlow("LIST_USERS")
+//    @RequiresPermission(UsuarioPermissions.LISTAR)
+//    @TrackFlow("LIST_USERS")
     public List<UsuarioResponse> listar() {
         return usuarioMapper.toResponseList(usuarioService.listarTodos());
     }

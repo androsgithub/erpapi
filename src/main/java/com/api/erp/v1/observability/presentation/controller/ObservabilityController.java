@@ -2,7 +2,9 @@ package com.api.erp.v1.observability.presentation.controller;
 
 import com.api.erp.v1.observability.application.service.ObservabilityService;
 import com.api.erp.v1.observability.domain.entity.ObservabilityPermissions;
-import com.api.erp.v1.observability.presentation.dto.*;
+import com.api.erp.v1.observability.presentation.dto.FlowEventDto;
+import com.api.erp.v1.observability.presentation.dto.ObservabilityFilter;
+import com.api.erp.v1.observability.presentation.dto.PageableResponse;
 import com.api.erp.v1.shared.infrastructure.security.annotations.RequiresPermission;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

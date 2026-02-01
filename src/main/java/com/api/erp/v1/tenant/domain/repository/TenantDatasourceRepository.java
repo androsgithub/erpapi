@@ -6,11 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * TenantDatasourceRepository
- * 
+ * <p>
  * Repository para gerenciar configurações de datasources dos tenants
  */
 @Repository
@@ -27,8 +28,8 @@ public interface TenantDatasourceRepository extends JpaRepository<TenantDatasour
      */
     @Query("SELECT td FROM TenantDatasource td " +
             "WHERE td.tenant.nome = :tenantSlug AND td.isActive = true")
-    Optional<TenantDatasource> findByTenant_SlugAndIsActive(@Param("tenantSlug") String tenantSlug, 
-                                                             @Param("isActive") Boolean isActive);
+    Optional<TenantDatasource> findByTenant_SlugAndIsActive(@Param("tenantSlug") String tenantSlug,
+                                                            @Param("isActive") Boolean isActive);
 
     /**
      * Busca datasource por tenantId (independente de ativo)

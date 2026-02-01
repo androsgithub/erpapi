@@ -1,7 +1,7 @@
 package com.api.erp.v1.features.cliente.infrastructure.decorator;
 
 import com.api.erp.v1.features.cliente.domain.service.IClienteService;
-import com.api.erp.v1.tenant.domain.entity.ClienteConfig;
+import com.api.erp.v1.tenant.domain.entity.configs.ClienteConfig;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

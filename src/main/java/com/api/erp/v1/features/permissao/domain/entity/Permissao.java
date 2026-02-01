@@ -1,5 +1,6 @@
 package com.api.erp.v1.features.permissao.domain.entity;
 
+import com.api.erp.v1.shared.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,16 +10,12 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 
 @Entity
-@Table(name = "permissao")
+@Table(name = "tb_permissao")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Permissao {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Permissao extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String codigo;
@@ -32,14 +29,4 @@ public class Permissao {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoAcao acao;
-
-    @Embedded
-    private ContextoPermissao contexto;
-
-    @Column(nullable = false)
-    private boolean ativo;
-
-    public Map<String, String> getContexto(){
-        return contexto.getContexto();
-    }
 }

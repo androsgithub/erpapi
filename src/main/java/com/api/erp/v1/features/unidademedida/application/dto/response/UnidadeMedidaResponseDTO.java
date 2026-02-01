@@ -16,15 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class UnidadeMedidaResponseDTO {
-    
     private Long id;
     private String sigla;
     private String descricao;
-    private Boolean ativo;
-    
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime dataCriacao;
-    
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime dataAtualizacao;
 }

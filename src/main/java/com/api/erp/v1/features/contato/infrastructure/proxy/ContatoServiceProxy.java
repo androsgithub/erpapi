@@ -5,7 +5,7 @@ import com.api.erp.v1.features.contato.domain.entity.Contato;
 import com.api.erp.v1.features.contato.domain.service.IContatoService;
 import com.api.erp.v1.features.contato.infrastructure.decorator.ContatoServiceApplyDecorate;
 import com.api.erp.v1.features.contato.infrastructure.service.ContatoService;
-import com.api.erp.v1.tenant.domain.entity.ContatoConfig;
+import com.api.erp.v1.tenant.domain.entity.configs.ContatoConfig;
 import com.api.erp.v1.tenant.domain.entity.Tenant;
 import com.api.erp.v1.tenant.domain.service.ITenantService;
 import com.api.erp.v1.shared.infrastructure.service.SecurityService;

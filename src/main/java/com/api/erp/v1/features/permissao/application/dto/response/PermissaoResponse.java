@@ -9,8 +9,6 @@ public record PermissaoResponse(
         String codigo,
         String nome,
         String modulo,
-        TipoAcao acao,
-        Map<String, String> contexto,
-        boolean ativo
+        TipoAcao acao
 ) {
 }

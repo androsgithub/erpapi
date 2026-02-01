@@ -1,6 +1,6 @@
 package com.api.erp.v1.tenant.application.dto;
 
-import com.api.erp.v1.tenant.domain.entity.TenantConfig;
+import com.api.erp.v1.tenant.domain.entity.configs.TenantConfig;
 import com.api.erp.v1.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.shared.domain.valueobject.Email;
 import com.api.erp.v1.shared.domain.valueobject.Telefone;

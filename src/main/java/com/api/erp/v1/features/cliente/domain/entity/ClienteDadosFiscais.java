@@ -1,9 +1,9 @@
 package com.api.erp.v1.features.cliente.domain.entity;
 
-import com.api.erp.v1.shared.domain.enums.RegimeTributario;
 import com.api.erp.v1.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.shared.domain.valueobject.CPF;
 import com.api.erp.v1.shared.domain.valueobject.RG;
+import com.dros.taxengine.domain.RegimeTributario;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;

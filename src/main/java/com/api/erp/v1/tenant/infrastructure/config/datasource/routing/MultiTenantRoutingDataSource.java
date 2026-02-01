@@ -43,30 +43,6 @@ public class MultiTenantRoutingDataSource extends AbstractDataSource {
     }
 
     /**
-     * Registra um novo datasource no cache usando slug (converte para Long se necessário)
-     */
-    public void addDataSource(String tenantSlug, DataSource dataSource) {
-        log.info("Registrando datasource para tenant slug: {}", tenantSlug);
-        // Tenta usar o slug como Long se possível
-        try {
-            Long tenantId = Long.parseLong(tenantSlug);
-            dataSources.put(tenantId, dataSource);
-        } catch (NumberFormatException e) {
-            // Se não for um número, você pode querer armazenar de forma diferente
-            // Por enquanto, vamos apenas registrar um aviso
-            log.warn("Tenant slug não é numérico: {}. Não foi armazenado no cache de datasources.", tenantSlug);
-        }
-    }
-
-    /**
-     * Remove datasource do cache (ex: quando tenant é deletado)
-     */
-    public void removeDataSource(Long tenantId) {
-        log.info("Removendo datasource para tenant: {}", tenantId);
-        dataSources.remove(tenantId);
-    }
-
-    /**
      * Obtém conexão para o banco do tenant
      * 
      * Se TenantContext estiver vazio (inicialização da app), usa defaultDataSource (master)
@@ -75,7 +51,7 @@ public class MultiTenantRoutingDataSource extends AbstractDataSource {
     public Connection getConnection() throws SQLException {
         Long tenantId = TenantContext.getTenantId();
         log.info("🔌 [MultiTenantRoutingDataSource.getConnection] Tentando obter conexão. TenantContext.tenantId = {}", tenantId);
-        
+
         // Fallback para defaultDataSource quando TenantContext está vazio
         // Isso acontece durante a inicialização da aplicação (startup/migrations)
         if (tenantId == null) {

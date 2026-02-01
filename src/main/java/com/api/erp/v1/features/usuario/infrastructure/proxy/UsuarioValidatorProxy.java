@@ -1,7 +1,7 @@
 package com.api.erp.v1.features.usuario.infrastructure.proxy;
 
 import com.api.erp.v1.tenant.domain.entity.Tenant;
-import com.api.erp.v1.tenant.domain.entity.UsuarioConfig;
+import com.api.erp.v1.tenant.domain.entity.configs.UsuarioConfig;
 import com.api.erp.v1.tenant.domain.service.ITenantService;
 import com.api.erp.v1.features.usuario.application.dto.request.CreateUsuarioRequest;
 import com.api.erp.v1.features.usuario.application.validator.BasicUsuarioValidator;

@@ -18,4 +18,5 @@ public class UsuarioResponse {
     private StatusUsuario status;
     private LocalDateTime dataCriacao;
     private Set<ContatoResponse> contatos;
+    private long tenantId;
 }

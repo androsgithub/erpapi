@@ -1,6 +1,6 @@
 package com.api.erp.v1.features.endereco.infrastructure.decorator;
 
-import com.api.erp.v1.tenant.domain.entity.EnderecoConfig;
+import com.api.erp.v1.tenant.domain.entity.configs.EnderecoConfig;
 import com.api.erp.v1.features.endereco.domain.service.IEnderecoService;
 import lombok.extern.slf4j.Slf4j;
 

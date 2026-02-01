@@ -1,8 +1,8 @@
 package com.api.erp.v1.observability.application.service;
 
 import com.api.erp.v1.observability.presentation.dto.*;
-import com.dros.observability.domain.entity.FlowEventEntity;
-import com.dros.observability.domain.repository.FlowEventRepository;
+import com.dros.observability.tracker.database.entity.FlowEventEntity;
+import com.dros.observability.tracker.database.repository.FlowEventRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * DDD: Application Service que orquestra domain e infrastructure
  */
 @Service
-@Transactional(transactionManager = "logsTransactionManager", readOnly = true)
+@Transactional(readOnly = true)
 public class ObservabilityService {
 
     private final FlowEventRepository flowEventRepository;

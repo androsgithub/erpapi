@@ -42,7 +42,7 @@ public class UnidadeMedidaService implements IUnidadeMedidaService {
             throw new BusinessException(HttpStatus.CONFLICT, "Já existe uma unidade de medida com a sigla: " + dto.getSigla());
         }
 
-        UnidadeMedida unidade = UnidadeMedida.builder().sigla(dto.getSigla().trim().toUpperCase()).descricao(dto.getDescricao().trim()).ativo(true).build();
+        UnidadeMedida unidade = UnidadeMedida.builder().sigla(dto.getSigla().trim().toUpperCase()).descricao(dto.getDescricao().trim()).build();
 
         UnidadeMedida salva = repository.save(unidade);
         return converterParaResponseDTO(salva);
@@ -64,7 +64,6 @@ public class UnidadeMedidaService implements IUnidadeMedidaService {
 
         unidade.setSigla(dto.getSigla().trim().toUpperCase());
         unidade.setDescricao(dto.getDescricao().trim());
-        unidade.atualizarDataAtualizacao();
 
         UnidadeMedida atualizada = repository.save(unidade);
         return converterParaResponseDTO(atualizada);
@@ -91,7 +90,6 @@ public class UnidadeMedidaService implements IUnidadeMedidaService {
      */
     public UnidadeMedidaResponseDTO ativar(Long id) {
         UnidadeMedida unidade = obterPorId(id);
-        unidade.ativar();
         UnidadeMedida atualizada = repository.save(unidade);
         return converterParaResponseDTO(atualizada);
     }
@@ -101,7 +99,6 @@ public class UnidadeMedidaService implements IUnidadeMedidaService {
      */
     public UnidadeMedidaResponseDTO desativar(Long id) {
         UnidadeMedida unidade = obterPorId(id);
-        unidade.desativar();
         UnidadeMedida atualizada = repository.save(unidade);
         return converterParaResponseDTO(atualizada);
     }
@@ -125,6 +122,6 @@ public class UnidadeMedidaService implements IUnidadeMedidaService {
      * Converte entidade para DTO
      */
     private UnidadeMedidaResponseDTO converterParaResponseDTO(UnidadeMedida unidade) {
-        return UnidadeMedidaResponseDTO.builder().id(unidade.getId()).sigla(unidade.getSigla()).descricao(unidade.getDescricao()).ativo(unidade.getAtivo()).dataCriacao(unidade.getDataCriacao()).dataAtualizacao(unidade.getDataAtualizacao()).build();
+        return UnidadeMedidaResponseDTO.builder().id(unidade.getId()).sigla(unidade.getSigla()).descricao(unidade.getDescricao()).build();
     }
 }

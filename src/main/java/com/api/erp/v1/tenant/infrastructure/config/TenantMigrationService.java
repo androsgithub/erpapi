@@ -122,7 +122,7 @@ public class TenantMigrationService {
                     .locations("classpath:db/migration/tenant")
                     .baselineOnMigrate(true)
                     .validateOnMigrate(false)
-                    .table("flyway_schema_history")  // Tabela padrão do Flyway
+                    .table("tenant_erpapi_migrations_history")  // Tabela padrão do Flyway
                     .load();
 
             // Tenta repair (remove migrações falhadas se houver)

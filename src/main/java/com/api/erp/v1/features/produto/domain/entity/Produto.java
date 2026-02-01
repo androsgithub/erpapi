@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE tb_produto SET deleted = true, deleted_at = now() WHERE id = ?")
-@Filter(name = "tenantIdFilter", condition = "tenant_id = :tenantId")
 public class Produto extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 50)

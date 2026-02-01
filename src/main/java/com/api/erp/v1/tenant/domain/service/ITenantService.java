@@ -2,7 +2,7 @@ package com.api.erp.v1.tenant.domain.service;
 
 import com.api.erp.v1.tenant.application.dto.*;
 import com.api.erp.v1.tenant.domain.entity.Tenant;
-import com.api.erp.v1.tenant.domain.entity.TenantConfig;
+import com.api.erp.v1.tenant.domain.entity.configs.TenantConfig;
 
 public interface ITenantService {
     Tenant getDadosTenant(Long tenantId);

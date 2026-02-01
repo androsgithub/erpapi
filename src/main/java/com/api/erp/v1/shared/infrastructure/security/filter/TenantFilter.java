@@ -2,11 +2,14 @@ package com.api.erp.v1.shared.infrastructure.security.filter;
 
 import com.api.erp.v1.shared.common.constant.HeaderConst;
 import com.api.erp.v1.tenant.infrastructure.config.datasource.TenantContext;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 

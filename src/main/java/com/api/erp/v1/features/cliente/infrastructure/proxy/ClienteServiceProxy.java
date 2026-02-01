@@ -5,7 +5,7 @@ import com.api.erp.v1.features.cliente.domain.entity.Cliente;
 import com.api.erp.v1.features.cliente.domain.service.IClienteService;
 import com.api.erp.v1.features.cliente.infrastructure.decorator.ClienteServiceApplyDecorate;
 import com.api.erp.v1.features.cliente.infrastructure.service.ClienteService;
-import com.api.erp.v1.tenant.domain.entity.ClienteConfig;
+import com.api.erp.v1.tenant.domain.entity.configs.ClienteConfig;
 import com.api.erp.v1.tenant.domain.entity.Tenant;
 import com.api.erp.v1.tenant.domain.service.ITenantService;
 import com.api.erp.v1.shared.infrastructure.service.SecurityService;

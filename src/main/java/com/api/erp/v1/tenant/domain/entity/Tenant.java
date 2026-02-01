@@ -5,6 +5,7 @@ import com.api.erp.v1.shared.domain.valueobject.Email;
 import com.api.erp.v1.shared.domain.valueobject.Telefone;
 import com.api.erp.v1.shared.infrastructure.persistence.converters.EmailConverter;
 import com.api.erp.v1.shared.infrastructure.persistence.converters.TelefoneConverter;
+import com.api.erp.v1.tenant.domain.entity.configs.TenantConfig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

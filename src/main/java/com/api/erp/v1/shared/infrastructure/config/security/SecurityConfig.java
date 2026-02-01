@@ -5,7 +5,6 @@ import com.api.erp.v1.shared.infrastructure.security.filter.TenantFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -16,7 +15,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
 
     private final BearerTokenFilter bearerTokenFilter;
@@ -36,10 +34,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Rotas públicas do Swagger/OpenAPI
                         .requestMatchers("/v3/api-docs/**",
-                                                  "/swagger-ui/**",
-                                                  "/swagger-ui.html",
-                                                  "/swagger-resources/**",
-                                                  "/webjars/**").permitAll()
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**").permitAll()
                         // Rotas públicas da autenticação
                         .requestMatchers("/api/v1/usuarios/login").permitAll()
                         .requestMatchers("/api/v1/usuarios/health").permitAll()

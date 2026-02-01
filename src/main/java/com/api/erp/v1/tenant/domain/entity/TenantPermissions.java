@@ -4,7 +4,7 @@ public final class TenantPermissions {
     private TenantPermissions() {
     }
 
-    public static final String PREFIX = "empresa";
+    public static final String PREFIX = "tenant";
     public static final String BUSCAR = PREFIX + ".buscar";
     public static final String ATUALIZAR = PREFIX + ".atualizar";
 }

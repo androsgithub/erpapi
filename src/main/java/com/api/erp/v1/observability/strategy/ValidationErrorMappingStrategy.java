@@ -1,7 +1,7 @@
 package com.api.erp.v1.observability.strategy;
 
 import com.api.erp.v1.shared.domain.exception.ValidationException;
-import com.dros.observability.application.mapper.strategy.ErrorMappingStrategy;
+import com.dros.observability.core.mapper.strategy.ErrorMappingStrategy;
 import com.dros.observability.domain.FlowStatus;
 import jakarta.validation.ConstraintViolationException;
 

@@ -1,9 +1,9 @@
 package com.api.erp.v1.tenant.domain.entity;
 
-import com.api.erp.v1.shared.domain.enums.ContribuinteICMS;
-import com.api.erp.v1.shared.domain.enums.RegimeTributario;
 import com.api.erp.v1.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.shared.infrastructure.persistence.converters.CNPJConverter;
+import com.dros.taxengine.domain.ContribuinteICMS;
+import com.dros.taxengine.domain.RegimeTributario;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;

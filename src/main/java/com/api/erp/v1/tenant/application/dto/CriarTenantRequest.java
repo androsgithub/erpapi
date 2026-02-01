@@ -1,8 +1,8 @@
 package com.api.erp.v1.tenant.application.dto;
 
-import com.api.erp.v1.shared.domain.enums.ContribuinteICMS;
-import com.api.erp.v1.shared.domain.enums.RegimeTributario;
 import com.api.erp.v1.shared.domain.enums.TenantType;
+import com.dros.taxengine.domain.ContribuinteICMS;
+import com.dros.taxengine.domain.RegimeTributario;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**

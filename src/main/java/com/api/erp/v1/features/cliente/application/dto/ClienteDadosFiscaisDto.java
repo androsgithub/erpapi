@@ -1,6 +1,7 @@
 package com.api.erp.v1.features.cliente.application.dto;
 
-import com.api.erp.v1.shared.domain.enums.RegimeTributario;
+
+import com.dros.taxengine.domain.RegimeTributario;
 
 public record ClienteDadosFiscaisDto(
         String razaoSocial,

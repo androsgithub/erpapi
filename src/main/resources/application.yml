@@ -1,0 +1,107 @@
+spring:
+  application:
+    name: erp
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration/master
+    out-of-order: 'false'
+    validate-on-migrate: 'false'
+
+  datasource:
+    logs:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: root
+      password: '12345'
+      url: jdbc:mysql://localhost:3306/erpapi_logs?useSSL=false&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: '12345'
+    username: root
+    url: jdbc:mysql://localhost:3306/erpapi?useSSL=false&serverTimezone=UTC
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+    show-sql: true
+
+  boot:
+    admin:
+      client:
+        url: "http://localhost:8081"
+        username: "admin"
+        password: "admin"
+        auto-registration: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+# -------------------------------
+
+observability:
+  database:
+    username: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: '12345'
+    url: jdbc:mysql://localhost:3306/erpapi_logs?useSSL=false&serverTimezone=UTC
+    enabled: false
+  kafka:
+    enabled: false
+    bootstrap-servers: localhost:9092
+  websocket:
+    enabled: false
+
+# ------------------------------
+
+taxengine:
+  enabled: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/erpapi_tax?useSSL=false&serverTimezone=UTC
+    username: root
+    password: '12345'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+# -------------------------------
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    url: /v3/api-docs
+    operations-sorter: method
+    tags-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+
+# -------------------------------
+
+logging:
+  level:
+    org:
+      hibernate:
+        orm:
+          jdbc:
+            bind: TRACE
+        SQL: DEBUG
+      flywaydb: DEBUG
+    root: INFO
+    com:
+      api:
+        erp: DEBUG
+server:
+  port: '8080'
+jwt:
+  expiration: '86400000'
+  secret: your-secret-key-change-this-in-production-environment-very-important

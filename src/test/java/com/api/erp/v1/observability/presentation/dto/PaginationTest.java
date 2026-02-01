@@ -1,5 +1,6 @@
 package com.api.erp.v1.observability.presentation.dto;
 
+import com.api.erp.v1.observability.application.service.SearchBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
