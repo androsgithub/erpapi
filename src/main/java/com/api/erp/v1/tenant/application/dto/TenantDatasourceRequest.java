@@ -1,5 +1,8 @@
 package com.api.erp.v1.tenant.application.dto;
 
+import com.api.erp.v1.tenant.domain.entity.DBType;
+import org.flywaydb.core.internal.database.DatabaseType;
+
 /**
  * TenantDatasourceRequest
  * 
@@ -11,7 +14,6 @@ public record TenantDatasourceRequest(
         String databaseName,
         String username,
         String password,
-        String driverClassName,
-        String dialect
+        DBType dbType
 ) {
 }

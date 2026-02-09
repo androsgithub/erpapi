@@ -2,13 +2,9 @@ package com.api.erp.v1.features.permissao.domain.entity;
 
 import com.api.erp.v1.shared.domain.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.Map;
-
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "tb_permissao")
 @Data

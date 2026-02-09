@@ -7,11 +7,9 @@ import com.api.erp.v1.features.permissao.domain.entity.Permissao;
 import com.api.erp.v1.features.permissao.domain.entity.Role;
 import com.api.erp.v1.features.permissao.domain.repository.PermissaoRepository;
 import com.api.erp.v1.features.permissao.domain.repository.RoleRepository;
-import com.api.erp.v1.features.permissao.domain.repository.UsuarioPermissaoRepository;
 import com.api.erp.v1.features.permissao.domain.service.IGerenciamentoPermissaoService;
 import com.api.erp.v1.features.usuario.domain.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,7 +19,6 @@ public class GerenciamentoPermissaoService implements IGerenciamentoPermissaoSer
 
     private final PermissaoRepository permissaoRepository;
     private final RoleRepository roleRepository;
-    private final UsuarioPermissaoRepository usuarioPermissaoRepository;
     private final UsuarioRepository usuarioRepository;
 
     @Override

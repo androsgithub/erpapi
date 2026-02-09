@@ -1,8 +1,11 @@
 package com.api.erp.v1.features.contato.application.dto.response;
 
-import com.api.erp.v1.shared.domain.valueobject.CustomData;
+
+import com.api.erp.v1.features.customfield.domain.entity.CustomData;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 public record ContatoResponse(
         Long id,
@@ -11,7 +14,7 @@ public record ContatoResponse(
         String descricao,
         boolean principal,
         boolean ativo,
-        CustomData custom_data,
+        List<CustomData> custom_data,
         LocalDateTime create_At,
         LocalDateTime updated_at
 ) {

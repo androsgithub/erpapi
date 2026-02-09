@@ -65,7 +65,7 @@ public class BearerTokenFilter extends OncePerRequestFilter {
 
                 // ✅ CRITICAL: Set TenantContext for DataSource routing
                 if (tenantId != null && !tenantId.isEmpty()) {
-                    TenantContext.setTenantId(tenantId);
+                    TenantContext.setTenantId(Long.valueOf(tenantId));
                     log.debug("✅ TenantContext setado do JWT | tenantId: {}", tenantId);
                 }
             }

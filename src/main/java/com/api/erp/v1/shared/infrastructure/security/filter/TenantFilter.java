@@ -32,7 +32,7 @@ public class TenantFilter extends OncePerRequestFilter {
         String tenantId = request.getHeader(HeaderConst.TENANT_ID_HEADER);
 
         if (tenantId != null && !tenantId.isEmpty()) {
-            TenantContext.setTenantId(tenantId);
+            TenantContext.setTenantId(Long.valueOf(tenantId));
             log.info("✅ TenantContext setado do HEADER | tenantId: {} | rota: {}", 
                     tenantId, request.getRequestURI());
         } else {

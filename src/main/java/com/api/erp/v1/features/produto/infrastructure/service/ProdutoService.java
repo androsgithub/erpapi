@@ -1,5 +1,7 @@
 package com.api.erp.v1.features.produto.infrastructure.service;
 
+import com.api.erp.v1.features.customfield.domain.entity.CustomData;
+import com.api.erp.v1.features.customfield.domain.entity.CustomFieldDefinition;
 import com.api.erp.v1.features.produto.application.dto.ClassificacaoFiscalDTO;
 import com.api.erp.v1.features.produto.application.dto.ProdutoRequestDTO;
 import com.api.erp.v1.features.produto.domain.entity.ClassificacaoFiscal;
@@ -19,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Serviço de Aplicação para Produto
@@ -59,7 +63,18 @@ public class ProdutoService implements IProdutoService {
         produto.setPrecoVenda(dto.getPrecoVenda());
         produto.setPrecoCusto(dto.getPrecoCusto());
         produto.setDescricaoDetalhada(dto.getDescricaoDetalhada());
-        produto.setCustomData(dto.getCustomData());
+
+        List<CustomData> listCustomData = List.of();
+
+        dto.getCustomData().forEach((key,value )-> {
+            CustomData cd = new CustomData();
+            CustomFieldDefinition cfd = new CustomFieldDefinition();
+            cfd.setFieldKey(key);
+            cd.setField(cfd);
+            listCustomData.add(cd);
+        });
+
+        produto.setCustomData(listCustomData);
 
 
         return repository.save(produto);

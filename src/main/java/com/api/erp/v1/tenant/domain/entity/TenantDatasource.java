@@ -7,23 +7,20 @@ import java.time.LocalDateTime;
 
 /**
  * TenantDatasource
- * 
+ * <p>
  * Entidade que armazena a configuração de datasource (banco de dados) de cada tenant.
- * 
+ * <p>
  * Estratégia de Multi-Tenancy:
  * - DATABASE per TENANT: cada tenant pode ter seu próprio banco de dados
  * - ROW-based discrimination: dentro do banco, tenantId discrimina os dados (para matriz e filiais)
- * 
+ * <p>
  * Exemplo:
  * - Empresa JAGUAR: banco próprio (jaguar_db) + filiais usam o mesmo banco
  * - Empresa HECE: banco próprio (hece_db)
  * - Filial de JAGUAR em SP: mesmo banco jaguar_db, mas com tenantId diferente
  */
 @Entity
-@Table(name = "tb_tenant_datasource", indexes = {
-        @Index(name = "idx_tenant_id", columnList = "tenant_id"),
-        @Index(name = "idx_is_active", columnList = "is_active")
-})
+@Table(name = "tb_tenant_datasource", indexes = {@Index(name = "idx_tenant_id", columnList = "tenant_id"), @Index(name = "idx_is_active", columnList = "is_active")})
 @Getter
 @Setter
 @Builder
@@ -56,11 +53,9 @@ public class TenantDatasource {
     private String password;
 
     // ===== Configuração JDBC =====
-    @Column(name = "driver_class_name", nullable = false)
-    private String driverClassName;
-
-    @Column(name = "dialect", nullable = false)
-    private String dialect;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "db_type", nullable = false)
+    private DBType dbType;
 
     // ===== Status =====
     @Column(name = "is_active", nullable = false)
@@ -95,15 +90,37 @@ public class TenantDatasource {
      * Retorna a URL de conexão JDBC
      */
     public String getJdbcUrl() {
-        // MySQL: jdbc:mysql://host:port/database
-        if (driverClassName.contains("mysql")) {
-            return String.format("jdbc:mysql://%s:%d/%s", host, port, databaseName);
+        switch (dbType) {
+            case MYSQL:
+                return String.format("jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true", host, port, databaseName);
+
+            case MARIADB:
+                return String.format("jdbc:mariadb://%s:%d/%s", host, port, databaseName);
+
+            case POSTGRESQL:
+                return String.format("jdbc:postgresql://%s:%d/%s", host, port, databaseName);
+
+            case ORACLE:
+                // Oracle Thin: jdbc:oracle:thin:@host:port:SID
+                // Oracle Service: jdbc:oracle:thin:@host:port/SERVICE
+                return String.format("jdbc:oracle:thin:@%s:%d:%s", host, port, databaseName);
+
+            case SQL_SERVER:
+                // SQL Server: jdbc:sqlserver://host:port;databaseName=database
+                return String.format("jdbc:sqlserver://%s:%d;databaseName=%s", host, port, databaseName);
+
+            case H2:
+                // H2 em modo servidor: jdbc:h2:tcp://host:port/database
+                // H2 em arquivo: jdbc:h2:file:./data/database
+                // H2 em memória: jdbc:h2:mem:database
+                return String.format("jdbc:h2:tcp://%s:%d/%s", host, port, databaseName);
+
+            case DB2:
+                return String.format("jdbc:db2://%s:%d/%s", host, port, databaseName);
+
+            default:
+                throw new IllegalArgumentException("Tipo de banco não suportado: " + dbType.getNome());
         }
-        // PostgreSQL: jdbc:postgresql://host:port/database
-        if (driverClassName.contains("postgresql")) {
-            return String.format("jdbc:postgresql://%s:%d/%s", host, port, databaseName);
-        }
-        throw new IllegalArgumentException("Driver não suportado: " + driverClassName);
     }
 
     public enum TestStatus {

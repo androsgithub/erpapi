@@ -14,8 +14,8 @@ public class MainSeed {
 
     @Transactional
     public void executar() {
-//        permissaoSeed.executar();
-//        usuarioAdminSeed.executar();
+        permissaoSeed.executar();
+        usuarioAdminSeed.executar();
 //        unidadeMedidaSeed.executar();
     }
 }

@@ -2,38 +2,39 @@ package com.api.erp.v1.features.cliente.tenants.hece.validator;
 
 import com.api.erp.v1.features.cliente.application.dto.request.CreateClienteDto;
 import com.api.erp.v1.features.cliente.domain.validator.IClienteValidator;
-import com.api.erp.v1.features.cliente.infrastructure.proxy.ClienteValidatorProxy;
-import com.api.erp.v1.features.cliente.infrastructure.validator.ClienteValidatorDefault;
-import com.api.erp.v1.shared.domain.enums.TenantType;
 import com.api.erp.v1.shared.domain.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-@Component("clienteValidator_HECE")
+@Component
 public class ClienteValidatorHece implements IClienteValidator {
 
-    @Autowired
     @Qualifier("clienteValidatorDefault")
-    private IClienteValidator defaultValidator;
+    private final IClienteValidator defaultValidator;
+
+    @Autowired
+    public ClienteValidatorHece(IClienteValidator defaultValidator) {
+        this.defaultValidator = defaultValidator;
+    }
 
     @Override
     public void validarCriacao(CreateClienteDto dto) {
         // 1. Validações padrão
         defaultValidator.validarCriacao(dto);
 
-        String email_interno = dto.customData().getOptional("email_interno", String.class).orElseThrow(() -> new BusinessException("Deve ser informado o e-mail interno"));
+//        String emailInterno = dto.customData().getOptional("email_interno", String.class).orElseThrow(() -> new BusinessException("Deve ser informado o e-mail interno"));
 
         // 2. Validações específicas Empresa A
-        validarEmailInterno(email_interno);
+//        validarEmailInterno(emailInterno);
     }
 
     @Override
     public void validarAtualizacao(Long id, CreateClienteDto dto) {
         defaultValidator.validarAtualizacao(id, dto);
-        String email_interno = dto.customData().getOptional("email_interno", String.class).orElseThrow(() -> new BusinessException("Deve ser informado o e-mail interno"));
-        validarEmailInterno(email_interno);
+//        String emailInterno = dto.customData().getOptional("email_interno", String.class).orElseThrow(() -> new BusinessException("Deve ser informado o e-mail interno"));
+//        validarEmailInterno(emailInterno);
     }
 
     @Override

@@ -1,13 +1,13 @@
 package com.api.erp.v1.features.cliente.domain.entity;
 
-import com.api.erp.v1.features.contato.domain.entity.ClienteContato;
-import com.api.erp.v1.features.endereco.domain.entity.ClienteEndereco;
+import com.api.erp.v1.features.contato.domain.entity.Contato;
+import com.api.erp.v1.features.endereco.domain.entity.Endereco;
 import com.api.erp.v1.shared.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_cliente")
@@ -39,19 +39,11 @@ public class Cliente extends BaseEntity {
     @Embedded
     private ClientePreferencias preferencias;
 
-    @OneToMany(
-            mappedBy = "cliente",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private Set<ClienteContato> contatos;
+    @OneToMany
+    @JoinTable(name = "TB_CLIENTE_CONTATO", joinColumns = @JoinColumn(name = "cliente_id"), inverseJoinColumns = @JoinColumn(name = "contato_id"))
+    private List<Contato> contatos;
 
-    @OneToMany(
-            mappedBy = "cliente",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private Set<ClienteEndereco> enderecos;
+    @OneToMany
+    @JoinTable(name = "TB_CLIENTE_ENDERECO", joinColumns = @JoinColumn(name = "cliente_id"), inverseJoinColumns = @JoinColumn(name = "endereco_id"))
+    private List<Endereco> enderecos;
 }

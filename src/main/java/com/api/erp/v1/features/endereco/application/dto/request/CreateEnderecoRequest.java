@@ -1,7 +1,8 @@
 package com.api.erp.v1.features.endereco.application.dto.request;
 
 import com.api.erp.v1.features.endereco.domain.entity.EnderecoTipo;
-import com.api.erp.v1.shared.domain.valueobject.CustomData;
+
+import java.util.Map;
 
 public record CreateEnderecoRequest(
         String rua,
@@ -13,6 +14,6 @@ public record CreateEnderecoRequest(
         String cep,
         EnderecoTipo tipo,
         Boolean principal,
-        CustomData customData
+        Map<String, Object> customData
 ) {
 }

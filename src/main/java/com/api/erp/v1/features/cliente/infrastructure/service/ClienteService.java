@@ -15,7 +15,6 @@ import com.api.erp.v1.shared.domain.exception.NotFoundException;
 import com.api.erp.v1.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.shared.domain.valueobject.CPF;
 import com.api.erp.v1.shared.domain.valueobject.RG;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -25,11 +24,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClienteService implements IClienteService {
 
-    @Autowired
-    private ClienteRepository repository;
-    @Autowired
+    private final ClienteRepository repository;
     @Qualifier("clienteValidatorProxy")
-    private IClienteValidator validator;
+    private final IClienteValidator validator;
+
+    @Autowired
+    public ClienteService(ClienteRepository repository, IClienteValidator validator) {
+        this.repository = repository;
+        this.validator = validator;
+    }
 
     @Override
     public Page<Cliente> pegarTodos(Pageable pageable) {
@@ -84,7 +87,6 @@ public class ClienteService implements IClienteService {
                 preferenciasDto.malaDireta()
         );
         cliente.setPreferencias(preferencias);
-        cliente.setCustomData(clienteDto.customData());
 
         return repository.save(cliente);
     }
@@ -128,7 +130,6 @@ public class ClienteService implements IClienteService {
                 preferenciasDto.malaDireta()
         );
         cliente.setPreferencias(preferencias);
-        cliente.setCustomData(clienteDto.customData());
         return repository.save(cliente);
     }
 

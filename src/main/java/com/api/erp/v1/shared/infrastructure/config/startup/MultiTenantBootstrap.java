@@ -1,30 +1,39 @@
 package com.api.erp.v1.shared.infrastructure.config.startup;
 
-import com.api.erp.v1.shared.infrastructure.config.startup.seed.MainSeed;
-import com.api.erp.v1.shared.infrastructure.config.startup.seed.PermissaoSeed;
-import com.api.erp.v1.shared.infrastructure.config.startup.seed.UnidadeMedidaSeed;
-import com.api.erp.v1.shared.infrastructure.config.startup.seed.UsuarioAdminSeed;
+import com.api.erp.v1.shared.infrastructure.config.startup.seed.*;
 import com.api.erp.v1.tenant.domain.entity.Tenant;
 import com.api.erp.v1.tenant.domain.repository.TenantRepository;
 import com.api.erp.v1.tenant.infrastructure.config.datasource.TenantContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
-public class MultiTenantBootstrap implements ApplicationRunner {
+public class MultiTenantBootstrap {
 
     private final TenantRepository tenantRepository;
     private final MainSeed mainSeed;
 
-    @Override
-    public void run(ApplicationArguments args) {
+    @Autowired
+    public MultiTenantBootstrap(TenantRepository tenantRepository, MainSeed mainSeed) {
+        this.tenantRepository = tenantRepository;
+        this.mainSeed = mainSeed;
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void run() {
+
+        log.info("Criando schemas...");
+        SchemaGenerator.executar();
+        log.info("Schemas criados!");
 
         log.info("🚀 Iniciando bootstrap multi-tenant de permissões...");
 

@@ -3,6 +3,7 @@ package com.api.erp.v1.observability.application.service;
 import com.api.erp.v1.observability.presentation.dto.*;
 import com.dros.observability.tracker.database.entity.FlowEventEntity;
 import com.dros.observability.tracker.database.repository.FlowEventRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class ObservabilityService {
 
     private final FlowEventRepository flowEventRepository;
 
+    @Autowired
     public ObservabilityService(FlowEventRepository flowEventRepository) {
         this.flowEventRepository = flowEventRepository;
     }

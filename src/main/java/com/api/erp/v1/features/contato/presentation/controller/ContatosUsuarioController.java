@@ -6,7 +6,6 @@ import com.api.erp.v1.features.contato.application.dto.request.RemoverContatoReq
 import com.api.erp.v1.features.contato.application.dto.response.ContatoResponse;
 import com.api.erp.v1.features.contato.application.dto.response.UsuarioContatosResponse;
 import com.api.erp.v1.features.contato.application.mapper.IContatoMapper;
-import com.api.erp.v1.features.contato.application.mapper.UsuarioContatoMapper;
 import com.api.erp.v1.features.contato.domain.controller.IContatosUsuarioController;
 import com.api.erp.v1.features.contato.domain.entity.ContatoPermissions;
 import com.api.erp.v1.features.contato.domain.service.IGerenciamentoContatoService;
@@ -46,15 +45,14 @@ public class ContatosUsuarioController implements IContatosUsuarioController {
     private IGerenciamentoContatoService gerenciamentoContatoService;
     @Autowired
     private IContatoMapper contatoMapper;
-    @Autowired
-    private UsuarioContatoMapper usuarioContatoMapper;
 
     @PostMapping("/associar")
     @RequiresPermission(ContatoPermissions.CRIAR)
     public ResponseEntity<UsuarioContatosResponse> associarContatos(
             @RequestBody AssociarContatosRequest request) {
-        var usuarioContato = gerenciamentoContatoService.associarContatos(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioContatoMapper.toResponse(usuarioContato));
+//        var usuarioContato = gerenciamentoContatoService.associarContatos(request);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioContatoMapper.toResponse(usuarioContato));
+        return null;
     }
 
     @PostMapping("/{usuarioId}/contato")
@@ -70,8 +68,9 @@ public class ContatosUsuarioController implements IContatosUsuarioController {
     @RequiresPermission(ContatoPermissions.VISUALIZAR)
     public ResponseEntity<UsuarioContatosResponse> buscarContatosUsuario(
             @PathVariable @Parameter(description = "ID do usuário") Long usuarioId) {
-        var usuarioContato = gerenciamentoContatoService.buscarContatosUsuario(usuarioId);
-        return ResponseEntity.ok(usuarioContatoMapper.toResponse(usuarioContato));
+//        var usuarioContato = gerenciamentoContatoService.buscarContatosUsuario(usuarioId);
+//        return ResponseEntity.ok(usuarioContatoMapper.toResponse(usuarioContato));
+        return null;
     }
 
     @DeleteMapping("/remover")

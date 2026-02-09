@@ -2,9 +2,9 @@ package com.api.erp.v1.features.endereco.application.dto.response;
 
 import com.api.erp.v1.features.endereco.domain.entity.EnderecoTipo;
 import com.api.erp.v1.shared.domain.valueobject.CEP;
-import com.api.erp.v1.shared.domain.valueobject.CustomData;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 public record EnderecoResponse(
         Long id,
@@ -17,7 +17,7 @@ public record EnderecoResponse(
         CEP cep,
         EnderecoTipo tipo,
         Boolean principal,
-        CustomData custom_data,
+        Map<String, Object> custom_data,
         OffsetDateTime created_at,
         OffsetDateTime updated_at,
         Long created_by,

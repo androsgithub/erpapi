@@ -22,13 +22,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/clientes")
 public class ClienteController implements IClienteController {
 
-    @Autowired
     @Qualifier("clienteServiceProxy")
-    private IClienteService clienteService;
+    private final IClienteService clienteService;
+    private final IClienteCompleteMapper clienteCompleteMapper;
+    private final IClienteSimpleMapper clienteSimpleMapper;
+
     @Autowired
-    private IClienteCompleteMapper clienteCompleteMapper;
-    @Autowired
-    private IClienteSimpleMapper clienteSimpleMapper;
+    public ClienteController(IClienteService clienteService, IClienteCompleteMapper clienteCompleteMapper, IClienteSimpleMapper clienteSimpleMapper) {
+        this.clienteService = clienteService;
+        this.clienteCompleteMapper = clienteCompleteMapper;
+        this.clienteSimpleMapper = clienteSimpleMapper;
+    }
 
 
     @GetMapping
@@ -49,7 +53,7 @@ public class ClienteController implements IClienteController {
 
     @DeleteMapping("/{id}")
     @RequiresPermission(ClientePermissions.DELETAR)
-    public void deletar(Long id) {
+    public void deletar(@PathVariable Long id) {
         clienteService.deletar(id);
     }
 

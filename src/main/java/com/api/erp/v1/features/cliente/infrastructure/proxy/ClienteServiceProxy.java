@@ -5,10 +5,10 @@ import com.api.erp.v1.features.cliente.domain.entity.Cliente;
 import com.api.erp.v1.features.cliente.domain.service.IClienteService;
 import com.api.erp.v1.features.cliente.infrastructure.decorator.ClienteServiceApplyDecorate;
 import com.api.erp.v1.features.cliente.infrastructure.service.ClienteService;
-import com.api.erp.v1.tenant.domain.entity.configs.ClienteConfig;
-import com.api.erp.v1.tenant.domain.entity.Tenant;
-import com.api.erp.v1.tenant.domain.service.ITenantService;
 import com.api.erp.v1.shared.infrastructure.service.SecurityService;
+import com.api.erp.v1.tenant.domain.entity.Tenant;
+import com.api.erp.v1.tenant.domain.entity.configs.ClienteConfig;
+import com.api.erp.v1.tenant.domain.service.ITenantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -19,14 +19,22 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ClienteServiceProxy implements IClienteService {
+
+    private final ApplicationContext applicationContext;
+
+    private final ClienteService clienteServiceDefault;
+
+    private final SecurityService securityService;
+
+    private final ITenantService tenantService;
+
     @Autowired
-    private ApplicationContext applicationContext;
-    @Autowired
-    private ClienteService clienteServiceDefault;
-    @Autowired
-    private SecurityService securityService;
-    @Autowired
-    private ITenantService tenantService;
+    public ClienteServiceProxy(ApplicationContext applicationContext, ClienteService clienteServiceDefault, SecurityService securityService, ITenantService tenantService) {
+        this.applicationContext = applicationContext;
+        this.clienteServiceDefault = clienteServiceDefault;
+        this.securityService = securityService;
+        this.tenantService = tenantService;
+    }
 
     private IClienteService resolverService() {
         IClienteService response = clienteServiceDefault;
@@ -39,14 +47,11 @@ public class ClienteServiceProxy implements IClienteService {
             String beanName = "clienteService_" + tenantType;
 
             clienteConfig = tenant.getConfig().getClienteConfig();
+            
+            IClienteService service = applicationContext.getBean(beanName, IClienteService.class);
+            log.debug("[CLIENTE SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
+            response = service;
 
-            try {
-                IClienteService service = applicationContext.getBean(beanName, IClienteService.class);
-                log.debug("[CLIENTE SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
-                response = service;
-            } catch (Exception e) {
-                log.debug("[CLIENTE SERVICE] Service {} não encontrado, usando padrão", beanName);
-            }
         } catch (Exception e) {
             log.debug("[CLIENTE SERVICE] Erro ao resolver tenant, usando padrão: {}", e.getMessage());
         }

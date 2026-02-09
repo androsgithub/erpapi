@@ -7,9 +7,9 @@ import com.api.erp.v1.features.cliente.domain.entity.ClienteStatus;
 import com.api.erp.v1.features.cliente.domain.entity.TipoCliente;
 import com.api.erp.v1.features.contato.application.dto.response.ContatoResponse;
 import com.api.erp.v1.features.endereco.application.dto.response.EnderecoResponse;
-import com.api.erp.v1.shared.domain.valueobject.CustomData;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 public record ClienteCompleteResponseDto(
@@ -26,7 +26,7 @@ public record ClienteCompleteResponseDto(
         Set<ContatoResponse> contatos,
         Set<EnderecoResponse> enderecos,
 
-        CustomData customData,
+        Map<String, Object> customData,
 
         LocalDateTime dataCriacao,
         LocalDateTime dataAtualizacao

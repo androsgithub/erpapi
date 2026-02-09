@@ -1,10 +1,12 @@
 package com.api.erp.v1.tenant.application.dto;
 
+import com.api.erp.v1.tenant.domain.entity.DBType;
+
 import java.time.LocalDateTime;
 
 /**
  * TenantDatasourceResponse
- * 
+ * <p>
  * DTO para retornar configuração de datasource
  */
 public record TenantDatasourceResponse(
@@ -14,8 +16,7 @@ public record TenantDatasourceResponse(
         Integer port,
         String databaseName,
         String username,
-        String driverClassName,
-        String dialect,
+        DBType dbType,
         Boolean isActive,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

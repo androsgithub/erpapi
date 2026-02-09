@@ -1,7 +1,5 @@
 package com.api.erp.v1.features.usuario.domain.entity;
 
-import com.api.erp.v1.features.contato.domain.entity.UsuarioContato;
-import com.api.erp.v1.features.permissao.domain.entity.UsuarioPermissao;
 import com.api.erp.v1.shared.domain.entity.BaseEntity;
 import com.api.erp.v1.shared.domain.valueobject.CPF;
 import com.api.erp.v1.shared.domain.valueobject.Email;
@@ -9,12 +7,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -45,21 +40,14 @@ public class Usuario extends BaseEntity {
     @Column
     private LocalDateTime approved_at;
 
-    @OneToMany(
-            mappedBy = "usuario",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private Set<UsuarioPermissao> permissoes;
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioPermissao> permissoes;
 
-    @OneToMany(
-            mappedBy = "usuario",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private Set<UsuarioContato> contatos;
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioRole> roles;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioContato> contatos;
 
     // Builder Pattern
     public static class Builder {

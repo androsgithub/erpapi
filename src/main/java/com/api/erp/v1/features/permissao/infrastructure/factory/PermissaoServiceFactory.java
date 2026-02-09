@@ -1,6 +1,6 @@
 package com.api.erp.v1.features.permissao.infrastructure.factory;
 
-import com.api.erp.v1.features.permissao.domain.repository.UsuarioPermissaoRepository;
+import com.api.erp.v1.features.permissao.domain.repository.PermissaoRepository;
 import com.api.erp.v1.features.permissao.domain.service.IPermissaoService;
 import com.api.erp.v1.features.permissao.infrastructure.cache.PermissaoCacheManager;
 import com.api.erp.v1.features.permissao.infrastructure.decorator.PermissaoAuditServiceDecorator;
@@ -16,18 +16,18 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PermissaoServiceFactory {
 
-    private final UsuarioPermissaoRepository usuarioPermissaoRepository;
+    private final PermissaoRepository permissaoRepository;
     private final PermissaoCacheManager cacheManager;
     private final ITenantService tenantService;
 
     public IPermissaoService create() {
         log.info("[PERMISSAO FACTORY] Construindo PermissaoService com decorators");
-        
+
         PermissaoConfig config = obterConfiguracao();
-        IPermissaoService service = new PermissaoService(usuarioPermissaoRepository);
-        
+        IPermissaoService service = new PermissaoService(permissaoRepository);
+
         service = aplicarDecorators(service, config);
-        
+
         log.info("[PERMISSAO FACTORY] PermissaoService construído com sucesso");
         return service;
     }

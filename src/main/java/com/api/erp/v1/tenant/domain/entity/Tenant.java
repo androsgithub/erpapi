@@ -20,11 +20,12 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="tb_tenant")
+@Table(name = "tb_tenant")
 public class Tenant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nome;
 
     @Convert(converter = EmailConverter.class)
@@ -49,10 +50,10 @@ public class Tenant {
     private TenantDadosFiscais dadosFiscais = new TenantDadosFiscais();
 
     private boolean ativa;
-    
+
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
-    
+
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
 

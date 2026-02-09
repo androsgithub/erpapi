@@ -27,14 +27,22 @@ import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class TenantService implements ITenantService {
-    @Autowired
-    private TenantRepository tenantRepository;
+
+    private final TenantRepository tenantRepository;
     private final EnderecoRepository enderecoRepository;
     private final TenantDatasourceRepository tenantDatasourceRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final SecurityService securityService;
+
+    @Autowired
+    public TenantService(TenantRepository tenantRepository, EnderecoRepository enderecoRepository, TenantDatasourceRepository tenantDatasourceRepository, ApplicationEventPublisher eventPublisher, SecurityService securityService) {
+        this.tenantRepository = tenantRepository;
+        this.enderecoRepository = enderecoRepository;
+        this.tenantDatasourceRepository = tenantDatasourceRepository;
+        this.eventPublisher = eventPublisher;
+        this.securityService = securityService;
+    }
 
     @Override
     public Tenant getDadosTenant(Long tenantId) {
@@ -57,7 +65,7 @@ public class TenantService implements ITenantService {
     @Override
     public Tenant updateClienteConfig(Long tenantId, ClienteConfigRequest clienteConfigRequest) {
         log.info("[EMPRESA SERVICE] Atualizando configuração de Cliente");
-        Tenant empresa = tenantRepository.findById(Long.valueOf(tenantId)).orElse(null);
+            Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
             throw new IllegalStateException("Tenant do tenant não encontrada");
         }
@@ -84,7 +92,7 @@ public class TenantService implements ITenantService {
     @Override
     public Tenant updateContatoConfig(Long tenantId, ContatoConfigRequest contatoConfigRequest) {
         log.info("[EMPRESA SERVICE] Atualizando configuração de Contato");
-        Tenant empresa = tenantRepository.findById(Long.valueOf(tenantId)).orElse(null);
+        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
             throw new IllegalStateException("Tenant do tenant não encontrada");
         }
@@ -106,7 +114,7 @@ public class TenantService implements ITenantService {
         log.info("[EMPRESA SERVICE] Atualizando configuração de Endereco");
 
 
-        Tenant empresa = tenantRepository.findById(Long.valueOf(tenantId)).orElse(null);
+        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
             throw new IllegalStateException("Tenant do tenant não encontrada");
         }
@@ -125,7 +133,7 @@ public class TenantService implements ITenantService {
     @Override
     public Tenant updateUsuarioConfig(Long tenantId, UsuarioConfigRequest usuarioConfigRequest) {
         log.info("[EMPRESA SERVICE] Atualizando configuração de Usuario");
-        Tenant empresa = tenantRepository.findById(Long.valueOf(tenantId)).orElse(null);
+        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
             throw new IllegalStateException("Tenant do tenant não encontrada");
         }
@@ -144,7 +152,7 @@ public class TenantService implements ITenantService {
     @Override
     public Tenant updatePermissaoConfig(Long tenantId, PermissaoConfigRequest permissaoConfigRequest) {
         log.info("[EMPRESA SERVICE] Atualizando configuração de Permissao");
-        Tenant empresa = tenantRepository.findById(Long.valueOf(tenantId)).orElse(null);
+        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
             throw new IllegalStateException("Tenant do tenant não encontrada");
         }
@@ -175,7 +183,7 @@ public class TenantService implements ITenantService {
     @Override
     public Tenant updateInternalTenantConfig(Long tenantId, InternalTenantConfigRequest internalTenantConfigRequest) {
         log.info("[EMPRESA SERVICE] Atualizando configuração de Tenant");
-        Tenant empresa = tenantRepository.findById(Long.valueOf(tenantId)).orElse(null);
+        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
             throw new IllegalStateException("Tenant do tenant não encontrada");
         }

@@ -19,7 +19,7 @@ public class UsuarioConfig {
 
     @ElementCollection
     @CollectionTable(
-            name = "tenant_domains",
+            name = "tb_tenant_domains",
             joinColumns = @JoinColumn(name = "tenant_id")
     )
     private List<String> allowedEmailDomains;

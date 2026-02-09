@@ -33,7 +33,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
                 "com.api.erp.v1.features.usuario.domain.repository",
                 "com.api.erp.v1.features.permissao.domain.repository",
                 "com.api.erp.v1.features.produto.domain.repository",
-                "com.api.erp.v1.features.camposcustom.domain.repository",
+                "com.api.erp.v1.features.customfield.domain.repository",
                 "com.api.erp.v1.features.unidademedida.domain.repository"
         },
         entityManagerFactoryRef = "entityManagerFactory",

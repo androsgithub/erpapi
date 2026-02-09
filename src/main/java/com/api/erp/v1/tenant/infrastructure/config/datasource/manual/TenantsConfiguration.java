@@ -86,7 +86,7 @@ public class TenantsConfiguration {
                 "com.api.erp.v1.shared.infrastructure.persistence.converters",
                 "com.api.erp.v1.features.permissao.domain.entity",
                 "com.api.erp.v1.features.produto.domain.entity",
-                "com.api.erp.v1.features.camposcustom.domain.entity",
+                "com.api.erp.v1.features.customfield.domain.entity",
                 "com.api.erp.v1.features.unidademedida.domain.entity",
                 "com.api.erp.v1.tenant.domain.entity");
         entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter());

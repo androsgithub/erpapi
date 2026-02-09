@@ -1,6 +1,6 @@
 package com.api.erp.v1.features.permissao.infrastructure.config;
 
-import com.api.erp.v1.features.permissao.domain.repository.UsuarioPermissaoRepository;
+import com.api.erp.v1.features.permissao.domain.repository.PermissaoRepository;
 import com.api.erp.v1.features.permissao.domain.service.IPermissaoService;
 import com.api.erp.v1.features.permissao.infrastructure.cache.PermissaoCacheManager;
 import com.api.erp.v1.features.permissao.infrastructure.factory.PermissaoServiceFactory;
@@ -18,11 +18,11 @@ public class PermissaoServiceConfiguration {
 
     @Bean
     public PermissaoServiceFactory permissaoServiceFactory(
-            UsuarioPermissaoRepository usuarioPermissaoRepository,
+            PermissaoRepository permissaoRepository,
             PermissaoCacheManager cacheManager,
             ITenantService tenantService) {
         log.info("[PERMISSAO CONFIG] Criando PermissaoServiceFactory");
-        return new PermissaoServiceFactory(usuarioPermissaoRepository, cacheManager, tenantService);
+        return new PermissaoServiceFactory(permissaoRepository, cacheManager, tenantService);
     }
 
     @Bean

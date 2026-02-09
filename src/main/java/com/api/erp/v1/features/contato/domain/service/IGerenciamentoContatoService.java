@@ -4,7 +4,6 @@ import com.api.erp.v1.features.contato.application.dto.request.AssociarContatosR
 import com.api.erp.v1.features.contato.application.dto.CreateContatoRequest;
 import com.api.erp.v1.features.contato.application.dto.request.RemoverContatoRequest;
 import com.api.erp.v1.features.contato.domain.entity.Contato;
-import com.api.erp.v1.features.contato.domain.entity.UsuarioContato;
 
 /**
  * Interface para o serviço de gerenciamento de contatos de usuário
@@ -15,14 +14,6 @@ import com.api.erp.v1.features.contato.domain.entity.UsuarioContato;
  * A conversão para DTOs de response é responsabilidade do controller/mapper
  */
 public interface IGerenciamentoContatoService {
-
-    /**
-     * Associa múltiplos contatos a um usuário
-     * 
-     * @param request com usuarioId e lista de contatos
-     * @return a entidade UsuarioContato da última associação criada
-     */
-    UsuarioContato associarContatos(AssociarContatosRequest request);
 
     /**
      * Adiciona um contato a um usuário existente
@@ -39,14 +30,6 @@ public interface IGerenciamentoContatoService {
      * @param request com usuarioId e contatoId
      */
     void removerContato(RemoverContatoRequest request);
-
-    /**
-     * Busca todos os contatos de um usuário
-     * 
-     * @param usuarioId o ID do usuário
-     * @return a entidade UsuarioContato da primeira associação encontrada
-     */
-    UsuarioContato buscarContatosUsuario(Long usuarioId);
 
     /**
      * Marca um contato como principal

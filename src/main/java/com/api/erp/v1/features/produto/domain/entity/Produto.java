@@ -1,32 +1,31 @@
 package com.api.erp.v1.features.produto.domain.entity;
 
+import com.api.erp.v1.features.customfield.domain.entity.CustomData;
 import com.api.erp.v1.features.unidademedida.domain.entity.UnidadeMedida;
 import com.api.erp.v1.shared.domain.entity.BaseEntity;
-import com.api.erp.v1.shared.domain.valueobject.CustomData;
-import com.api.erp.v1.shared.infrastructure.persistence.converters.CustomDataAttributeConverter;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Entidade de domínio que representa um Produto.
- * 
+ * <p>
  * Responsabilidades:
  * - Armazenar dados do produto
  * - Validar estado do produto através de métodos de comportamento
  * - Representar as regras de negócio do domínio
- * 
+ * <p>
  * Atributos principais:
  * - Descrição: nome/descrição do produto
  * - Status: ativo, inativo, bloqueado ou descontinuado
  * - Tipo: comprado ou fabricável
  * - Unidade de Medida: referência à unidade padrão
  * - Informações Fiscais: NCM e preparação para futuras regras
- * 
+ * <p>
  * SRP: Representar e gerenciar o estado de um produto
  */
 @Entity
@@ -39,20 +38,25 @@ import java.time.LocalDateTime;
 @SQLDelete(sql = "UPDATE tb_produto SET deleted = true, deleted_at = now() WHERE id = ?")
 public class Produto extends BaseEntity {
 
+    @OneToMany
+    @JoinTable(name = "TB_CUSTOM_DATA", joinColumns = @JoinColumn(name = "entity_id"), inverseJoinColumns = @JoinColumn(name = "custom_data_id"))
+    @SQLRestriction("entity_type='TB_PRODUTO'")
+    private List<CustomData> customData;
+
     @Column(nullable = false, unique = true, length = 50)
     private String codigo;
-    
+
     @Column(nullable = false, length = 255)
     private String descricao;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusProduto status;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoProduto tipo;
-    
+
     /**
      * Referência à Unidade de Medida - evita valores soltos
      * Toda unidade deve ser uma entidade válida do sistema
@@ -64,14 +68,14 @@ public class Produto extends BaseEntity {
 
     @Embedded
     private ClassificacaoFiscal classificacaoFiscal;
-    
+
     // Campos adicionais úteis
     @Column(columnDefinition = "DECIMAL(10,2)")
     private BigDecimal precoVenda;
-    
+
     @Column(columnDefinition = "DECIMAL(10,2)")
     private BigDecimal precoCusto;
-    
+
     @Column(columnDefinition = "TEXT")
     private String descricaoDetalhada;
 

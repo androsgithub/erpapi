@@ -1,23 +1,17 @@
 package com.api.erp.v1.features.contato.domain.entity;
 
+import com.api.erp.v1.features.customfield.domain.entity.CustomData;
 import com.api.erp.v1.shared.domain.entity.BaseEntity;
-import com.api.erp.v1.shared.domain.valueobject.CustomData;
-import com.api.erp.v1.shared.infrastructure.persistence.converters.CustomDataAttributeConverter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Entidade que representa um contato de uma entidade (Usuário, Empresa, Cliente, etc.)
- * 
+ * <p>
  * Seguindo o padrão DDD, esta entidade é responsável por gerenciar as informações
  * de contato de uma entidade do sistema.
  */
@@ -49,14 +43,10 @@ public class Contato extends BaseEntity {
     @Builder.Default
     private boolean ativo = true;
 
-    @OneToMany(
-            mappedBy = "contato",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @JsonIgnore
-    private Set<UsuarioContato> usuariosContatos;
+    @OneToMany
+    @JoinTable(name = "TB_CUSTOM_DATA", joinColumns = @JoinColumn(name = "entity_id"), inverseJoinColumns = @JoinColumn(name = "custom_data_id"))
+    @SQLRestriction("entity_type='tb_contatos'")
+    private List<CustomData> customData;
 
     /**
      * Construtor simplificado para criar um contato básico

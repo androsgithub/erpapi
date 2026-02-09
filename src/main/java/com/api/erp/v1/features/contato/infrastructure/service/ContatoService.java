@@ -42,7 +42,7 @@ public class ContatoService implements IContatoService {
         }
 
         contato.setPrincipal(request.principal());
-        contato.setCustomData(request.customData());
+//        contato.setCustomData(request.customData());
 
         return contatoRepository.save(contato);
     }
@@ -103,7 +103,7 @@ public class ContatoService implements IContatoService {
         contato.setValor(request.valor());
         contato.setDescricao(request.descricao());
         contato.setPrincipal(request.principal());
-        contato.setCustomData(request.customData());
+//        contato.setCustomData(request.customData());
 
         return contatoRepository.save(contato);
     }

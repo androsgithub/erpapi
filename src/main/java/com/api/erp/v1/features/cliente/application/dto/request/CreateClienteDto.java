@@ -5,7 +5,9 @@ import com.api.erp.v1.features.cliente.application.dto.ClienteDadosFiscaisDto;
 import com.api.erp.v1.features.cliente.application.dto.ClientePreferenciasDto;
 import com.api.erp.v1.features.cliente.domain.entity.ClienteStatus;
 import com.api.erp.v1.features.cliente.domain.entity.TipoCliente;
-import com.api.erp.v1.shared.domain.valueobject.CustomData;
+
+import java.util.List;
+import java.util.Map;
 
 public record CreateClienteDto(
         String nome,
@@ -14,7 +16,6 @@ public record CreateClienteDto(
         TipoCliente tipoCliente,
         ClienteDadosFinanceirosDto dadosFinanceiros,
         ClientePreferenciasDto preferencias,
-
-        CustomData customData
+        Map<String, Object> customData
 ) {
 }

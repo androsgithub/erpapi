@@ -1,11 +1,13 @@
 package com.api.erp.v1.tenant.infrastructure.config.datasource.routing;
 
+import com.api.erp.v1.tenant.domain.entity.DBType;
 import com.api.erp.v1.tenant.domain.entity.Tenant;
 import com.api.erp.v1.tenant.domain.entity.TenantDatasource;
 import com.api.erp.v1.tenant.domain.repository.TenantDatasourceRepository;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.flywaydb.core.internal.database.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -96,7 +98,7 @@ public class DataSourceFactory {
      */
     private TenantDatasource fetchTenantDatasourceViaJdbc(Long tenantId) {
         String sql = "SELECT td.id, td.host, td.port, td.database_name, td.username, td.password, " +
-                "       td.driver_class_name, td.tenant_id " +
+                "       td.db_type, td.tenant_id " +
                 "FROM tb_tenant_datasource td " +
                 "WHERE td.tenant_id = ? AND td.is_active = true " +
                 "LIMIT 1";
@@ -115,7 +117,7 @@ public class DataSourceFactory {
                     td.setDatabaseName(rs.getString("database_name"));
                     td.setUsername(rs.getString("username"));
                     td.setPassword(rs.getString("password"));
-                    td.setDriverClassName(rs.getString("driver_class_name"));
+                    td.setDbType(DBType.valueOf(rs.getString("db_type")));
 
                     // Cria Tenant minimal com apenas ID
                     Tenant tenant = new Tenant();
@@ -149,7 +151,7 @@ public class DataSourceFactory {
         hikariConfig.setJdbcUrl(config.getJdbcUrl());
         hikariConfig.setUsername(config.getUsername());
         hikariConfig.setPassword(config.getPassword());
-        hikariConfig.setDriverClassName(config.getDriverClassName());
+        hikariConfig.setDriverClassName(config.getDbType().getDriver());
 
         // Pool configuration
         hikariConfig.setMaximumPoolSize(hikariMaxPoolSize);

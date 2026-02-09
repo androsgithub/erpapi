@@ -114,6 +114,7 @@ public class NotificationDecoratorContatoService implements IContatoService {
      * Verifica se deve notificar para este tipo de operação
      */
     private boolean shouldNotifyOn(String operation) {
+        // TODO: Implementar lugar para pegar a configuração
 //        String config = properties.getNotification().getEmailNotificationOn();
 //        return config != null && config.contains(operation);
         return false;

@@ -1,30 +1,22 @@
 package com.api.erp.v1.features.usuario.domain.entity;
 
 import com.api.erp.v1.features.permissao.domain.entity.Role;
-import com.api.erp.v1.features.permissao.domain.entity.UsuarioPermissao;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.api.erp.v1.shared.domain.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "tb_usuario_role")
-public class UsuarioRole {
+@Getter
+@Setter
+public class UsuarioRole extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "usuario_permissao_id", nullable = false)
-    @JsonIgnore
-    private UsuarioPermissao usuarioPermissao;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "role_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
     private Role role;
 }

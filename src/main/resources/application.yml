@@ -55,12 +55,12 @@ observability:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: '12345'
     url: jdbc:mysql://localhost:3306/erpapi_logs?useSSL=false&serverTimezone=UTC
-    enabled: false
+    enabled: true
   kafka:
     enabled: false
     bootstrap-servers: localhost:9092
   websocket:
-    enabled: false
+    enabled: true
 
 # ------------------------------
 
@@ -84,6 +84,12 @@ springdoc:
     tags-sorter: alpha
   api-docs:
     path: /v3/api-docs
+
+# -------------------------------
+
+sonar:
+  maven:
+    scanAll: true
 
 # -------------------------------
 

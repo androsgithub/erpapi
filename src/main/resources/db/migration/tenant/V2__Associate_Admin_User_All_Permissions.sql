@@ -1,23 +1,30 @@
-INSERT IGNORE INTO tb_usuario_permissao (usuario_id, data_inicio, data_fim, ativo)
-VALUES
-    (1, CURRENT_TIMESTAMP, NULL, TRUE);
-
-INSERT IGNORE INTO tb_usuario_role (usuario_permissao_id, role_id)
+INSERT INTO tb_usuario_role
+(
+    created_at,
+    created_by,
+    deleted,
+    scope,
+    tenant_group_id,
+    tenant_id,
+    version,
+    usuario_id,
+    role_id
+)
 SELECT
-    up.id as usuario_permissao_id,
-    3 as role_id
-FROM
-    tb_usuario_permissao up
-WHERE
-    up.usuario_id = 1
-    AND up.ativo = TRUE
-    AND up.data_fim IS NULL
-    AND NOT EXISTS (
-        SELECT
-            1
-        FROM
-            tb_usuario_role ur
-        WHERE
-            ur.usuario_permissao_id = up.id
-            AND ur.role_id = 3
-    );
+    NOW(6),
+    1,
+    b'0',
+    'TENANT',
+    1,
+    1,
+    0,
+    1,
+    3
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM tb_usuario_role ur
+    WHERE ur.usuario_id = 1
+      AND ur.role_id = 3
+      AND ur.tenant_id = 1
+      AND ur.deleted = b'0'
+);

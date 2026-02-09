@@ -73,8 +73,7 @@ public class TenantDatasourceService implements ITenantDatasourceService {
                 .databaseName(request.databaseName())
                 .username(request.username())
                 .password(request.password())
-                .driverClassName(request.driverClassName())
-                .dialect(request.dialect())
+                .dbType(request.dbType())
                 .isActive(true)
                 .testStatus(TenantDatasource.TestStatus.SUCCESS)
                 .testedAt(LocalDateTime.now())
@@ -132,8 +131,7 @@ public class TenantDatasourceService implements ITenantDatasourceService {
         tenantDatasource.setDatabaseName(request.databaseName());
         tenantDatasource.setUsername(request.username());
         tenantDatasource.setPassword(request.password());
-        tenantDatasource.setDriverClassName(request.driverClassName());
-        tenantDatasource.setDialect(request.dialect());
+        tenantDatasource.setDbType(request.dbType());
         tenantDatasource.setTestStatus(TenantDatasource.TestStatus.SUCCESS);
         tenantDatasource.setTestedAt(LocalDateTime.now());
 
@@ -162,8 +160,7 @@ public class TenantDatasourceService implements ITenantDatasourceService {
                     .databaseName(request.databaseName())
                     .username(request.username())
                     .password(request.password())
-                    .driverClassName(request.driverClassName())
-                    .dialect(request.dialect())
+                    .dbType(request.dbType())
                     .build();
 
             DataSource testDataSource = dataSourceFactory.createDataSourceFromConfig(tempConfig);
@@ -194,8 +191,7 @@ public class TenantDatasourceService implements ITenantDatasourceService {
                 tenantDatasource.getPort(),
                 tenantDatasource.getDatabaseName(),
                 tenantDatasource.getUsername(),
-                tenantDatasource.getDriverClassName(),
-                tenantDatasource.getDialect(),
+                tenantDatasource.getDbType(),
                 tenantDatasource.getIsActive(),
                 tenantDatasource.getCreatedAt(),
                 tenantDatasource.getUpdatedAt()

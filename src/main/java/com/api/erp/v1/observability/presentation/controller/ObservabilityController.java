@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * Implementação do controller para visualização de eventos de observability.
- * 
+ *
  * SOLID: Single Responsibility - apenas implementa a lógica dos endpoints
  * Clean Architecture: Controller → Service → Repository
  */
@@ -69,11 +69,11 @@ public class ObservabilityController implements IObservabilityController {
             if (traceId != null) filter.setTraceId(traceId);
             if (minExecutionTime != null) filter.setMinExecutionTime(minExecutionTime);
             if (maxExecutionTime != null) filter.setMaxExecutionTime(maxExecutionTime);
-            
+
             PageableResponse<FlowEventDto> response = observabilityService.findWithFilter(filter, page, pageSize);
             return ResponseEntity.ok(response);
         }
-        
+
         // Sem filtros, retornar todos com paginação
         PageableResponse<FlowEventDto> response = observabilityService.findAll(pageSize);
         return ResponseEntity.ok(response);

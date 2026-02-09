@@ -32,7 +32,7 @@ public class CacheDecoratorClienteService implements IClienteService {
 
     private final IClienteService service;
     private final ConcurrentHashMap<Long, Cliente> cache = new ConcurrentHashMap<>();
-    private static final long CACHE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutos
+    private static final long CACHE_TIMEOUT_MS = 5 * 60 * 1000L; // 5 minutos
     private final ConcurrentHashMap<Long, Long> cacheTimestamps = new ConcurrentHashMap<>();
 
     @Override

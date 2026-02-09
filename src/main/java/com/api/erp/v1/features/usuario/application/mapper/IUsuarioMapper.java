@@ -1,9 +1,13 @@
 package com.api.erp.v1.features.usuario.application.mapper;
 
 import com.api.erp.v1.features.contato.application.dto.response.ContatoResponse;
-import com.api.erp.v1.features.contato.domain.entity.UsuarioContato;
+import com.api.erp.v1.features.permissao.application.dto.response.PermissaoResponse;
+import com.api.erp.v1.features.permissao.application.dto.response.RoleResponse;
 import com.api.erp.v1.features.usuario.application.dto.response.UsuarioResponse;
 import com.api.erp.v1.features.usuario.domain.entity.Usuario;
+import com.api.erp.v1.features.usuario.domain.entity.UsuarioContato;
+import com.api.erp.v1.features.usuario.domain.entity.UsuarioPermissao;
+import com.api.erp.v1.features.usuario.domain.entity.UsuarioRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -21,28 +25,24 @@ public interface IUsuarioMapper {
 
     List<UsuarioResponse> toResponseList(List<Usuario> usuarios);
 
-    /**
-     * Mapeia um conjunto de UsuarioContato para um conjunto de ContatoResponse
-     * Extrai o Contato de dentro de cada UsuarioContato e converte para DTO
-     */
-    default Set<ContatoResponse> mapearContatos(Set<UsuarioContato> usuarioContatos) {
+    default Set<ContatoResponse> mapearContatos(List<UsuarioContato> usuarioContatos) {
         if (usuarioContatos == null || usuarioContatos.isEmpty()) {
             return Set.of();
         }
-        
+
         return usuarioContatos.stream()
-            .filter(uc -> uc.getContato() != null)
-            .map(uc -> new ContatoResponse(
-                uc.getContato().getId(),
-                uc.getContato().getTipo() != null ? uc.getContato().getTipo().toString() : null,
-                uc.getContato().getValor(),
-                uc.getContato().getDescricao(),
-                uc.getContato().isPrincipal(),
-                uc.getContato().isAtivo(),
-                uc.getContato().getCustomData(),
-                uc.getContato().getCreatedAt().toLocalDateTime(),
-                uc.getContato().getUpdatedAt().toLocalDateTime()
-            ))
-            .collect(Collectors.toSet());
+                .filter(uc -> uc.getContato() != null)
+                .map(uc -> new ContatoResponse(
+                        uc.getContato().getId(),
+                        uc.getContato().getTipo() != null ? uc.getContato().getTipo().toString() : null,
+                        uc.getContato().getValor(),
+                        uc.getContato().getDescricao(),
+                        uc.getContato().isPrincipal(),
+                        uc.getContato().isAtivo(),
+                        uc.getContato().getCustomData(),
+                        uc.getContato().getCreatedAt().toLocalDateTime(),
+                        uc.getContato().getUpdatedAt().toLocalDateTime()
+                ))
+                .collect(Collectors.toSet());
     }
 }
