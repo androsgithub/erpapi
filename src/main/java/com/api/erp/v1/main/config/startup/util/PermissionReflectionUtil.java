@@ -7,8 +7,8 @@ import java.util.List;
 
 public class PermissionReflectionUtil {
 
-    public static List<String> extrairPermissoes(Class<?> permissionClass) {
-        List<String> permissoes = new ArrayList<>();
+    public static List<String> extrairPermissions(Class<?> permissionClass) {
+        List<String> permissions = new ArrayList<>();
 
         for (Field field : permissionClass.getDeclaredFields()) {
 
@@ -21,7 +21,7 @@ public class PermissionReflectionUtil {
                     String valor = (String) field.get(null);
 
                     if (valor != null && valor.contains(".")) {
-                        permissoes.add(valor);
+                        permissions.add(valor);
                     }
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(
@@ -32,6 +32,6 @@ public class PermissionReflectionUtil {
             }
         }
 
-        return permissoes;
+        return permissions;
     }
 }

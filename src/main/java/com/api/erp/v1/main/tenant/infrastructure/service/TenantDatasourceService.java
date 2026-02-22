@@ -1,5 +1,10 @@
 package com.api.erp.v1.main.tenant.infrastructure.service;
 
+import com.api.erp.v1.main.datasource.routing.core.DataSourceRouter;
+import com.api.erp.v1.main.datasource.routing.domain.TenantDSConfig;
+import com.api.erp.v1.main.datasource.routing.infrastructure.HikariDataSourceFactory;
+import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
+import com.api.erp.v1.main.shared.common.error.ErrorHandler;
 import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceRequest;
 import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceResponse;
 import com.api.erp.v1.main.tenant.domain.entity.Tenant;
@@ -7,8 +12,6 @@ import com.api.erp.v1.main.tenant.domain.entity.TenantDatasource;
 import com.api.erp.v1.main.tenant.domain.repository.TenantDatasourceRepository;
 import com.api.erp.v1.main.tenant.domain.repository.TenantRepository;
 import com.api.erp.v1.main.tenant.domain.service.ITenantDatasourceService;
-import com.api.erp.v1.main.tenant.infrastructure.config.datasource.routing.DataSourceFactory;
-import com.api.erp.v1.main.tenant.infrastructure.config.datasource.routing.MultiTenantRoutingDataSource;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +26,14 @@ import java.util.Optional;
 
 /**
  * TenantSchemaService
- * 
+ * <p>
  * Implementação de serviço para gerenciar configurações de datasources dos tenants.
- * 
+ * <p>
  * Responsabilidades:
  * - Configurar novo datasource para um tenant
  * - Atualizar configuração de datasource
- * - Testar conexão com banco de dados
- * - Registrar datasource no MultiTenantRoutingDataSource
+ * - Test database connection
+ * - Registrar datasource no DataSourceRouter
  */
 @Slf4j
 @Service
@@ -39,93 +42,94 @@ public class TenantDatasourceService implements ITenantDatasourceService {
 
     private final TenantRepository tenantRepository;
     private final TenantDatasourceRepository tenantDatasourceRepository;
-    private final DataSourceFactory dataSourceFactory;
-    private final MultiTenantRoutingDataSource multiTenantRoutingDataSource;
+    private final HikariDataSourceFactory hikariDataSourceFactory;
+    private final DataSourceRouter dataSourceRouter;
 
     /**
-     * Configura novo datasource para um tenant
+     * Configures new datasource for a tenant
      */
     @Override
     @Transactional(transactionManager = "masterTransactionManager")
     public TenantDatasourceResponse configurarDatasource(Long tenantId, TenantDatasourceRequest request) {
-        log.info("Configurando datasource para tenant: {}", tenantId);
+        log.info("Configuring datasource for tenant: {}", tenantId);
 
-        // 1. Buscar tenant
+        // 1. Get tenant
         Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new IllegalArgumentException("Tenant não encontrado: " + tenantId));
+            .orElseThrow(() -> TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException());
 
-        // 2. Validar se já existe datasource configurado
+        // 2. Validate if datasource is already configured
         if (tenantDatasourceRepository.existsByTenant_IdAndIsActive(tenant.getId(), true)) {
-            throw new IllegalStateException("Datasource já configurado para este tenant");
+            throw TenantErrorMessage.DATASOURCE_ALREADY_EXISTS.toBusinessException();
         }
 
-        // 3. Testar conexão antes de salvar
+        // 3. Test connection before saving
         if (!testarConexao(request)) {
-            log.error("Falha ao testar conexão com banco de dados para tenant: {}", tenantId);
-            throw new RuntimeException("Falha ao conectar com o banco de dados. Verifique as credenciais.");
+            log.error("Failed to test database connection for tenant: {}", tenantId);
+            throw TenantErrorMessage.DATASOURCE_CONNECTION_FAILED.toBusinessException();
         }
 
-        // 4. Criar e salvar TenantDatasource
+        // 4. Create and save TenantDatasource
         TenantDatasource tenantDatasource = TenantDatasource.builder()
-                .tenant(tenant)
-                .host(request.host())
-                .port(request.port())
-                .databaseName(request.databaseName())
-                .username(request.username())
-                .password(request.password())
-                .dbType(request.dbType())
-                .isActive(true)
-                .testStatus(TenantDatasource.TestStatus.SUCCESS)
-                .testedAt(LocalDateTime.now())
-                .build();
+            .tenant(tenant)
+            .host(request.host())
+            .port(request.port())
+            .databaseName(request.databaseName())
+            .username(request.username())
+            .password(request.password())
+            .dbType(request.dbType())
+            .isActive(true)
+            .testStatus(TenantDatasource.TestStatus.SUCCESS)
+            .testedAt(LocalDateTime.now())
+            .build();
 
         tenantDatasource = tenantDatasourceRepository.save(tenantDatasource);
-        log.info("Datasource configurado com sucesso para tenant: {} | ID: {}", tenantId, tenant.getId());
+        log.info("Datasource successfully configured for tenant: {} | ID: {}", tenantId, tenant.getId());
 
-        // 5. Registrar no MultiTenantRoutingDataSource
-        DataSource dataSource = dataSourceFactory.createDataSourceFromConfig(tenantDatasource);
-        multiTenantRoutingDataSource.addDataSource(tenantId, dataSource);
+        // 5. Register datasource in DataSourceRouter
+        TenantDSConfig config = new TenantDSConfig(tenantDatasource.getTenant().getId(), tenantDatasource.getJdbcUrl(), tenantDatasource.getUsername(), tenantDatasource.getPassword(), tenantDatasource.getDbType());
+        DataSource dataSource = hikariDataSourceFactory.createDataSource(config);
+        dataSourceRouter.registerDataSource(tenantId, dataSource);
 
         return toResponse(tenantDatasource);
     }
 
     /**
-     * Obtém configuração de datasource de um tenant
+     * Gets datasource configuration for a tenant
      */
     @Override
     @Transactional(transactionManager = "masterTransactionManager", readOnly = true)
     public Optional<TenantDatasourceResponse> obterDatasource(Long tenantId) {
-        log.debug("Buscando datasource para tenant: {}", tenantId);
+        log.debug("Fetching datasource for tenant: {}", tenantId);
 
         return tenantRepository.findById(tenantId)
-                .flatMap(tenant -> tenantDatasourceRepository.findByTenant_IdAndIsActive(tenant.getId(), true))
-                .map(this::toResponse);
+            .flatMap(tenant -> tenantDatasourceRepository.findByTenant_IdAndIsActive(tenant.getId(), true))
+            .map(this::toResponse);
     }
 
     /**
-     * Atualiza configuração de datasource de um tenant
+     * Updates datasource configuration for a tenant
      */
     @Override
     @Transactional(transactionManager = "masterTransactionManager")
     public TenantDatasourceResponse atualizarDatasource(Long tenantId, TenantDatasourceRequest request) {
-        log.info("Atualizando datasource para tenant: {}", tenantId);
+        log.info("Updating datasource for tenant: {}", tenantId);
 
-        // 1. Buscar tenant
+        // 1. Get tenant
         Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new IllegalArgumentException("Tenant não encontrado: " + tenantId));
+            .orElseThrow(() -> TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException());
 
-        // 2. Buscar datasource ativo
+        // 2. Get active datasource
         TenantDatasource tenantDatasource = tenantDatasourceRepository
-                .findByTenant_IdAndIsActive(tenant.getId(), true)
-                .orElseThrow(() -> new IllegalArgumentException("Datasource não configurado para este tenant"));
+            .findByTenant_IdAndIsActive(tenant.getId(), true)
+            .orElseThrow(() -> TenantErrorMessage.DATASOURCE_NOT_CONFIGURED.toNotFoundException());
 
-        // 3. Testar nova conexão
+        // 3. Test new connection
         if (!testarConexao(request)) {
-            log.error("Falha ao testar nova configuração de datasource para tenant: {}", tenantId);
-            throw new RuntimeException("Falha ao conectar com o novo banco de dados");
+            log.error("Failed to test new datasource configuration for tenant: {}", tenantId);
+            throw TenantErrorMessage.DATASOURCE_CONNECTION_FAILED.toBusinessException();
         }
 
-        // 4. Atualizar entidade
+        // 4. Update entity
         tenantDatasource.setHost(request.host());
         tenantDatasource.setPort(request.port());
         tenantDatasource.setDatabaseName(request.databaseName());
@@ -136,38 +140,32 @@ public class TenantDatasourceService implements ITenantDatasourceService {
         tenantDatasource.setTestedAt(LocalDateTime.now());
 
         tenantDatasource = tenantDatasourceRepository.save(tenantDatasource);
-        log.info("Datasource atualizado com sucesso para tenant: {}", tenantId);
+        log.info("Datasource successfully updated for tenant: {}", tenantId);
 
-        // 5. Atualizar no MultiTenantRoutingDataSource
-        DataSource dataSource = dataSourceFactory.createDataSourceFromConfig(tenantDatasource);
-        multiTenantRoutingDataSource.addDataSource(tenantId, dataSource);
+        // 5. Update datasource in DataSourceRouter
+        TenantDSConfig config = new TenantDSConfig(tenantDatasource.getTenant().getId(), tenantDatasource.getJdbcUrl(), tenantDatasource.getUsername(), tenantDatasource.getPassword(), tenantDatasource.getDbType());
+        DataSource dataSource = hikariDataSourceFactory.createDataSource(config);
+        dataSourceRouter.registerDataSource(tenantId, dataSource);
 
         return toResponse(tenantDatasource);
     }
 
     /**
-     * Testa conexão com banco de dados
+     * Tests database connection
      */
     @Override
     public boolean testarConexao(TenantDatasourceRequest request) {
-        log.debug("Testando conexão com banco: {}:{}/{}", request.host(), request.port(), request.databaseName());
+        log.debug("Testing database connection: {}:{}/{}", request.host(), request.port(), request.databaseName());
 
         try {
-            // Criar datasource temporário para teste
-            TenantDatasource tempConfig = TenantDatasource.builder()
-                    .host(request.host())
-                    .port(request.port())
-                    .databaseName(request.databaseName())
-                    .username(request.username())
-                    .password(request.password())
-                    .dbType(request.dbType())
-                    .build();
+            // Create temporary datasource for testing
+            TenantDatasource tempConfig = TenantDatasource.builder().host(request.host()).port(request.port()).databaseName(request.databaseName()).username(request.username()).password(request.password()).dbType(request.dbType()).build();
 
-            DataSource testDataSource = dataSourceFactory.createDataSourceFromConfig(tempConfig);
-            
-            // Tentar obter conexão
+            DataSource testDataSource = hikariDataSourceFactory.createDataSource(new TenantDSConfig(tempConfig.getTenant().getId(), tempConfig.getJdbcUrl(), tempConfig.getUsername(), tempConfig.getPassword(), tempConfig.getDbType()));
+
+            // Try to get connection
             try (Connection connection = testDataSource.getConnection()) {
-                log.debug("Conexão com banco de dados testada com sucesso");
+                log.debug("Database connection tested successfully");
                 // Fechar datasource se for HikariCP
                 if (testDataSource instanceof HikariDataSource) {
                     ((HikariDataSource) testDataSource).close();
@@ -175,7 +173,7 @@ public class TenantDatasourceService implements ITenantDatasourceService {
                 return true;
             }
         } catch (SQLException e) {
-            log.error("Erro ao testar conexão com banco de dados", e);
+            log.error("Error testing database connection", e);
             return false;
         }
     }
@@ -184,17 +182,6 @@ public class TenantDatasourceService implements ITenantDatasourceService {
      * Converte TenantDatasource para TenantDatasourceResponse
      */
     private TenantDatasourceResponse toResponse(TenantDatasource tenantDatasource) {
-        return new TenantDatasourceResponse(
-                tenantDatasource.getId(),
-                tenantDatasource.getTenant().getId(),
-                tenantDatasource.getHost(),
-                tenantDatasource.getPort(),
-                tenantDatasource.getDatabaseName(),
-                tenantDatasource.getUsername(),
-                tenantDatasource.getDbType(),
-                tenantDatasource.getIsActive(),
-                tenantDatasource.getCreatedAt(),
-                tenantDatasource.getUpdatedAt()
-        );
+        return new TenantDatasourceResponse(tenantDatasource.getId(), tenantDatasource.getTenant().getId(), tenantDatasource.getHost(), tenantDatasource.getPort(), tenantDatasource.getDatabaseName(), tenantDatasource.getUsername(), tenantDatasource.getDbType(), tenantDatasource.getIsActive(), tenantDatasource.getCreatedAt(), tenantDatasource.getUpdatedAt());
     }
 }

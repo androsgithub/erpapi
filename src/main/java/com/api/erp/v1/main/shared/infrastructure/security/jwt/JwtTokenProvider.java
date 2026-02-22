@@ -31,13 +31,13 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(String email, String usuarioId, Long tenantId) {
-        return generateToken(email, usuarioId, tenantId, null);
+    public String generateToken(String email, String userId, Long tenantId) {
+        return generateToken(email, userId, tenantId, null);
     }
 
-    public String generateToken(String email, String usuarioId, Long tenantId, String tenantSlug) {
+    public String generateToken(String email, String userId, Long tenantId, String tenantSlug) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("usuarioId", usuarioId);
+        claims.put("userId", userId);
         claims.put("tenantId", tenantId);
         if (tenantSlug != null && !tenantSlug.isEmpty()) {
             claims.put("tenantSlug", tenantSlug);
@@ -65,9 +65,9 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    public String getUsuarioIdFromToken(String token) {
+    public String getUserIdFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);
-        return String.valueOf(claims.get("usuarioId"));
+        return String.valueOf(claims.get("userId"));
     }
 
     public String getTenantIdFromToken(String token) {
@@ -106,7 +106,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
-            logger.error("Token inválido: {}", e.getMessage());
+            logger.error("Invalid token: {}", e.getMessage());
             return false;
         }
     }

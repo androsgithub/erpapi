@@ -17,17 +17,17 @@ public interface ITenantService {
 
     Tenant updateDadosTenant(Long tenantId, TenantRequest empresaRequest);
 
-    Tenant updateClienteConfig(Long tenantId, ClienteConfigRequest clienteConfigRequest);
+    Tenant updateCustomerConfig(Long tenantId, CustomerConfigRequest customerConfigRequest);
 
-    Tenant updateContatoConfig(Long tenantId, ContatoConfigRequest contatoConfigRequest);
+    Tenant updateContactConfig(Long tenantId, ContactConfigRequest contactConfigRequest);
 
-    Tenant updateEnderecoConfig(Long tenantId, EnderecoConfigRequest enderecoConfigRequest);
+    Tenant updateAddressConfig(Long tenantId, AddressConfigRequest addressConfigRequest);
 
-    Tenant updatePermissaoConfig(Long tenantId, PermissaoConfigRequest permissaoConfigRequest);
+    Tenant updatePermissionConfig(Long tenantId, PermissionConfigRequest permissionConfigRequest);
 
     Tenant updateInternalTenantConfig(Long tenantId, InternalTenantConfigRequest internalTenantConfigRequest);
 
-    Tenant updateUsuarioConfig(Long tenantId, UsuarioConfigRequest usuarioConfigRequest);
+    Tenant updateUserConfig(Long tenantId, UserConfigRequest userConfigRequest);
 
     // DELETE Operations
     void deletarTenant(Long tenantId);

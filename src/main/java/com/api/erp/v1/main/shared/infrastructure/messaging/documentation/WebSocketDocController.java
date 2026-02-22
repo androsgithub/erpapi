@@ -36,7 +36,7 @@ public class WebSocketDocController {
         {
           "titulo": "Novo usuário pendente",
           "mensagem": "Usuário João Vitor aguarda aprovação",
-          "tipo": "USUARIO_PENDENTE",
+          "tipo": "USER_PENDENTE",
           "dataHora": "2025-01-01T10:00:00"
         }
         """

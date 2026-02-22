@@ -17,25 +17,25 @@ public class TenantValidator {
 
     public static void validarNome(String nome) {
         if (nome == null || nome.isBlank()) {
-            throw new BusinessException("Nome da empresa é obrigatório");
+            throw new BusinessException("Company name is required");
         }
         if (nome.length() < 3) {
-            throw new BusinessException("Nome da empresa deve ter no mínimo 3 caracteres");
+            throw new BusinessException("Company name must have at least 3 characters");
         }
         if (nome.length() > 255) {
-            throw new BusinessException("Nome da empresa não pode ter mais de 255 caracteres");
+            throw new BusinessException("Company name cannot exceed 255 characters");
         }
     }
 
     public static void validarCnpj(CNPJ cnpj) {
         if (cnpj == null) {
-            throw new BusinessException("CNPJ da empresa é obrigatório");
+            throw new BusinessException("Company CNPJ is required");
         }
     }
 
     public static void validarEmail(Email email) {
         if (email == null) {
-            throw new BusinessException("Email da empresa é obrigatório");
+            throw new BusinessException("Company email is required");
         }
     }
 
@@ -44,7 +44,7 @@ public class TenantValidator {
             try {
                 new Telefone(telefone);
             } catch (IllegalArgumentException e) {
-                throw new BusinessException("Telefone inválido");
+                throw new BusinessException("Invalid phone number");
             }
         }
     }
@@ -54,7 +54,7 @@ public class TenantValidator {
             try {
                 new CEP(cep);
             } catch (IllegalArgumentException e) {
-                throw new BusinessException("CEP inválido");
+                throw new BusinessException("Invalid ZIP code");
             }
         }
     }

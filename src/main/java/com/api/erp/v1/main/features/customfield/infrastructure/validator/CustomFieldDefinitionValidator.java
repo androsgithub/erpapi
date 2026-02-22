@@ -20,19 +20,19 @@ public class CustomFieldDefinitionValidator {
     public void validateCreate(CreateCustomFieldRequest request,Long tenantId) {
 
         if (!StringUtils.hasText(request.target())) {
-            throw new BusinessException("Nome da tabela é obrigatório");
+            throw new BusinessException("Table name is required");
         }
 
         if (!StringUtils.hasText(request.fieldKey())) {
-            throw new BusinessException("fieldKey é obrigatório");
+            throw new BusinessException("fieldKey is required");
         }
 
         if (request.fieldKey().contains(" ")) {
-            throw new BusinessException("fieldKey não pode conter espaços");
+            throw new BusinessException("fieldKey cannot contain spaces");
         }
 
         if (request.fieldType() == null) {
-            throw new BusinessException("Tipo do campo é obrigatório");
+            throw new BusinessException("Field type is required");
         }
 
         if (repository.existsByTenantIdAndTargetAndFieldKey(
@@ -40,7 +40,7 @@ public class CustomFieldDefinitionValidator {
                 request.target(),
                 request.fieldKey()
         )) {
-            throw new BusinessException("Campo já registrado para esta tabela");
+            throw new BusinessException("Field already registered for this table");
         }
     }
 
@@ -49,7 +49,7 @@ public class CustomFieldDefinitionValidator {
     public void validateUpdate(UpdateCustomFieldRequest request) {
 
         if (request.fieldOrder() != null && request.fieldOrder() < 0) {
-            throw new BusinessException("fieldOrder não pode ser negativo");
+            throw new BusinessException("fieldOrder cannot be negative");
         }
     }
 
@@ -57,7 +57,7 @@ public class CustomFieldDefinitionValidator {
 
     public void validateStatusChange(Boolean active) {
         if (active == null) {
-            throw new BusinessException("Status ativo/inativo deve ser informado");
+            throw new BusinessException("Active/inactive status must be informed");
         }
     }
 

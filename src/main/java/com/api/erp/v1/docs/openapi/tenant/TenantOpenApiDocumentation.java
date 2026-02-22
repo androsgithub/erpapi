@@ -75,16 +75,16 @@ public interface TenantOpenApiDocumentation extends ITenantController {
 
     @Override
     @Operation(
-            summary = "Atualizar configurações de cliente",
-            description = "Atualiza as configurações relacionadas ao módulo de clientes da tenant."
+            summary = "Atualizar configurações de customer",
+            description = "Atualiza as configurações relacionadas ao módulo de customers da tenant."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Configurações de cliente atualizadas"),
+            @ApiResponse(responseCode = "200", description = "Configurações de customer atualizadas"),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
             @ApiResponse(responseCode = "400", description = "Configuração inválida")
     })
-    ResponseEntity<TenantResponse> atualizarClienteConfig(
-            @RequestBody ClienteConfigRequest request
+    ResponseEntity<TenantResponse> atualizarCustomerConfig(
+            @RequestBody CustomerConfigRequest request
     );
 
     @Override
@@ -97,8 +97,8 @@ public interface TenantOpenApiDocumentation extends ITenantController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
             @ApiResponse(responseCode = "400", description = "Configuração inválida")
     })
-    ResponseEntity<TenantResponse> atualizarUsuarioConfig(
-            @RequestBody UsuarioConfigRequest request
+    ResponseEntity<TenantResponse> atualizarUserConfig(
+            @RequestBody UserConfigRequest request
     );
 
     @Override
@@ -111,8 +111,8 @@ public interface TenantOpenApiDocumentation extends ITenantController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
             @ApiResponse(responseCode = "400", description = "Configuração inválida")
     })
-    ResponseEntity<TenantResponse> atualizarPermissaoConfig(
-            @RequestBody PermissaoConfigRequest request
+    ResponseEntity<TenantResponse> atualizarPermissionConfig(
+            @RequestBody PermissionConfigRequest request
     );
 
     @Override
@@ -139,21 +139,21 @@ public interface TenantOpenApiDocumentation extends ITenantController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
             @ApiResponse(responseCode = "400", description = "Dados de endereço inválidos")
     })
-    ResponseEntity<TenantResponse> atualizarEnderecoConfig(
-            @RequestBody EnderecoConfigRequest request
+    ResponseEntity<TenantResponse> atualizarAddressConfig(
+            @RequestBody AddressConfigRequest request
     );
 
     @Override
     @Operation(
-            summary = "Atualizar informações de contato da tenant",
-            description = "Atualiza informações de contato da tenant, como telefone, e-mail e canais de comunicação."
+            summary = "Atualizar informações de contact da tenant",
+            description = "Atualiza informações de contact da tenant, como telefone, e-mail e canais de comunicação."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contato atualizado com sucesso"),
+            @ApiResponse(responseCode = "200", description = "Contact atualizado com sucesso"),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "400", description = "Dados de contato inválidos")
+            @ApiResponse(responseCode = "400", description = "Dados de contact inválidos")
     })
-    ResponseEntity<TenantResponse> atualizarContatoConfig(
-            @RequestBody ContatoConfigRequest request
+    ResponseEntity<TenantResponse> atualizarContactConfig(
+            @RequestBody ContactConfigRequest request
     );
 }

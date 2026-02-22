@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.shared.infrastructure.security.jwt;
 
-import com.api.erp.v1.main.shared.domain.entity.UsuarioAutenticado;
+import com.api.erp.v1.main.shared.domain.entity.UserAutenticado;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -11,13 +11,13 @@ public class BearerTokenAuthentication extends AbstractAuthenticationToken {
     private final String token;
     private final String username;
 
-    private final UsuarioAutenticado usuarioAutenticado;
+    private final UserAutenticado userAutenticado;
 
-    public BearerTokenAuthentication(String token, String username, UsuarioAutenticado usuarioAutenticado) {
+    public BearerTokenAuthentication(String token, String username, UserAutenticado userAutenticado) {
         super(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
         this.token = token;
         this.username = username;
-        this.usuarioAutenticado = usuarioAutenticado;
+        this.userAutenticado = userAutenticado;
         setAuthenticated(true);
     }
 
@@ -27,8 +27,8 @@ public class BearerTokenAuthentication extends AbstractAuthenticationToken {
     }
 
     @Override
-    public UsuarioAutenticado getPrincipal() {
-        return usuarioAutenticado;
+    public UserAutenticado getPrincipal() {
+        return userAutenticado;
     }
 
     @Override

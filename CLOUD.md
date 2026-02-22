@@ -30,7 +30,7 @@ ERP Cloud é um sistema de gestão empresarial projetado para ser:
 - **Seguro**: Isolamento de dados, controle de acesso granular
 
 ### Objetivo Principal
-Fornecer uma plataforma centralizada para gerenciamento de processos empresariais (usuários, produtos, clientes, etc) com suporte a múltiplos tenants.
+Fornecer uma plataforma centralizada para gerenciamento de processos empresariais (usuários, products, customers, etc) com suporte a múltiplos tenants.
 
 ---
 
@@ -337,7 +337,7 @@ public class CreateUserHandler implements CommandHandler<CreateUserCommand, Crea
 #### **Fluxo Completo de uma Requisição**
 
 ```
-1. POST /api/users → UsuarioController.criar()
+1. POST /api/users → UserController.criar()
    │
 2. @TrackFlow("CREATE_USER") intercepta
    ├─ Cria FlowEvent inicial
@@ -488,9 +488,9 @@ Tabela: tb_tenant
 - Validação em múltiplas camadas (repository, handler, domain)
 
 #### **Por que Multi-Tenant?**
-1. **Custo-benefício**: Uma única instância serve múltiplos clientes
-2. **Escalabilidade**: Fácil onboarding de novos clientes
-3. **Manutenção**: Uma codebase para múltiplos clientes
+1. **Custo-benefício**: Uma única instância serve múltiplos customers
+2. **Escalabilidade**: Fácil onboarding de novos customers
+3. **Manutenção**: Uma codebase para múltiplos customers
 4. **Isolamento**: Dados completamente separados logicamente
 
 ---
@@ -564,7 +564,7 @@ Evento:  UserCreatedEvent(userId, email, tenantId, occurredOn)
 - Mapper Pattern para separação User.java ↔ UserEntity.java
 
 **Real**:
-- Aggregados com @Entity direto (ex: `Usuario.java` em v1/features/usuario/domain/entity/)
+- Aggregados com @Entity direto (ex: `User.java` em v1/features/user/domain/entity/)
 - Sem camada Domain separada; domain e persistência acoplados
 - Model em domain/entity/ com anotações JPA
 
@@ -574,9 +574,9 @@ Evento:  UserCreatedEvent(userId, email, tenantId, occurredOn)
 - Violação de Clean Architecture
 
 **Recomendação**: 
-- Refatorar Usuario.java para remover @Entity, @Column, @OneToMany, etc
-- Criar Usuario.java (puro) e UsuarioEntity.java (JPA)
-- Implementar UsuarioMapper.java para conversão
+- Refatorar User.java para remover @Entity, @Column, @OneToMany, etc
+- Criar User.java (puro) e UserEntity.java (JPA)
+- Implementar UserMapper.java para conversão
 
 ---
 
@@ -598,7 +598,7 @@ Evento:  UserCreatedEvent(userId, email, tenantId, occurredOn)
 **Real**:
 ```
 /src/main/java/com/api/erp/v1/
-├── features/usuario/
+├── features/user/
 │   ├── domain/
 │   │   ├── entity/     (com @Entity - acoplado ⚠️)
 │   │   ├── controller/ (em domain? deveria estar em presentation ⚠️)
@@ -616,7 +616,7 @@ Evento:  UserCreatedEvent(userId, email, tenantId, occurredOn)
 **Problemas**:
 - `/core/` não existe; refatoração para `/v1/features/` não foi documentada
 - Controladores em `domain/controller/` (deveria estar em `presentation/`)
-- Nomenclatura em português (Usuario) vs English (User) em CLOUD.md
+- Nomenclatura em português (User) vs English (User) em CLOUD.md
 - Pasta `/core/` documentada está vazia no projeto real
 
 ---
@@ -628,7 +628,7 @@ Evento:  UserCreatedEvent(userId, email, tenantId, occurredOn)
 - Validação encapsulada no construtor
 
 **Real**:
-- `UsuarioRole` e `UsuarioPermissao` são @Entity (não são Value Objects)
+- `UserRole` e `UserPermission` são @Entity (não são Value Objects)
 - `Email` e `CPF` corretamente implementados como Value Objects
 - `UserPassword` / senha armazenada como String em `senha_hash` (sem Value Object)
 - UserName não existe; apenas `nome_completo` como String
@@ -662,7 +662,7 @@ Evento:  UserCreatedEvent(userId, email, tenantId, occurredOn)
 - @TrackFlow para rastreamento automático
 
 **Real**:
-- Lógica em Services (v1/features/usuario/domain/service/)
+- Lógica em Services (v1/features/user/domain/service/)
 - Não há Handlers/Commands explícitos
 - @TrackFlow pode estar implementado em observability
 - Controladores chamam services diretamente
@@ -730,7 +730,7 @@ interface TenantAware {
 
 ### **Fluxo 1: Registrar Novo Usuário**
 ```
-1. Cliente chama POST /users
+1. Customer chama POST /users
    ├─ Validação: email formato, senha força
    
 2. CreateUserCommand criado
@@ -794,7 +794,7 @@ Controlador: "Pode João executar USER_CREATE?"
 - **Commands**: Não explícitos; lógica em services
 - **Handlers**: Não existem; Services fazem orquestração
 - **Value Objects**: `Email`, `CPF` (parcial)
-- **Aggregates**: `Usuario`, `Tenant`, `Produto` (em português)
+- **Aggregates**: `User`, `Tenant`, `Product` (em português)
 - **Events**: FlowEvent (técnico) vs Domain Events (não implementados)
 
 ### **Validação em Camadas**
@@ -818,11 +818,11 @@ Nunca done de forma reversível. Apenas hash para verificação.
 ## 🚀 Roadmap Arquitetural
 
 ### **Fase 1 (Em Progresso)**: Core User Module
-- [x] User aggregate (implementado como Usuario.java com @Entity acoplado ⚠️)
-- [x] Multi-role support (UsuarioRole como @Entity)
-- [x] Independent permissions (UsuarioPermissao como @Entity)
+- [x] User aggregate (implementado como User.java com @Entity acoplado ⚠️)
+- [x] Multi-role support (UserRole como @Entity)
+- [x] Independent permissions (UserPermission como @Entity)
 - [ ] Domain events (não implementado)
-- [x] REST endpoints (implementado em v1/features/usuario/presentation/)
+- [x] REST endpoints (implementado em v1/features/user/presentation/)
 - ⚠️ [x] Value Objects (parcial: Email, CPF implementados; UserPassword não)
 
 **Status**: ~70% - Funcionalidade básica implementada, mas sem padrões DDD/Clean Architecture rigorosos
@@ -830,8 +830,8 @@ Nunca done de forma reversível. Apenas hash para verificação.
 ---
 
 ### **Fase 2 (80% Concluída)**: Extensões
-- [x] Product module (v1/features/produto/ - ✅ implementado)
-- [x] Customer module (v1/features/cliente/ - ✅ implementado)
+- [x] Product module (v1/features/product/ - ✅ implementado)
+- [x] Customer module (v1/features/customer/ - ✅ implementado)
 - [x] Custom fields (v1/features/customfield/ - ✅ parcialmente implementado)
 - [x] Audit logging / Observability (v1/observability/ - ✅ implementado)
 
@@ -860,21 +860,21 @@ Nunca done de forma reversível. Apenas hash para verificação.
 - **Tests**: `/src/test/java/com/api/erp/core/domain/user/` ❌ VAZIO
 
 ### **Estrutura Real (Implementada - /v1/features/)**
-- **User Aggregate**: `/src/main/java/com/api/erp/v1/features/usuario/domain/entity/Usuario.java` ⚠️ com @Entity acoplado
+- **User Aggregate**: `/src/main/java/com/api/erp/v1/features/user/domain/entity/User.java` ⚠️ com @Entity acoplado
 - **Value Objects**: `/src/main/java/com/api/erp/v1/shared/domain/valueobject/` (Email.java, CPF.java, NCM.java, etc)
-- **Services**: `/src/main/java/com/api/erp/v1/features/usuario/domain/service/`
-- **Repository**: `/src/main/java/com/api/erp/v1/features/usuario/domain/repository/`
-- **Presentation**: `/src/main/java/com/api/erp/v1/features/usuario/presentation/controller/`
-- **Tests**: `/src/test/java/com/api/erp/v1/features/usuario/`
+- **Services**: `/src/main/java/com/api/erp/v1/features/user/domain/service/`
+- **Repository**: `/src/main/java/com/api/erp/v1/features/user/domain/repository/`
+- **Presentation**: `/src/main/java/com/api/erp/v1/features/user/presentation/controller/`
+- **Tests**: `/src/test/java/com/api/erp/v1/features/user/`
 
 ### **Outros Módulos Implementados em /v1/features/**
 - **Tenant (Multi-tenancy)**: `/src/main/java/com/api/erp/v1/tenant/` ✅
 - **Observability**: `/src/main/java/com/api/erp/v1/observability/` ✅
-- **Produto**: `/src/main/java/com/api/erp/v1/features/produto/` ✅
-- **Cliente**: `/src/main/java/com/api/erp/v1/features/cliente/` ✅
-- **Endereco**: `/src/main/java/com/api/erp/v1/features/endereco/` ✅
-- **Permissão**: `/src/main/java/com/api/erp/v1/features/permissao/` ✅
-- **Unidade de Medida**: `/src/main/java/com/api/erp/v1/features/unidademedida/` ✅
+- **Product**: `/src/main/java/com/api/erp/v1/features/product/` ✅
+- **Customer**: `/src/main/java/com/api/erp/v1/features/customer/` ✅
+- **Address**: `/src/main/java/com/api/erp/v1/features/address/` ✅
+- **Permissão**: `/src/main/java/com/api/erp/v1/features/permission/` ✅
+- **Unidade de Medida**: `/src/main/java/com/api/erp/v1/features/measureunit/` ✅
 
 ---
 
@@ -883,8 +883,8 @@ Nunca done de forma reversível. Apenas hash para verificação.
 Para alinhar a implementação com a arquitetura documentada:
 
 ### **Prioridade 1 (Alta)**: 
-- ✅ Separar Domain puro de persistência (remover @Entity de Usuario.java)
-- ✅ Implementar Mapper Pattern corretamente (Usuario.java puro + UsuarioEntity.java + UsuarioMapper.java)
+- ✅ Separar Domain puro de persistência (remover @Entity de User.java)
+- ✅ Implementar Mapper Pattern corretamente (User.java puro + UserEntity.java + UserMapper.java)
 - ✅ Criar handlers CQRS explícitos (CreateUserHandler, ActivateUserHandler, etc)
 
 ### **Prioridade 2 (Média)**:

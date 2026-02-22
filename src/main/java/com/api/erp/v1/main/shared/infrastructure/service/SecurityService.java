@@ -21,7 +21,7 @@ public class SecurityService {
         return auth.getPrincipal().getTenantId();
     }
 
-    public String getAuthUsuarioId() {
+    public String getAuthUserId() {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
@@ -32,7 +32,7 @@ public class SecurityService {
         BearerTokenAuthentication auth =
                 (BearerTokenAuthentication) authentication;
 
-        return auth.getPrincipal().getUsuarioId();
+        return auth.getPrincipal().getUserId();
     }
 }
 

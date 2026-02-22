@@ -13,7 +13,7 @@ public record NotificacaoDTO(
         @Schema(example = "Usuário João Vitor aguarda aprovação")
         String mensagem,
 
-        @Schema(example = "USUARIO_PENDENTE")
+        @Schema(example = "USER_PENDENTE")
         String tipo,
 
         @Schema(example = "2025-01-01T10:00:00")

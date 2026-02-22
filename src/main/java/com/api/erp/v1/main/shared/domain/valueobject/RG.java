@@ -6,7 +6,7 @@ public class RG {
 
     public RG(String valor) {
         if (!isValido(valor)) {
-            throw new IllegalArgumentException("RG inválido");
+            throw new IllegalArgumentException("Invalid RG");
         }
         this.valor = limpar(valor);
     }

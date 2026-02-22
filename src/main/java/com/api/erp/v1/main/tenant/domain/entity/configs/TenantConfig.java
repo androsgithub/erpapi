@@ -14,31 +14,31 @@ public class TenantConfig {
 
     @Embedded
     @Builder.Default
-    private UsuarioConfig usuarioConfig = new UsuarioConfig();
+    private UserConfig userConfig = new UserConfig();
 
     @Embedded
     @Builder.Default
-    private ContatoConfig contatoConfig = new ContatoConfig();
+    private ContactConfig contactConfig = new ContactConfig();
 
     @Embedded
     @Builder.Default
-    private ClienteConfig clienteConfig = new ClienteConfig();
+    private CustomerConfig customerConfig = new CustomerConfig();
 
     @Embedded
     @Builder.Default
-    private EnderecoConfig enderecoConfig = new EnderecoConfig();
+    private AddressConfig addressConfig = new AddressConfig();
 
     @Embedded
     @Builder.Default
-    private PermissaoConfig permissaoConfig = new PermissaoConfig();
+    private PermissionConfig permissionConfig = new PermissionConfig();
 
     @Embedded
     @Builder.Default
-    private UnidadeMedidaConfig unidadeMedidaConfig = new UnidadeMedidaConfig();
+    private MeasureUnitConfig measureUnitConfig = new MeasureUnitConfig();
 
     @Embedded
     @Builder.Default
-    private ProdutoConfig produtoConfig = new ProdutoConfig();
+    private ProductConfig productConfig = new ProductConfig();
 
     @Embedded
     @Builder.Default

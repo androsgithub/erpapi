@@ -2,6 +2,10 @@ spring:
   application:
     name: erp
 
+  threads:
+    virtual:
+      enabled: true
+
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -15,10 +19,11 @@ spring:
       username: root
       password: '12345'
       url: jdbc:mysql://localhost:3306/erpapi_logs?useSSL=false&serverTimezone=UTC
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    password: '12345'
-    username: root
-    url: jdbc:mysql://localhost:3306/erpapi?useSSL=false&serverTimezone=UTC
+    master:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      password: '12345'
+      username: root
+      url: jdbc:mysql://localhost:3306/erpapi?useSSL=false&serverTimezone=UTC
 
   jpa:
     hibernate:
@@ -29,9 +34,9 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         use_sql_comments: true
-    show-sql: true
+    show-sql: false
 
   boot:
     admin:
@@ -99,7 +104,7 @@ logging:
       hibernate:
         orm:
           jdbc:
-            bind: TRACE
+#            bind: TRACE
         SQL: DEBUG
       flywaydb: DEBUG
     root: INFO

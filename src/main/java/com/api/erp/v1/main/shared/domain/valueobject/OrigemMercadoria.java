@@ -33,7 +33,7 @@ public final class OrigemMercadoria {
             case 6 -> ESTRANGEIRA_IMPORTACAO_DIRETA_SEM_SIMILAR;
             case 7 -> ESTRANGEIRA_ADQUIRIDA_MERCADO_INTERNO_SEM_SIMILAR;
             case 8 -> NACIONAL_CONTEUDO_IMPORTACAO_SUPERIOR_70;
-            default -> throw new IllegalArgumentException("Código de origem inválido: " + codigo);
+            default -> throw new IllegalArgumentException("Invalid origin code: " + codigo);
         };
     }
 

@@ -26,18 +26,18 @@ public final class UnidadeTributavel {
 
     private String validarCodigo(String codigo) {
         if (codigo == null || codigo.isBlank()) {
-            throw new IllegalArgumentException("Código da unidade tributável não pode ser vazio");
+            throw new IllegalArgumentException("Taxable unit code cannot be empty");
         }
         String codigoLimpo = codigo.trim().toUpperCase();
         if (codigoLimpo.length() > 6) {
-            throw new IllegalArgumentException("Código da unidade tributável não pode ter mais de 6 caracteres");
+            throw new IllegalArgumentException("Taxable unit code cannot exceed 6 characters");
         }
         return codigoLimpo;
     }
 
     private String validarDescricao(String descricao) {
         if (descricao == null || descricao.isBlank()) {
-            throw new IllegalArgumentException("Descrição da unidade tributável não pode ser vazia");
+            throw new IllegalArgumentException("Taxable unit description cannot be empty");
         }
         return descricao.trim();
     }

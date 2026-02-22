@@ -7,7 +7,7 @@ public class CNPJ {
     
     public CNPJ(String valor) {
         if (!isValido(valor)) {
-            throw new ValidationException("cnpj", "CNPJ inválido. Verifique o formato e os dígitos verificadores.");
+            throw new ValidationException("cnpj", "Invalid CNPJ. Check format and check digits.");
         }
         this.valor = limpar(valor);
     }

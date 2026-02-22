@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.shared.infrastructure.security.util;
 
-import com.api.erp.v1.main.features.permissao.domain.service.IPermissaoService;
+import com.api.erp.v1.main.features.permission.domain.service.IPermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,21 +13,21 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PermissionEvaluator {
 
-    private final IPermissaoService permissaoService;
+    private final IPermissionService permissionService;
 
-    public boolean hasPermission(String permissaoCodigo) {
-        return hasPermission(permissaoCodigo, Collections.emptyMap());
+    public boolean hasPermission(String permissionCodigo) {
+        return hasPermission(permissionCodigo, Collections.emptyMap());
     }
 
-    public boolean hasPermission(String permissaoCodigo, Map<String, String> contexto) {
-        Long usuarioId = getUsuarioIdFromContext();
-        return permissaoService.hasPermission(usuarioId, permissaoCodigo, contexto);
+    public boolean hasPermission(String permissionCodigo, Map<String, String> contexto) {
+        Long userId = getUserIdFromContext();
+        return permissionService.hasPermission(userId, permissionCodigo, contexto);
     }
 
-    private Long getUsuarioIdFromContext() {
+    private Long getUserIdFromContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getDetails() == null) {
-            throw new IllegalStateException("Usuário não autenticado ou sem usuárioId no contexto");
+            throw new IllegalStateException("User not authenticated or without userId in context");
         }
 
         Object details = authentication.getDetails();
@@ -43,7 +43,7 @@ public class PermissionEvaluator {
         try {
             return Long.parseLong(detailsStr);
         } catch (NumberFormatException e) {
-            throw new IllegalStateException("Não foi possível converter usuarioId '" + detailsStr + "' para Long", e);
+            throw new IllegalStateException("Failed to convert userId '" + detailsStr + "' to Long", e);
         }
     }
 }

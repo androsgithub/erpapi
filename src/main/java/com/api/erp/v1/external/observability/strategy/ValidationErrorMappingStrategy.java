@@ -6,10 +6,10 @@ import com.dros.observability.domain.FlowStatus;
 import jakarta.validation.ConstraintViolationException;
 
 /**
- * Estratégia para mapeamento de erros de validação.
+ * Strategy for mapping validation errors.
  * 
- * Mapeia ValidationException, ConstraintViolationException e IllegalArgumentException
- * para FlowStatus.ERROR_VALIDATION.
+ * Maps ValidationException, ConstraintViolationException and IllegalArgumentException
+ * to FlowStatus.ERROR_VALIDATION.
  */
 public class ValidationErrorMappingStrategy implements ErrorMappingStrategy {
 
@@ -38,7 +38,7 @@ public class ValidationErrorMappingStrategy implements ErrorMappingStrategy {
     }
 
     /**
-     * Estratégia de validação tem alta prioridade pois é muito comum.
+     * Validation strategy has high priority as it is very common.
      */
     @Override
     public int getPriority() {

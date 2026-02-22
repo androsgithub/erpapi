@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.tenant.domain.entity;
 
-import com.api.erp.v1.main.features.endereco.domain.entity.Endereco;
+import com.api.erp.v1.main.features.address.domain.entity.Address;
 import com.api.erp.v1.main.shared.domain.valueobject.Email;
 import com.api.erp.v1.main.shared.domain.valueobject.Telefone;
 import com.api.erp.v1.main.shared.infrastructure.persistence.converters.EmailConverter;
@@ -37,9 +37,9 @@ public class Tenant {
     private Telefone telefone;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "endereco_id")
+    @JoinColumn(name = "address_id")
     @JsonIgnore
-    private Endereco endereco;
+    private Address address;
 
     @Embedded
     @Builder.Default

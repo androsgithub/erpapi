@@ -1,27 +1,27 @@
 package com.api.erp.v1.main.config;
 
-import com.api.erp.v1.main.features.permissao.domain.service.IGerenciamentoPermissaoService;
-import com.api.erp.v1.main.features.permissao.infrastructure.config.PermissaoServiceConfiguration;
-import com.api.erp.v1.main.features.permissao.infrastructure.factory.GerenciamentoPermissaoServiceFactory;
-import com.api.erp.v1.main.features.unidademedida.domain.service.IUnidadeMedidaService;
-import com.api.erp.v1.main.features.unidademedida.infrastructure.factory.UnidadeMedidaServiceFactory;
+import com.api.erp.v1.main.features.permission.domain.service.IGerenciamentoPermissionService;
+import com.api.erp.v1.main.features.permission.infrastructure.config.PermissionServiceConfiguration;
+import com.api.erp.v1.main.features.permission.infrastructure.factory.GerenciamentoPermissionServiceFactory;
+import com.api.erp.v1.main.features.measureunit.domain.service.IMeasureUnitService;
+import com.api.erp.v1.main.features.measureunit.infrastructure.factory.MeasureUnitServiceFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({PermissaoServiceConfiguration.class})
+@Import({PermissionServiceConfiguration.class})
 public class ServiceConfiguration {
 
     @Bean
-    public IUnidadeMedidaService unidadeMedidaService(
-            UnidadeMedidaServiceFactory factory) {
+    public IMeasureUnitService measureUnitService(
+            MeasureUnitServiceFactory factory) {
         return factory.create();
     }
 
     @Bean
-    public IGerenciamentoPermissaoService gerenciamentoPermissaoService(
-            GerenciamentoPermissaoServiceFactory factory) {
+    public IGerenciamentoPermissionService gerenciamentoPermissionService(
+            GerenciamentoPermissionServiceFactory factory) {
         return factory.create();
     }
 }

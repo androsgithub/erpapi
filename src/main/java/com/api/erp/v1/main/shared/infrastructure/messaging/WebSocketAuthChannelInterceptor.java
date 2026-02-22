@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.shared.infrastructure.messaging;
 
-import com.api.erp.v1.main.shared.domain.entity.UsuarioAutenticado;
+import com.api.erp.v1.main.shared.domain.entity.UserAutenticado;
 import com.api.erp.v1.main.shared.infrastructure.security.jwt.BearerTokenAuthentication;
 import com.api.erp.v1.main.shared.infrastructure.security.jwt.JwtTokenProvider;
 import org.slf4j.Logger;
@@ -40,25 +40,25 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
                 if (jwtTokenProvider.isTokenValid(token)) {
                     String email = jwtTokenProvider.getEmailFromToken(token);
-                    String usuarioId = jwtTokenProvider.getUsuarioIdFromToken(token);
+                    String userId = jwtTokenProvider.getUserIdFromToken(token);
                     String tenantId = jwtTokenProvider.getTenantIdFromToken(token);
-                    UsuarioAutenticado usuarioAutenticado = new UsuarioAutenticado(usuarioId, tenantId);
+                    UserAutenticado userAutenticado = new UserAutenticado(userId, tenantId);
 
-                    logger.info("Usuário autenticado via WebSocket: {} ({})", email, usuarioId);
+                    logger.info("Usuário autenticado via WebSocket: {} ({})", email, userId);
 
                     BearerTokenAuthentication authentication =
-                            new BearerTokenAuthentication(token, email, usuarioAutenticado);
-                    authentication.setDetails(usuarioId);
+                            new BearerTokenAuthentication(token, email, userAutenticado);
+                    authentication.setDetails(userId);
 
                     // Define a autenticação no contexto do STOMP
                     accessor.setUser(authentication);
                 } else {
                     logger.warn("Token JWT inválido no WebSocket");
-                    throw new IllegalArgumentException("Token inválido");
+                    throw new IllegalArgumentException("Invalid token");
                 }
             } else {
                 logger.warn("Header Authorization ausente ou inválido no CONNECT");
-                throw new IllegalArgumentException("Autenticação obrigatória");
+                throw new IllegalArgumentException("Authentication required");
             }
         }
 

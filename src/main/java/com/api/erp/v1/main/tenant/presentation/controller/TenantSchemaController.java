@@ -1,5 +1,6 @@
 package com.api.erp.v1.main.tenant.presentation.controller;
 
+import com.api.erp.v1.main.datasource.routing.TenantContext;
 import com.api.erp.v1.main.tenant.application.dto.DatasourceTesteResponse;
 import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceRequest;
 import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceResponse;
@@ -7,7 +8,7 @@ import com.api.erp.v1.main.tenant.domain.controller.ITenantDatabaseController;
 import com.api.erp.v1.docs.openapi.tenant.TenantDatabaseOpenApiDocumentation;
 import com.api.erp.v1.main.tenant.domain.entity.TenantPermissions;
 import com.api.erp.v1.main.tenant.domain.service.ITenantDatasourceService;
-import com.api.erp.v1.main.tenant.infrastructure.config.datasource.TenantContext;
+import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class TenantSchemaController implements ITenantDatabaseController, Tenant
     private ITenantDatasourceService tenantDataSourceService;
 
     @PostMapping("/datasource")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
     public ResponseEntity<TenantDatasourceResponse> configurarDatasource(
             @RequestBody TenantDatasourceRequest request) {
@@ -32,16 +34,18 @@ public class TenantSchemaController implements ITenantDatabaseController, Tenant
     }
 
     @GetMapping("/datasource")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.BUSCAR)
     public ResponseEntity<TenantDatasourceResponse> obterDatasource() {
         Long tenantId = TenantContext.getTenantId();
-        log.info("[EMPRESA CONTROLLER] Obtendo configuração de datasource do tenant: {}", tenantId);
+        log.info("[TENANT CONTROLLER] Getting datasource configuration for tenant: {}", tenantId);
         return tenantDataSourceService.obterDatasource(tenantId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/datasource")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
     public ResponseEntity<TenantDatasourceResponse> atualizarDatasource(
             @RequestBody TenantDatasourceRequest request) {
@@ -52,15 +56,16 @@ public class TenantSchemaController implements ITenantDatabaseController, Tenant
     }
 
     @PostMapping("/datasource/teste")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.BUSCAR)
     public ResponseEntity<?> testarConexaoDatasource(
             @RequestBody TenantDatasourceRequest request) {
         Long tenantId = TenantContext.getTenantId();
-        log.info("[EMPRESA CONTROLLER] Testando conexão de datasource para tenant: {}", tenantId);
+        log.info("[TENANT CONTROLLER] Testing datasource connection for tenant: {}", tenantId);
         boolean sucesso = tenantDataSourceService.testarConexao(request);
 
         if (sucesso) {
-            return ResponseEntity.ok(new DatasourceTesteResponse("Conexão estabelecida com sucesso", true));
+            return ResponseEntity.ok(new DatasourceTesteResponse("Connection established successfully", true));
         } else {
             return ResponseEntity.badRequest().body(new DatasourceTesteResponse("Falha ao conectar com o banco de dados", false));
         }

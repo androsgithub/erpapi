@@ -8,7 +8,6 @@ public enum DBType {
     H2("h2", "org.hibernate.dialect.H2Dialect", "org.h2.Driver"),
     MARIADB("mariadb", "org.hibernate.dialect.MariaDBDialect", "org.mariadb.jdbc.Driver"),
     DB2("db2", "org.hibernate.dialect.DB2Dialect", "com.ibm.db2.jcc.DB2Driver"),
-    // Novos bancos de dados
     SQLITE("sqlite", "org.hibernate.community.dialect.SQLiteDialect", "org.sqlite.JDBC"),
     COCKROACHDB("cockroachdb", "org.hibernate.dialect.CockroachDialect", "org.postgresql.Driver"),
     SYBASE("sybase", "org.hibernate.dialect.SybaseDialect", "com.sybase.jdbc4.jdbc.SybDriver"),
@@ -41,30 +40,73 @@ public enum DBType {
         return driver;
     }
 
+    /**
+     * Resolve DBType pelo nome do banco (case-insensitive com trim)
+     */
     public static DBType fromNome(String nome) {
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new IllegalArgumentException("Database name cannot be null or empty");
+        }
+        
         for (DBType banco : values()) {
-            if (banco.nome.equalsIgnoreCase(nome)) {
+            if (banco.nome.equalsIgnoreCase(nome.trim())) {
                 return banco;
             }
         }
-        throw new IllegalArgumentException("Banco de dados não suportado: " + nome);
+        throw new IllegalArgumentException("Unsupported database: " + nome);
     }
 
+    /**
+     * Resolve DBType pelo dialeto Hibernate
+     */
     public static DBType fromDialeto(String dialeto) {
+        if (dialeto == null || dialeto.trim().isEmpty()) {
+            throw new IllegalArgumentException("Dialect cannot be null or empty");
+        }
+        
+        String dialectoLower = dialeto.toLowerCase();
         for (DBType banco : values()) {
-            if (banco.dialeto.equals(dialeto) || dialeto.contains(banco.nome)) {
+            if (banco.dialeto.equalsIgnoreCase(dialeto) || dialectoLower.contains(banco.nome)) {
                 return banco;
             }
         }
-        throw new IllegalArgumentException("Dialeto não reconhecido: " + dialeto);
+        throw new IllegalArgumentException("Unrecognized dialect: " + dialeto);
     }
 
+    /**
+     * Resolve DBType pelo driver JDBC (case-insensitive com trim)
+     */
     public static DBType fromDriver(String driver) {
+        if (driver == null || driver.trim().isEmpty()) {
+            throw new IllegalArgumentException("Driver cannot be null or empty");
+        }
+        
         for (DBType banco : values()) {
-            if (banco.driver.equals(driver)) {
+            if (banco.driver.equalsIgnoreCase(driver.trim())) {
                 return banco;
             }
         }
-        throw new IllegalArgumentException("Driver não reconhecido: " + driver);
+        throw new IllegalArgumentException("Unrecognized driver: " + driver);
+    }
+
+    /**
+     * Verifica se um driver é suportado
+     */
+    public static boolean isSupported(String driver) {
+        if (driver == null || driver.trim().isEmpty()) {
+            return false;
+        }
+        
+        try {
+            fromDriver(driver);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return this.nome + " (Dialeto: " + this.dialeto + ")";
     }
 }

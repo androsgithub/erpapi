@@ -1,8 +1,9 @@
 package com.api.erp.v1.main.tenant.infrastructure.service;
 
-import com.api.erp.v1.main.features.endereco.domain.repository.EnderecoRepository;
-import com.api.erp.v1.main.features.permissao.infrastructure.factory.PermissaoConfigUpdateEvent;
+import com.api.erp.v1.main.features.address.domain.repository.AddressRepository;
+import com.api.erp.v1.main.features.permission.infrastructure.factory.PermissionConfigUpdateEvent;
 import com.api.erp.v1.main.shared.domain.exception.NotFoundException;
+import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
 import com.api.erp.v1.main.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.main.shared.domain.valueobject.Email;
 import com.api.erp.v1.main.shared.domain.valueobject.Telefone;
@@ -29,15 +30,15 @@ import java.util.List;
 public class TenantService implements ITenantService {
 
     private final TenantRepository tenantRepository;
-    private final EnderecoRepository enderecoRepository;
+    private final AddressRepository addressRepository;
     private final TenantDatasourceRepository tenantDatasourceRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final SecurityService securityService;
 
     @Autowired
-    public TenantService(TenantRepository tenantRepository, EnderecoRepository enderecoRepository, TenantDatasourceRepository tenantDatasourceRepository, ApplicationEventPublisher eventPublisher, SecurityService securityService) {
+    public TenantService(TenantRepository tenantRepository, AddressRepository addressRepository, TenantDatasourceRepository tenantDatasourceRepository, ApplicationEventPublisher eventPublisher, SecurityService securityService) {
         this.tenantRepository = tenantRepository;
-        this.enderecoRepository = enderecoRepository;
+        this.addressRepository = addressRepository;
         this.tenantDatasourceRepository = tenantDatasourceRepository;
         this.eventPublisher = eventPublisher;
         this.securityService = securityService;
@@ -45,7 +46,8 @@ public class TenantService implements ITenantService {
 
     @Override
     public Tenant getDadosTenant(Long tenantId) {
-        return tenantRepository.findById(tenantId).orElseThrow(() -> new NotFoundException("Tenant do tenant não encontrada"));
+        return tenantRepository.findById(tenantId)
+            .orElseThrow(() -> TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException());
     }
 
     @Override
@@ -54,75 +56,54 @@ public class TenantService implements ITenantService {
         empresa.setNome(empresaRequest.nome());
         empresa.setEmail(empresaRequest.email());
         empresa.setTelefone(empresaRequest.telefone());
-        // Endereco comentado no Tenant entity
-        // Endereco endereco = enderecoRepository.findById(empresaRequest.enderecoId()).orElse(null);
-        // empresa.setEndereco(endereco);
+        // Address comentado no Tenant entity
+        // Address address = addressRepository.findById(empresaRequest.addressId()).orElse(null);
+        // empresa.setAddress(address);
 
         return tenantRepository.save(empresa);
     }
 
     @Override
-    public Tenant updateClienteConfig(Long tenantId, ClienteConfigRequest clienteConfigRequest) {
-        log.info("[EMPRESA SERVICE] Atualizando configuração de Cliente");
+    public Tenant updateCustomerConfig(Long tenantId, CustomerConfigRequest customerConfigRequest) {
+        log.info("[TENANT SERVICE] Updating Customer configuration");
             Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw new IllegalStateException("Tenant do tenant não encontrada");
+            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
         }
 
-        ClienteConfig clienteConfig = new ClienteConfig();
-        clienteConfig.setClienteAuditEnabled(clienteConfigRequest.clienteAuditEnabled());
-        clienteConfig.setClienteCacheEnabled(clienteConfigRequest.clienteCacheEnabled());
-        clienteConfig.setClienteValidationEnabled(clienteConfigRequest.clienteValidationEnabled());
-        clienteConfig.setClienteNotificationEnabled(clienteConfigRequest.clienteNotificationEnabled());
-        clienteConfig.setClienteTenantCustomizationEnabled(clienteConfigRequest.clienteTenantCustomizationEnabled());
-        empresa.getConfig().setClienteConfig(clienteConfig);
+        CustomerConfig customerConfig = new CustomerConfig();
+        customerConfig.setCustomerAuditEnabled(customerConfigRequest.customerAuditEnabled());
+        customerConfig.setCustomerCacheEnabled(customerConfigRequest.customerCacheEnabled());
+        customerConfig.setCustomerValidationEnabled(customerConfigRequest.customerValidationEnabled());
+        customerConfig.setCustomerNotificationEnabled(customerConfigRequest.customerNotificationEnabled());
+        customerConfig.setCustomerTenantCustomizationEnabled(customerConfigRequest.customerTenantCustomizationEnabled());
+        empresa.getConfig().setCustomerConfig(customerConfig);
 
         Tenant empresaSalva = tenantRepository.save(empresa);
 
-        // Obtém usuário atual para auditoria
-        String usuario = obterUsuarioAtual();
+        // Get current user for audit
+        String user = obterUserAtual();
 
-        // Publica evento para recarregar decorators de Cliente
-        log.info("[EMPRESA SERVICE] Publicando ClienteConfigUpdateEvent");
+        // Publica evento para recarregar decorators de Customer
+        log.info("[TENANT SERVICE] Publishing CustomerConfigUpdateEvent");
 
         return empresaSalva;
     }
 
     @Override
-    public Tenant updateContatoConfig(Long tenantId, ContatoConfigRequest contatoConfigRequest) {
-        log.info("[EMPRESA SERVICE] Atualizando configuração de Contato");
+    public Tenant updateContactConfig(Long tenantId, ContactConfigRequest contactConfigRequest) {
+        log.info("[TENANT SERVICE] Updating Contact configuration");
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw new IllegalStateException("Tenant do tenant não encontrada");
+            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
         }
 
-        ContatoConfig contatoConfig = new ContatoConfig();
-        contatoConfig.setContatoAuditEnabled(contatoConfigRequest.contatoAuditEnabled());
-        contatoConfig.setContatoCacheEnabled(contatoConfigRequest.contatoCacheEnabled());
-        contatoConfig.setContatoValidationEnabled(contatoConfigRequest.contatoValidationEnabled());
-        contatoConfig.setContatoNotificationEnabled(contatoConfigRequest.contatoNotificationEnabled());
-        empresa.getConfig().setContatoConfig(contatoConfig);
-
-        Tenant empresaSalva = tenantRepository.save(empresa);
-
-        return empresaSalva;
-    }
-
-    @Override
-    public Tenant updateEnderecoConfig(Long tenantId, EnderecoConfigRequest enderecoConfigRequest) {
-        log.info("[EMPRESA SERVICE] Atualizando configuração de Endereco");
-
-
-        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
-        if (empresa == null) {
-            throw new IllegalStateException("Tenant do tenant não encontrada");
-        }
-
-        EnderecoConfig enderecoConfig = new EnderecoConfig();
-        enderecoConfig.setEnderecoAuditEnabled(enderecoConfigRequest.enderecoAuditEnabled());
-        enderecoConfig.setEnderecoCacheEnabled(enderecoConfigRequest.enderecoCacheEnabled());
-        enderecoConfig.setEnderecoValidationEnabled(enderecoConfigRequest.enderecoValidationEnabled());
-        empresa.getConfig().setEnderecoConfig(enderecoConfig);
+        ContactConfig contactConfig = new ContactConfig();
+        contactConfig.setContactAuditEnabled(contactConfigRequest.contactAuditEnabled());
+        contactConfig.setContactCacheEnabled(contactConfigRequest.contactCacheEnabled());
+        contactConfig.setContactValidationEnabled(contactConfigRequest.contactValidationEnabled());
+        contactConfig.setContactNotificationEnabled(contactConfigRequest.contactNotificationEnabled());
+        empresa.getConfig().setContactConfig(contactConfig);
 
         Tenant empresaSalva = tenantRepository.save(empresa);
 
@@ -130,18 +111,20 @@ public class TenantService implements ITenantService {
     }
 
     @Override
-    public Tenant updateUsuarioConfig(Long tenantId, UsuarioConfigRequest usuarioConfigRequest) {
-        log.info("[EMPRESA SERVICE] Atualizando configuração de Usuario");
+    public Tenant updateAddressConfig(Long tenantId, AddressConfigRequest addressConfigRequest) {
+        log.info("[TENANT SERVICE] Updating Address configuration");
+
+
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw new IllegalStateException("Tenant do tenant não encontrada");
+            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
         }
 
-        UsuarioConfig usuarioConfig = new UsuarioConfig();
-        usuarioConfig.setUsuarioApprovalRequired(usuarioConfigRequest.usuarioApprovalRequired());
-        usuarioConfig.setUsuarioCorporateEmailRequired(usuarioConfigRequest.usuarioCorporateEmailRequired());
-        usuarioConfig.setAllowedEmailDomains(usuarioConfigRequest.allowedEmailDomains());
-        empresa.getConfig().setUsuarioConfig(usuarioConfig);
+        AddressConfig addressConfig = new AddressConfig();
+        addressConfig.setAddressAuditEnabled(addressConfigRequest.addressAuditEnabled());
+        addressConfig.setAddressCacheEnabled(addressConfigRequest.addressCacheEnabled());
+        addressConfig.setAddressValidationEnabled(addressConfigRequest.addressValidationEnabled());
+        empresa.getConfig().setAddressConfig(addressConfig);
 
         Tenant empresaSalva = tenantRepository.save(empresa);
 
@@ -149,31 +132,50 @@ public class TenantService implements ITenantService {
     }
 
     @Override
-    public Tenant updatePermissaoConfig(Long tenantId, PermissaoConfigRequest permissaoConfigRequest) {
-        log.info("[EMPRESA SERVICE] Atualizando configuração de Permissao");
+    public Tenant updateUserConfig(Long tenantId, UserConfigRequest userConfigRequest) {
+        log.info("[TENANT SERVICE] Updating User configuration");
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw new IllegalStateException("Tenant do tenant não encontrada");
+            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
         }
 
-        PermissaoConfig permissaoConfig = new PermissaoConfig();
-        permissaoConfig.setPermissaoAuditEnabled(permissaoConfigRequest.permissaoAuditEnabled());
-        permissaoConfig.setPermissaoCacheEnabled(permissaoConfigRequest.permissaoCacheEnabled());
-        permissaoConfig.setPermissaoValidationEnabled(permissaoConfigRequest.permissaoValidationEnabled());
-        empresa.getConfig().setPermissaoConfig(permissaoConfig);
+        UserConfig userConfig = new UserConfig();
+        userConfig.setUserApprovalRequired(userConfigRequest.userApprovalRequired());
+        userConfig.setUserCorporateEmailRequired(userConfigRequest.userCorporateEmailRequired());
+        userConfig.setAllowedEmailDomains(userConfigRequest.allowedEmailDomains());
+        empresa.getConfig().setUserConfig(userConfig);
 
         Tenant empresaSalva = tenantRepository.save(empresa);
 
-        // Obtém usuário atual para auditoria
-        String usuario = obterUsuarioAtual();
+        return empresaSalva;
+    }
 
-        // Publica evento para recarregar decorators de Permissao
-        log.info("[EMPRESA SERVICE] Publicando PermissaoConfigUpdateEvent");
-        eventPublisher.publishEvent(new PermissaoConfigUpdateEvent(
+    @Override
+    public Tenant updatePermissionConfig(Long tenantId, PermissionConfigRequest permissionConfigRequest) {
+        log.info("[TENANT SERVICE] Updating Permission configuration");
+        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
+        if (empresa == null) {
+            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
+        }
+
+        PermissionConfig permissionConfig = new PermissionConfig();
+        permissionConfig.setPermissionAuditEnabled(permissionConfigRequest.permissionAuditEnabled());
+        permissionConfig.setPermissionCacheEnabled(permissionConfigRequest.permissionCacheEnabled());
+        permissionConfig.setPermissionValidationEnabled(permissionConfigRequest.permissionValidationEnabled());
+        empresa.getConfig().setPermissionConfig(permissionConfig);
+
+        Tenant empresaSalva = tenantRepository.save(empresa);
+
+        // Get current user for audit
+        String user = obterUserAtual();
+
+        // Publish event to reload Permission decorators
+        log.info("[TENANT SERVICE] Publishing PermissionConfigUpdateEvent");
+        eventPublisher.publishEvent(new PermissionConfigUpdateEvent(
                 this,
-                permissaoConfig,
+                permissionConfig,
                 empresa.getId(),
-                usuario
+                user
         ));
 
         return empresaSalva;
@@ -181,10 +183,10 @@ public class TenantService implements ITenantService {
 
     @Override
     public Tenant updateInternalTenantConfig(Long tenantId, InternalTenantConfigRequest internalTenantConfigRequest) {
-        log.info("[EMPRESA SERVICE] Atualizando configuração de Tenant");
+        log.info("[TENANT SERVICE] Updating Tenant configuration");
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw new IllegalStateException("Tenant do tenant não encontrada");
+            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
         }
 
         InternalTenantConfig tenantConfig = new InternalTenantConfig();
@@ -204,14 +206,14 @@ public class TenantService implements ITenantService {
      * Obtém o usuário atual do contexto de segurança.
      * Retorna "SYSTEM" se não houver usuário autenticado.
      */
-    private String obterUsuarioAtual() {
+    private String obterUserAtual() {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.isAuthenticated()) {
                 return auth.getName();
             }
         } catch (Exception e) {
-            log.debug("[EMPRESA SERVICE] Erro ao obter usuário atual", e);
+            log.debug("[TENANT SERVICE] Error getting current user", e);
         }
         return "SYSTEM";
     }
@@ -235,8 +237,8 @@ public class TenantService implements ITenantService {
     public Tenant criarTenant(CriarTenantRequest request) {
         log.info("[EMPRESA SERVICE] Criando nova empresa: {}", request.nome());
 
-        // Validar se já existe empresa com esse CNPJ
-        // Aqui você pode adicionar uma validação se necessário
+        // Check if company with this CNPJ already exists
+        // Here you can add a validation if necessary
 
         // Criar nova empresa
         Tenant empresa = new Tenant();
@@ -253,7 +255,7 @@ public class TenantService implements ITenantService {
         empresaDadosFiscais.setRegimeTributario(request.regimeTributario());
         empresa.setDadosFiscais(empresaDadosFiscais);
 
-        // Criar configuração padrão da empresa
+        // Create default company configuration
         TenantConfig empresaConfig = new TenantConfig();
 
         // Configurar TenantConfig com o tipo de tenant
@@ -263,12 +265,12 @@ public class TenantService implements ITenantService {
         tenantConfig.setTenantFeaturesEnabled(true);
         empresaConfig.setInternalTenantConfig(tenantConfig);
 
-        // Adicionar outras configurações padrão
-        empresaConfig.setClienteConfig(new ClienteConfig());
-        empresaConfig.setContatoConfig(new ContatoConfig());
-        empresaConfig.setEnderecoConfig(new EnderecoConfig());
-        empresaConfig.setPermissaoConfig(new PermissaoConfig());
-        empresaConfig.setUsuarioConfig(new UsuarioConfig());
+        // Add other default configurations
+        empresaConfig.setCustomerConfig(new CustomerConfig());
+        empresaConfig.setContactConfig(new ContactConfig());
+        empresaConfig.setAddressConfig(new AddressConfig());
+        empresaConfig.setPermissionConfig(new PermissionConfig());
+        empresaConfig.setUserConfig(new UserConfig());
 
         empresa.setConfig(empresaConfig);
 
@@ -296,13 +298,13 @@ public class TenantService implements ITenantService {
         log.info("[EMPRESA SERVICE] Deletando empresa: {}", tenantId);
 
         Tenant empresa = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new IllegalArgumentException("Tenant não encontrada: " + tenantId));
+                .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + tenantId));
 
-        // Marcar como inativa ao invés de deletar (soft delete)
+        // Mark as inactive instead of deleting (soft delete)
         empresa.setAtiva(false);
         tenantRepository.save(empresa);
 
-        // Também desativar o datasource associado
+        // Also deactivate the associated datasource
         tenantDatasourceRepository.findByTenant_IdAndIsActive(tenantId, true)
                 .ifPresent(tenantDs -> {
                     tenantDs.setIsActive(false);

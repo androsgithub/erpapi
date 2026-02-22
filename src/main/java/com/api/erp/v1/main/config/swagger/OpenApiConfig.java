@@ -22,13 +22,21 @@ public class OpenApiConfig {
                 .contact(new Contact()
                     .name("Equipe ERP")
                     .email("support@empresa.com")))
-            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+            .addSecurityItem(new SecurityRequirement().addList("bearerAuth").addList("X-Tenant-ID"))
             .components(new Components()
                 .addSecuritySchemes("bearerAuth", 
                     new SecurityScheme()
                         .type(SecurityScheme.Type.HTTP)
                         .scheme("bearer")
                         .bearerFormat("JWT")
-                        .description("Bearer token para autenticação")));
+                        .description("Bearer token para autenticação"))
+                .addSecuritySchemes("X-Tenant-ID",
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.APIKEY)
+                        .in(SecurityScheme.In.HEADER)
+                        .name("X-Tenant-ID")
+                        .description("Header obrigatório para requisições tenant-specific. " +
+                                     "Identifica unicamente o tenant em um ambiente multitenant. " +
+                                     "Não é necessário para endpoints administrativos.")));
     }
 }

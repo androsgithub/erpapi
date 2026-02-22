@@ -15,17 +15,17 @@ public final class CodigoBeneficioFiscal {
 
     private String validar(String valor) {
         if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException("Código de benefício fiscal não pode ser vazio");
+            throw new IllegalArgumentException("Tax benefit code cannot be empty");
         }
 
         String codigoLimpo = valor.trim().toUpperCase();
 
         if (codigoLimpo.length() > 10) {
-            throw new IllegalArgumentException("Código de benefício fiscal não pode ter mais de 10 caracteres");
+            throw new IllegalArgumentException("Tax benefit code cannot exceed 10 characters");
         }
 
         if (!codigoLimpo.matches("^[A-Z0-9]+$")) {
-            throw new IllegalArgumentException("Código de benefício fiscal deve conter apenas letras e números");
+            throw new IllegalArgumentException("Tax benefit code must contain only letters and numbers");
         }
 
         return codigoLimpo;

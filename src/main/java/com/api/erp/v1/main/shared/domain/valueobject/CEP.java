@@ -5,7 +5,7 @@ public class CEP {
     
     public CEP(String valor) {
         if (!isValido(valor)) {
-            throw new IllegalArgumentException("CEP inválido");
+            throw new IllegalArgumentException("Invalid ZIP code");
         }
         this.valor = limpar(valor);
     }

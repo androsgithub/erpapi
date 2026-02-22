@@ -20,27 +20,27 @@ public interface ITenantController {
             @RequestBody TenantRequest request
     );
 
-    ResponseEntity<TenantResponse> atualizarClienteConfig(
-            @RequestBody ClienteConfigRequest request
+    ResponseEntity<TenantResponse> atualizarCustomerConfig(
+            @RequestBody CustomerConfigRequest request
     );
 
-    ResponseEntity<TenantResponse> atualizarUsuarioConfig(
-            @RequestBody UsuarioConfigRequest request
+    ResponseEntity<TenantResponse> atualizarUserConfig(
+            @RequestBody UserConfigRequest request
     );
 
-    ResponseEntity<TenantResponse> atualizarPermissaoConfig(
-            @RequestBody PermissaoConfigRequest request
+    ResponseEntity<TenantResponse> atualizarPermissionConfig(
+            @RequestBody PermissionConfigRequest request
     );
 
     ResponseEntity<TenantResponse> atualizarTenantConfig(
             @RequestBody InternalTenantConfigRequest request
     );
 
-    ResponseEntity<TenantResponse> atualizarEnderecoConfig(
-            @RequestBody EnderecoConfigRequest request
+    ResponseEntity<TenantResponse> atualizarAddressConfig(
+            @RequestBody AddressConfigRequest request
     );
 
-    ResponseEntity<TenantResponse> atualizarContatoConfig(
-            @RequestBody ContatoConfigRequest request
+    ResponseEntity<TenantResponse> atualizarContactConfig(
+            @RequestBody ContactConfigRequest request
     );
 }

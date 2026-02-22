@@ -5,13 +5,13 @@ import com.dros.observability.core.mapper.strategy.ErrorMappingStrategy;
 import com.dros.observability.domain.FlowStatus;
 
 /**
- * Estratégia para mapeamento de erros de negócio.
+ * Strategy for mapping business errors.
  * 
- * Mapeia BusinessException e suas subclasses (como ProdutoException)
- * para FlowStatus.ERROR_VALIDATION, pois erros de negócio são essencialmente
- * violações de regras de domínio que deveriam ter sido validadas.
+ * Maps BusinessException and its subclasses (such as ProductException)
+ * to FlowStatus.ERROR_VALIDATION, because business errors are essentially
+ * domain rule violations that should have been validated.
  * 
- * Prioridade alta pois é comum em operações de domínio.
+ * High priority as it is common in domain operations.
  */
 public class BusinessErrorMappingStrategy implements ErrorMappingStrategy {
 
@@ -29,21 +29,21 @@ public class BusinessErrorMappingStrategy implements ErrorMappingStrategy {
         // Fallback: verificação por nome de classe
         String className = exception.getClass().getName();
         return className.contains("BusinessException") ||
-               className.contains("ProdutoException") ||
-               className.contains("ClienteException") ||
+               className.contains("ProductException") ||
+               className.contains("CustomerException") ||
                className.contains("DomainException");
     }
 
     @Override
     public FlowStatus map(Throwable exception) {
-        // Erros de negócio são tratados como erros de validação
-        // pois violam regras do domínio
+        // Business errors are treated as validation errors
+        // because they violate domain rules
         return FlowStatus.ERROR_VALIDATION;
     }
 
     /**
-     * Prioridade alta, logo após validações diretas.
-     * Garante que BusinessException seja mapeada antes de estratégias genéricas.
+     * High priority, right after direct validations.
+     * Ensures BusinessException is mapped before generic strategies.
      */
     @Override
     public int getPriority() {

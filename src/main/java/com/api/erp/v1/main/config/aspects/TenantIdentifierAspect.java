@@ -1,7 +1,8 @@
 package com.api.erp.v1.main.config.aspects;
 
+import com.api.erp.v1.main.datasource.routing.TenantContext;
 import com.api.erp.v1.main.tenant.domain.repository.TenantGroupRepository;
-import com.api.erp.v1.main.tenant.infrastructure.config.datasource.TenantContext;
+//import com.api.erp.v1.main.tenant.infrastructure.config.datasource.TenantContext;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;

@@ -10,6 +10,6 @@ public record TenantRequest(
         CNPJ cnpj,
         Email email,
         Telefone telefone,
-        Long enderecoId
+        Long addressId
 ) {
 }

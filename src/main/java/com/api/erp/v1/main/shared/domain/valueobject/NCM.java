@@ -19,13 +19,13 @@ public final class NCM {
 
     private String validar(String valor) {
         if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException("NCM não pode ser vazio");
+            throw new IllegalArgumentException("NCM cannot be empty");
         }
 
         String ncmLimpo = valor.replaceAll("[^0-9]", "");
 
         if (ncmLimpo.length() != 8) {
-            throw new IllegalArgumentException("NCM deve ter 8 dígitos. Valor fornecido: " + valor);
+            throw new IllegalArgumentException("NCM must have 8 digits. Value provided: " + valor);
         }
 
         return ncmLimpo;

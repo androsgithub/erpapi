@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
-                "Erro de validação nos dados fornecidos",
+                "Validation error in provided data",
                 request.getRequestURI()
         );
 

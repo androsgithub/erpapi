@@ -1,0 +1,13 @@
+package com.api.erp.v1.main.features.address.domain.entity;
+
+public final class AddressPermissions {
+
+    private AddressPermissions() {
+    }
+
+    public static final String PREFIX = "addresss";
+    public static final String CRIAR = PREFIX + ".criar";
+    public static final String ATUALIZAR = PREFIX + ".atualizar";
+    public static final String VISUALIZAR = PREFIX + ".visualizar";
+    public static final String DELETAR = PREFIX + ".deletar";
+}

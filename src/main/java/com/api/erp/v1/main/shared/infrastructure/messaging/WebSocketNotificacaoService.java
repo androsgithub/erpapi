@@ -17,9 +17,9 @@ public class WebSocketNotificacaoService {
         messagingTemplate.convertAndSend("/topic/gestores", notificacao);
     }
 
-    public void notificarUsuario(String usuarioId, NotificacaoDTO notificacao) {
+    public void notificarUser(String userId, NotificacaoDTO notificacao) {
         messagingTemplate.convertAndSendToUser(
-                usuarioId,
+                userId,
                 "/queue/notificacoes",
                 notificacao
         );

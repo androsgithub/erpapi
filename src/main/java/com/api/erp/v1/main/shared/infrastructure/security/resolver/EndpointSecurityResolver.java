@@ -21,13 +21,13 @@ public class EndpointSecurityResolver {
                     "/health"
             ),
             TenantAccessType.PUBLIC_WITH_TENANT, List.of(
-                    "/api/v1/usuarios/login"
+                    "/api/v1/users/login"
             ),
             TenantAccessType.AUTHENTICATED, List.of(
 
             ),
             TenantAccessType.AUTHENTICATED_WITH_TENANT, List.of(
-                    "/api/v1/usuarios/me",
+                    "/api/v1/users/me",
                     "/api/v1/pedidos/**",
                     "/api/v1/financeiro/**"
             )

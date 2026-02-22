@@ -5,7 +5,7 @@ public class CPF {
     
     public CPF(String valor) {
         if (!isValido(valor)) {
-            throw new IllegalArgumentException("CPF inválido");
+            throw new IllegalArgumentException("Invalid CPF");
         }
         this.valor = limpar(valor);
     }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.*;
 
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -28,7 +29,7 @@ import java.time.OffsetDateTime;
                   )
                 """
 )
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

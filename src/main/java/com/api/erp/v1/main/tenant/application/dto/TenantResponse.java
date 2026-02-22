@@ -14,7 +14,7 @@ public record TenantResponse(
         CNPJ cnpj,
         Email email,
         Telefone telefone,
-        String enderecoId,
+        String addressId,
         boolean ativa,
         TenantConfig config,
         LocalDateTime dataCriacao,

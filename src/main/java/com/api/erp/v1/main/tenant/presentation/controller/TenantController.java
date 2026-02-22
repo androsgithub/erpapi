@@ -1,5 +1,6 @@
 package com.api.erp.v1.main.tenant.presentation.controller;
 
+import com.api.erp.v1.main.datasource.routing.TenantContext;
 import com.api.erp.v1.main.tenant.application.dto.*;
 import com.api.erp.v1.main.tenant.application.mapper.TenantMapper;
 import com.api.erp.v1.main.tenant.domain.controller.ITenantController;
@@ -7,7 +8,7 @@ import com.api.erp.v1.docs.openapi.tenant.TenantOpenApiDocumentation;
 import com.api.erp.v1.main.tenant.domain.entity.Tenant;
 import com.api.erp.v1.main.tenant.domain.entity.TenantPermissions;
 import com.api.erp.v1.main.tenant.domain.service.ITenantService;
-import com.api.erp.v1.main.tenant.infrastructure.config.datasource.TenantContext;
+import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
     private TenantMapper tenantMapper;
 
     @GetMapping()
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.BUSCAR)
     public ResponseEntity<TenantResponse> obter() {
         Long tenantId = TenantContext.getTenantId();
@@ -40,6 +42,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
     }
 
     @PostMapping
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
     public ResponseEntity<TenantResponse> criar(@RequestBody CriarTenantRequest request) {
         log.info("[EMPRESA CONTROLLER] Criando nova tenant: {}", request.nome());
@@ -47,8 +50,9 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
         return ResponseEntity.status(HttpStatus.CREATED).body(tenantMapper.toResponse(tenant));
     }
 
-    @GetMapping("/listar")
-//    @RequiresPermission(TenantPermissions.BUSCAR)
+    @GetMapping("/listar")    
+    @RequiresXTenantId    
+    @RequiresPermission(TenantPermissions.BUSCAR)
     public ResponseEntity<List<TenantResponse>> listar() {
         log.info("[EMPRESA CONTROLLER] Listando todas as tenants");
         List<Tenant> tenants = tenantService.listarTenants();
@@ -59,6 +63,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
     }
 
     @PutMapping("")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
     public ResponseEntity<TenantResponse> atualizar(
 
@@ -68,37 +73,41 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 
-    @PutMapping("/config/cliente")
+    @PutMapping("/config/customer")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarClienteConfig(
+    public ResponseEntity<TenantResponse> atualizarCustomerConfig(
 
-            @RequestBody ClienteConfigRequest request) {
+            @RequestBody CustomerConfigRequest request) {
         Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateClienteConfig(tenantId,request);
+        Tenant tenant = tenantService.updateCustomerConfig(tenantId,request);
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 
-    @PutMapping("/config/usuario")
+    @PutMapping("/config/user")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarUsuarioConfig(
+    public ResponseEntity<TenantResponse> atualizarUserConfig(
 
-            @RequestBody UsuarioConfigRequest request) {
+            @RequestBody UserConfigRequest request) {
         Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateUsuarioConfig(tenantId,request);
+        Tenant tenant = tenantService.updateUserConfig(tenantId,request);
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 
-    @PutMapping("/config/permissao")
+    @PutMapping("/config/permission")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarPermissaoConfig(
+    public ResponseEntity<TenantResponse> atualizarPermissionConfig(
 
-            @RequestBody PermissaoConfigRequest request) {
+            @RequestBody PermissionConfigRequest request) {
         Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updatePermissaoConfig(tenantId,request);
+        Tenant tenant = tenantService.updatePermissionConfig(tenantId,request);
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 
     @PutMapping("/config/tenant")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
     public ResponseEntity<TenantResponse> atualizarTenantConfig(
 
@@ -108,23 +117,25 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 
-    @PutMapping("/config/endereco")
+    @PutMapping("/config/address")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarEnderecoConfig(
+    public ResponseEntity<TenantResponse> atualizarAddressConfig(
 
-            @RequestBody EnderecoConfigRequest request) {
+            @RequestBody AddressConfigRequest request) {
         Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateEnderecoConfig(tenantId, request);
+        Tenant tenant = tenantService.updateAddressConfig(tenantId, request);
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 
-    @PutMapping("/config/contato")
+    @PutMapping("/config/contact")
+    @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarContatoConfig(
+    public ResponseEntity<TenantResponse> atualizarContactConfig(
 
-            @RequestBody ContatoConfigRequest request) {
+            @RequestBody ContactConfigRequest request) {
         Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateContatoConfig(tenantId,request);
+        Tenant tenant = tenantService.updateContactConfig(tenantId,request);
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 }

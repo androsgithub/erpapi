@@ -15,13 +15,13 @@ public final class CEST {
 
     private String validar(String valor) {
         if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException("CEST não pode ser vazio");
+            throw new IllegalArgumentException("CEST cannot be empty");
         }
 
         String cestLimpo = valor.replaceAll("[^0-9]", "");
 
         if (cestLimpo.length() != 7) {
-            throw new IllegalArgumentException("CEST deve ter 7 dígitos. Valor fornecido: " + valor);
+            throw new IllegalArgumentException("CEST must have 7 digits. Value provided: " + valor);
         }
 
         return cestLimpo;

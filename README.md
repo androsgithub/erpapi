@@ -4,7 +4,7 @@ Sistema de ERP (Enterprise Resource Planning) desenvolvido em **Spring Boot 4.0.
 
 ## 📋 Visão Geral
 
-Aplicação completa de ERP com suporte a múltiplas funcionalidades de gestão empresarial, incluindo gerenciamento de usuários, produtos, empresas, endereços, permissões e unidades de medida.
+Aplicação completa de ERP com suporte a múltiplas funcionalidades de gestão empresarial, incluindo gerenciamento de usuários, products, empresas, endereços, permissões e unidades de medida.
 
 ## 🚀 Tecnologias
 
@@ -25,11 +25,11 @@ src/
 │   │   └── v1/
 │   │       ├── features/
 │   │       │   ├── empresa/            # Gestão de empresas
-│   │       │   ├── endereco/           # Gestão de endereços
-│   │       │   ├── permissao/          # Gestão de permissões
-│   │       │   ├── produto/            # Gestão de produtos
-│   │       │   ├── unidademedida/      # Gestão de unidades de medida
-│   │       │   └── usuario/            # Gestão de usuários
+│   │       │   ├── address/           # Gestão de endereços
+│   │       │   ├── permission/          # Gestão de permissões
+│   │       │   ├── product/            # Gestão de products
+│   │       │   ├── measureunit/      # Gestão de unidades de medida
+│   │       │   └── user/            # Gestão de usuários
 │   │       └── shared/
 │   │           ├── domain/             # Entidades e conceitos compartilhados
 │   │           ├── exception/          # Exceções customizadas
@@ -78,14 +78,14 @@ Gestão completa de informações de empresas vinculadas ao ERP.
 ### Usuário
 Gerenciamento de usuários com suporte a controle de acesso baseado em roles e permissões.
 
-### Produto
-Catálogo completo de produtos com categorização e gestão de estoque.
+### Product
+Catálogo completo de products com categorização e gestão de estoque.
 
 ### Unidade de Medida
-Sistema de unidades de medida para produtos e operações.
+Sistema de unidades de medida para products e operações.
 
 ### Endereço
-Gestão centralizada de endereços para empresas, filiais e clientes.
+Gestão centralizada de endereços para empresas, filiais e customers.
 
 ### Permissão
 Sistema granular de permissões e controle de acesso.
@@ -102,12 +102,12 @@ Toda a documentação do projeto está disponível na pasta `DOCS/`:
 - **CLASSIFICACAO_FISCAL_AJUSTE.md** - Informações de classificação fiscal
 - **HELP.md** - Guia de ajuda
 - **IMPLEMENTACAO_FINALIZADA.md** - Funcionalidades implementadas
-- **LEIA-ME-PRODUTOS.md** - Documentação específica de produtos
-- **PRODUTO_DIAGRAMA_ARQUITETURA.md** - Diagrama da arquitetura
-- **PRODUTO_FEATURE_DOCUMENTACAO.md** - Documentação de features
-- **PRODUTO_GUIA_RAPIDO.md** - Guia rápido
-- **PRODUTO_INDICE_CLASSES.md** - Índice de classes
-- **PRODUTO_RESUMO_EXECUTIVO.md** - Resumo executivo
+- **LEIA-ME-PRODUCTS.md** - Documentação específica de products
+- **PRODUCT_DIAGRAMA_ARQUITETURA.md** - Diagrama da arquitetura
+- **PRODUCT_FEATURE_DOCUMENTACAO.md** - Documentação de features
+- **PRODUCT_GUIA_RAPIDO.md** - Guia rápido
+- **PRODUCT_INDICE_CLASSES.md** - Índice de classes
+- **PRODUCT_RESUMO_EXECUTIVO.md** - Resumo executivo
 - **TESTE_PRATICO_MULTIPLOS_COMPONENTES.md** - Testes práticos
 - **VALIDACAO_MULTIPLOS_COMPONENTES.md** - Validações
 - **README_OLD.md** - README anterior (histórico)

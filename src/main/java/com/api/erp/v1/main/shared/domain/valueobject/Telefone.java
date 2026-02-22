@@ -5,7 +5,7 @@ public class Telefone {
     
     public Telefone(String valor) {
         if (!isValido(valor)) {
-            throw new IllegalArgumentException("Telefone inválido");
+            throw new IllegalArgumentException("Invalid phone number");
         }
         this.valor = limpar(valor);
     }

@@ -3,11 +3,11 @@ package com.api.erp.v1.main.shared.domain.exception;
 import org.springframework.http.HttpStatus;
 
 /**
- * Exceção lançada quando validações de negócio falham.
+ * Exception thrown when business validations fail.
  * 
- * Implementa DDD ao representar falhas de validação com contexto de domínio.
- * Usa Strategy para permitir diferentes tipos de validação.
- * Segue Clean Code com responsabilidade única.
+ * Implements DDD by representing validation failures with domain context.
+ * Uses Strategy pattern to allow different validation types.
+ * Follows Clean Code with single responsibility.
  */
 public class ValidationException extends RuntimeException {
     private final String field;
@@ -15,8 +15,8 @@ public class ValidationException extends RuntimeException {
     private final String code;
 
     /**
-     * Construtor básico com campo e mensagem.
-     * Usa BAD_REQUEST como status padrão.
+     * Basic constructor with field and message.
+     * Uses BAD_REQUEST as default status.
      */
     public ValidationException(String field, String message) {
         super(message);
@@ -26,7 +26,7 @@ public class ValidationException extends RuntimeException {
     }
 
     /**
-     * Construtor completo com controle de status HTTP.
+     * Full constructor with HTTP status control.
      */
     public ValidationException(String field, String message, HttpStatus status) {
         super(message);
@@ -36,7 +36,7 @@ public class ValidationException extends RuntimeException {
     }
 
     /**
-     * Construtor com código de erro customizado para melhor identificação.
+     * Constructor with custom error code for better identification.
      */
     public ValidationException(String field, String message, String code, HttpStatus status) {
         super(message);

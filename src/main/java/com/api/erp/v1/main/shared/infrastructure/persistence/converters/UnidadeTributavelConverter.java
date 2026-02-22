@@ -29,7 +29,7 @@ public class UnidadeTributavelConverter implements AttributeConverter<UnidadeTri
         
         String[] parts = dbData.split("\\|", 2);
         if (parts.length != 2) {
-            throw new IllegalArgumentException("Formato inválido de UnidadeTributavel: " + dbData);
+            throw new IllegalArgumentException("Invalid UnidadeTributavel format: " + dbData);
         }
         
         return UnidadeTributavel.de(parts[0], parts[1]);

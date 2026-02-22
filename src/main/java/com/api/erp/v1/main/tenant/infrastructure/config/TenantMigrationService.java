@@ -1,11 +1,13 @@
 package com.api.erp.v1.main.tenant.infrastructure.config;
 
+import com.api.erp.v1.main.tenant.domain.entity.DBType;
 import com.api.erp.v1.main.tenant.domain.entity.TenantDatasource;
 import com.api.erp.v1.main.tenant.domain.entity.Tenant;
 import com.api.erp.v1.main.tenant.domain.repository.TenantDatasourceRepository;
 import com.api.erp.v1.main.tenant.domain.repository.TenantRepository;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +18,8 @@ import javax.sql.DataSource;
 import java.util.List;
 
 @Service
+@Slf4j
 public class TenantMigrationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(TenantMigrationService.class);
 
     private final TenantRepository tenantRepository;
     private final TenantDatasourceRepository tenantDatasourceRepository;
@@ -31,19 +32,19 @@ public class TenantMigrationService {
 
     @Transactional(readOnly = true)
     public MigrationReport migrateAllTenants() {
-        logger.info("========================================");
-        logger.info("🚀 Iniciando migrações de TODOS os tenants");
-        logger.info("========================================");
+        log.info("========================================");
+        log.info("Starting migrations for ALL tenants");
+        log.info("========================================");
 
         MigrationReport report = new MigrationReport();
 
         try {
             // Busca tenants ativos
             List<?> tenants = tenantRepository.findAllByAtivaTrue();
-            logger.info("📊 Encontrados {} tenants ativos", tenants.size());
+            log.info("📊 Encontrados {} tenants ativos", tenants.size());
 
             if (tenants.isEmpty()) {
-                logger.warn("⚠️ Nenhum tenant ativo encontrado!");
+                log.warn("⚠️ Nenhum tenant ativo encontrado!");
                 return report;
             }
 
@@ -51,22 +52,22 @@ public class TenantMigrationService {
             tenants.forEach(tenantObj -> {
                 try {
                     var tenant = (Tenant) tenantObj;
-                    logger.info("");
-                    logger.info("─────────────────────────────────────────");
-                    logger.info("🔄 Processando Tenant: {} (ID: {})", tenant.getNome(), tenant.getId());
-                    logger.info("─────────────────────────────────────────");
+                    log.info("");
+                    log.info("─────────────────────────────────────────");
+                    log.info("🔄 Processando Tenant: {} (ID: {})", tenant.getNome(), tenant.getId());
+                    log.info("─────────────────────────────────────────");
 
                     // Busca datasource do tenant
                     TenantDatasource datasource = tenantDatasourceRepository
                             .findByTenantIdAndStatus(tenant.getId(), true);
 
                     if (datasource == null) {
-                        logger.warn("⚠️ Tenant {} não tem datasource configurado!", tenant.getNome());
-                        report.addFailure(tenant.getNome(), "Datasource não configurado");
+                        log.warn("Tenant {} does not have a configured datasource!", tenant.getNome());
+                        report.addFailure(tenant.getNome(), "Datasource not configured");
                         return;
                     }
 
-                    logger.info("📍 Banco de dados: {}@{}:{}/{}",
+                    log.info("📍 Banco de dados: {}@{}:{}/{}",
                             datasource.getUsername(),
                             datasource.getHost(),
                             datasource.getPort(),
@@ -75,31 +76,31 @@ public class TenantMigrationService {
                     // Executa migração para este tenant
                     migrateTenant(tenant.getNome(), datasource);
                     report.addSuccess(tenant.getNome());
-                    logger.info("✅ Migração concluída com sucesso para: {}", tenant.getNome());
+                    log.info("Migration successfully completed for: {}", tenant.getNome());
 
                 } catch (Exception e) {
                     var tenant = (Tenant) tenantObj;
-                    logger.error("❌ Erro ao migrar tenant: {}", tenant.getNome(), e);
+                    log.error("❌ Erro ao migrar tenant: {}", tenant.getNome(), e);
                     report.addFailure(tenant.getNome(), e.getMessage());
                 }
             });
 
         } catch (Exception e) {
-            logger.error("❌ Erro crítico ao processar migrações de tenants", e);
+            log.error("Critical error while processing tenant migrations", e);
             report.setCriticalError(e.getMessage());
         }
 
-        logger.info("");
-        logger.info("========================================");
-        logger.info("📋 RESUMO DE MIGRAÇÕES");
-        logger.info("========================================");
-        logger.info("✅ Sucesso: {}", report.getSuccessCount());
-        logger.info("❌ Falha: {}", report.getFailureCount());
+        log.info("");
+        log.info("========================================");
+        log.info("MIGRATION SUMMARY");
+        log.info("========================================");
+        log.info("✅ Sucesso: {}", report.getSuccessCount());
+        log.info("❌ Falha: {}", report.getFailureCount());
 
         if (report.hasFailures()) {
-            logger.warn("⚠️ Algumas migrações falharam:");
+            log.warn("Some migrations failed:");
             report.getFailures().forEach((tenant, error) -> {
-                logger.warn("  - {}: {}", tenant, error);
+                log.warn("  - {}: {}", tenant, error);
             });
         }
 
@@ -115,11 +116,21 @@ public class TenantMigrationService {
             validateConnection(tenantDataSource, tenantName);
 
             // Configura e executa Flyway
-            logger.info("🔧 Configurando Flyway para tenant: {}", tenantName);
+            log.info("🔧 Configurando Flyway para tenant: {}", tenantName);
+
+            DBType dbType;
+            try {
+                dbType = DBType.fromDriver(tenantDataSource.getConnection().getMetaData().getDriverName());
+            } catch (Exception e) {
+                dbType = DBType.MYSQL;
+                log.error("Error getting dbType by driver during migrations! Using DBType.MYSQL as default");
+            }
+
+            String flywayLocation = "classpath:db/migration/tenant/" + dbType.getNome().toLowerCase();
 
             Flyway flyway = Flyway.configure()
                     .dataSource(tenantDataSource)
-                    .locations("classpath:db/migration/tenant")
+                    .locations(flywayLocation)
                     .baselineOnMigrate(true)
                     .validateOnMigrate(false)
                     .table("tenant_erpapi_migrations_history")  // Tabela padrão do Flyway
@@ -127,24 +138,24 @@ public class TenantMigrationService {
 
             // Tenta repair (remove migrações falhadas se houver)
             try {
-                logger.debug("🔧 Executando repair para limpar migrações falhadas...");
+                log.debug("Running repair to clean up failed migrations...");
                 flyway.repair();
-                logger.debug("✅ Repair concluído");
+                log.debug("Repair completed");
             } catch (Exception e) {
-                logger.debug("ℹ️ Repair não necessário ou erro esperado: {}", e.getMessage());
+                log.debug("ℹ️ Repair not necessary or expected error: {}", e.getMessage());
             }
 
-            // Executa as migrações
-            logger.info("📊 Executando migrações...");
+            // Execute migrations
+            log.info("📊 Running migrations...");
             var result = flyway.migrate();
-            logger.info("✅ Migrações executadas com sucesso!");
-            logger.info("   - Versão atual: {}", result.success ? "OK" : "ERRO");
-            logger.info("   - Migrações aplicadas: {}", result.migrationsExecuted);
+            log.info("Migrations executed successfully!");
+            log.info("   - Current version: {}", result.success ? "OK" : "ERROR");
+            log.info("   - Migrations applied: {}", result.migrationsExecuted);
 
         } finally {
-            // Sempre fecha a conexão
+            // Always close the connection
             if (tenantDataSource != null && !tenantDataSource.isClosed()) {
-                logger.debug("🔌 Fechando conexão do tenant: {}", tenantName);
+                log.debug("Closing tenant connection: {}", tenantName);
                 tenantDataSource.close();
             }
         }
@@ -152,18 +163,18 @@ public class TenantMigrationService {
 
     @Transactional(readOnly = true)
     public void migrateTenantById(Long tenantId) throws Exception {
-        logger.info("🔄 Executando migração para tenant ID: {}", tenantId);
+        log.info("Running migration for tenant ID: {}", tenantId);
 
         var tenant = tenantRepository.findById(tenantId).orElse(null);
         if (tenant == null || !tenant.isAtiva()) {
-            throw new IllegalArgumentException("Tenant não encontrado ou inativo: " + tenantId);
+            throw new IllegalArgumentException("Tenant not found or inactive: " + tenantId);
         }
 
         TenantDatasource datasource = tenantDatasourceRepository
                 .findByTenantIdAndStatus(tenant.getId(), true);
 
         if (datasource == null) {
-            throw new IllegalArgumentException("Datasource não configurado para tenant: " + tenantId);
+            throw new IllegalArgumentException("Datasource not configured for tenant: " + tenantId);
         }
 
         migrateTenant(tenant.getNome(), datasource);
@@ -172,7 +183,7 @@ public class TenantMigrationService {
     private HikariDataSource createDataSourceForTenant(TenantDatasource datasource) {
         HikariConfig config = new HikariConfig();
 
-        // Constrói JDBC URL: jdbc:mysql://host:port/database
+        // Builds JDBC URL: jdbc:mysql://host:port/database
         String jdbcUrl = String.format(
                 "jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true",
                 datasource.getHost(),
@@ -189,21 +200,21 @@ public class TenantMigrationService {
         config.setIdleTimeout(30000);  // 30 segundos
         config.setAutoCommit(true);
 
-        logger.debug("📦 Criando HikariDataSource para: {}", datasource.getDatabaseName());
+        log.debug("📦 Creating HikariDataSource for: {}", datasource.getDatabaseName());
         return new HikariDataSource(config);
     }
 
     private void validateConnection(DataSource dataSource, String tenantName) throws Exception {
-        logger.debug("🔗 Validando conexão com banco: {}", tenantName);
+        log.debug("Validating database connection: {}", tenantName);
 
         try (var connection = dataSource.getConnection()) {
             var metaData = connection.getMetaData();
-            logger.debug("   ✓ Banco de dados: {}", metaData.getDatabaseProductName());
-            logger.debug("   ✓ Versão: {}", metaData.getDatabaseProductVersion());
-            logger.debug("   ✓ Conexão ativa e funcional!");
+            log.debug("   ✓ Database: {}", metaData.getDatabaseProductName());
+            log.debug("   ✓ Version: {}", metaData.getDatabaseProductVersion());
+            log.debug("   ✓ Connection active and functional!");
         } catch (Exception e) {
-            logger.error("❌ Erro ao conectar ao banco: {}", tenantName, e);
-            throw new RuntimeException("Não foi possível conectar ao banco do tenant: " + tenantName, e);
+            log.error("❌ Error connecting to database: {}", tenantName, e);
+            throw new RuntimeException("Unable to connect to tenant database: " + tenantName, e);
         }
     }
 

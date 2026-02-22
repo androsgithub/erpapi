@@ -119,7 +119,7 @@ public class TenantDatasource {
                 return String.format("jdbc:db2://%s:%d/%s", host, port, databaseName);
 
             default:
-                throw new IllegalArgumentException("Tipo de banco não suportado: " + dbType.getNome());
+                throw new IllegalArgumentException("Unsupported database type: " + dbType.getNome());
         }
     }
 

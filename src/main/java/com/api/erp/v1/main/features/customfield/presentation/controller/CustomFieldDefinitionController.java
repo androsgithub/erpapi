@@ -1,5 +1,6 @@
 package com.api.erp.v1.main.features.customfield.presentation.controller;
 
+import com.api.erp.v1.main.datasource.routing.TenantContext;
 import com.api.erp.v1.main.features.customfield.application.dto.request.ChangeCustomFieldStatusRequest;
 import com.api.erp.v1.main.features.customfield.application.dto.request.CreateCustomFieldRequest;
 import com.api.erp.v1.main.features.customfield.application.dto.request.UpdateCustomFieldRequest;
@@ -8,8 +9,8 @@ import com.api.erp.v1.main.features.customfield.domain.controller.ICustomFieldDe
 import com.api.erp.v1.docs.openapi.features.customfield.CustomFieldDefinitionOpenApiDocumentation;
 import com.api.erp.v1.main.features.customfield.domain.entity.CustomFieldPermissions;
 import com.api.erp.v1.main.features.customfield.infrastructure.service.CustomFieldDefinitionService;
-import com.api.erp.v1.main.tenant.infrastructure.config.datasource.TenantContext;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
+import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
     /* ===================== LIST ===================== */
 
     @GetMapping
+    @RequiresXTenantId
     @RequiresPermission(CustomFieldPermissions.VISUALIZAR)
     public List<CustomFieldResponse> getCustomFields(@RequestParam String table) {
         Long tenantId = TenantContext.getTenantId();
@@ -39,6 +41,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
     /* ===================== CREATE ===================== */
 
     @PostMapping
+    @RequiresXTenantId
     @RequiresPermission(CustomFieldPermissions.CRIAR)
     public CustomFieldResponse create(
 
@@ -51,6 +54,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
     /* ===================== UPDATE ===================== */
 
     @PutMapping("/{id}")
+    @RequiresXTenantId
     @RequiresPermission(CustomFieldPermissions.ATUALIZAR)
     public CustomFieldResponse update(
 
@@ -64,6 +68,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
     /* ===================== ENABLE / DISABLE ===================== */
 
     @PatchMapping("/{id}/status")
+    @RequiresXTenantId
     @RequiresPermission(CustomFieldPermissions.ATUALIZAR)
     public CustomFieldResponse changeStatus(
 
@@ -77,6 +82,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
     /* ===================== DELETE ===================== */
 
     @DeleteMapping("/{id}")
+    @RequiresXTenantId
     @RequiresPermission(CustomFieldPermissions.DELETAR)
     public void delete(
 

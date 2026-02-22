@@ -472,7 +472,7 @@
         <div class="input-group">
             <input
                     type="text"
-                    id="usuarioIdInput"
+                    id="userIdInput"
                     placeholder="ID do Usuário (UUID)"
                     disabled
                     style="flex: 2;"
@@ -486,7 +486,7 @@
             >
             <button
                     class="btn-subscribe"
-                    onclick="aprovarUsuario()"
+                    onclick="aprovarUser()"
                     disabled
                     id="aprovarBtn"
                     style="background: #28a745; flex: 1;">
@@ -539,7 +539,7 @@
             <li><strong>2. Inscrever nos tópicos:</strong> Clique em "📢 Gestores" e "🔔 Minhas Notificações"</li>
             <li><strong>3. Testar Aprovação:</strong> Preencha os UUIDs do usuário e gestor, clique em "Aprovar"</li>
             <li><strong>4. Receber notificação:</strong> A notificação será enviada automaticamente para os tópicos inscritos</li>
-            <li><strong>Endpoint usado:</strong> <code>PATCH /api/v1/usuarios/{id}/aprovar?gestorId={gestorId}</code></li>
+            <li><strong>Endpoint usado:</strong> <code>PATCH /api/v1/users/{id}/aprovar?gestorId={gestorId}</code></li>
         </ul>
     </div>
 </div>
@@ -642,19 +642,19 @@
       }
     }
 
-    function aprovarUsuario() {
-      const usuarioId = document.getElementById('usuarioIdInput').value.trim();
+    function aprovarUser() {
+      const userId = document.getElementById('userIdInput').value.trim();
       const gestorId = document.getElementById('gestorIdInput').value.trim();
       const token = document.getElementById('tokenInput').value.trim();
 
-      if (!usuarioId || !gestorId) {
+      if (!userId || !gestorId) {
         addMessage('Sistema', '❌ Preencha o ID do usuário e do gestor', 'error');
         return;
       }
 
       // Valida se são UUIDs válidos
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(usuarioId) || !uuidRegex.test(gestorId)) {
+      if (!uuidRegex.test(userId) || !uuidRegex.test(gestorId)) {
         addMessage('Sistema', '❌ IDs inválidos. Use formato UUID', 'error');
         return;
       }
@@ -665,7 +665,7 @@
       const baseUrl = document.getElementById('urlInput').value.replace('/ws', '');
 
       // Monta a URL com query params conforme o controller
-      const url = `${baseUrl}/api/v1/usuarios/${usuarioId}/aprovar?gestorId=${gestorId}`;
+      const url = `${baseUrl}/api/v1/users/${userId}/aprovar?gestorId=${gestorId}`;
 
       fetch(url, {
         method: 'PATCH',
@@ -688,7 +688,7 @@
 📊 Status: ${data.status}
 
 Aguarde a notificação via WebSocket...`, 'success');
-        document.getElementById('usuarioIdInput').value = '';
+        document.getElementById('userIdInput').value = '';
         document.getElementById('gestorIdInput').value = '';
       })
       .catch(error => {
@@ -826,7 +826,7 @@ Aguarde a notificação via WebSocket...`, 'success');
       const messageInput = document.getElementById('messageInput');
       const destinationInput = document.getElementById('destinationInput');
       const topicInput = document.getElementById('topicInput');
-      const usuarioIdInput = document.getElementById('usuarioIdInput');
+      const userIdInput = document.getElementById('userIdInput');
       const gestorIdInput = document.getElementById('gestorIdInput');
       const urlInput = document.getElementById('urlInput');
       const tokenInput = document.getElementById('tokenInput');
@@ -844,7 +844,7 @@ Aguarde a notificação via WebSocket...`, 'success');
         messageInput.disabled = false;
         destinationInput.disabled = false;
         topicInput.disabled = false;
-        usuarioIdInput.disabled = false;
+        userIdInput.disabled = false;
         gestorIdInput.disabled = false;
         urlInput.disabled = true;
         tokenInput.disabled = true;
@@ -863,7 +863,7 @@ Aguarde a notificação via WebSocket...`, 'success');
         messageInput.disabled = true;
         destinationInput.disabled = true;
         topicInput.disabled = true;
-        usuarioIdInput.disabled = true;
+        userIdInput.disabled = true;
         gestorIdInput.disabled = true;
         urlInput.disabled = false;
         tokenInput.disabled = false;

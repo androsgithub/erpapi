@@ -26,9 +26,9 @@ public class PermissionInterceptor implements HandlerInterceptor {
 
             if (method.isAnnotationPresent(RequiresPermission.class)) {
                 RequiresPermission annotation = method.getAnnotation(RequiresPermission.class);
-                for (String permissaoCodigo : annotation.value()) {
-                    if (!permissionEvaluator.hasPermission(permissaoCodigo)) {
-                        throw new AccessDeniedException("Acesso negado para a permissão: " + permissaoCodigo);
+                for (String permissionCodigo : annotation.value()) {
+                    if (!permissionEvaluator.hasPermission(permissionCodigo)) {
+                        throw new AccessDeniedException("Access denied for permission: " + permissionCodigo);
                     }
                 }
             }
