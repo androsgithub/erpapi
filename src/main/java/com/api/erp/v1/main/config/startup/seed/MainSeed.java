@@ -54,15 +54,18 @@ public class MainSeed {
             erros++;
         }
 
-        try {
-            log.debug("3️⃣  Executando seeder de unidades de medida...");
-            measureUnitSeed.executar();
-            log.info("✅ Unidades de medida inicializadas com sucesso");
-            sucessos++;
-        } catch (Exception e) {
-            log.error("❌ Erro ao executar seeder de unidades de medida:", e);
-            erros++;
-        }
+        // ❌ COMENTADO: Unidades de medida agora são migração FlywayDB
+        // - Usar migration: V2__Insert_Measure_Units.sql para dados padrão
+        // - Seed apenas para unidades específicas do tenant se necessário
+        // try {
+        //     log.debug("3️⃣  Executando seeder de unidades de medida...");
+        //     measureUnitSeed.executar();
+        //     log.info("✅ Unidades de medida inicializadas com sucesso");
+        //     sucessos++;
+        // } catch (Exception e) {
+        //     log.error("❌ Erro ao executar seeder de unidades de medida:", e);
+        //     erros++;
+        // }
 
         if (erros == 0) {
             log.info("✅ Todos os {} seeders foram executados com sucesso", sucessos);

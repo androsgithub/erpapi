@@ -92,7 +92,7 @@ create table
       value longtext,
       custom_field_id bigint,
       entity_id bigint not null,
-      custom_data_id bigint not null,
+      custom_data_id bigint,
       primary key (id)
    ) engine = InnoDB;
 
@@ -369,8 +369,6 @@ create table
 alter table TB_CUSTOMER_CONTACT add constraint UKoyvoyiovpks7mak7a6o9shsjf unique (contact_id);
 
 alter table TB_CUSTOMER_ADDRESS add constraint UK3g4mi2jwv887g1adobbi2ty7j unique (address_id);
-
-alter table TB_CUSTOM_DATA add constraint UKb7y9ubgkokofmmajuqk9oxkmn unique (custom_data_id);
 
 alter table tb_permission add constraint UK1uq3cg2rbrpk3ykinkkju2gaw unique (codigo);
 

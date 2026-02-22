@@ -10,10 +10,13 @@ import com.api.erp.v1.main.tenant.domain.entity.TenantPermissions;
 import com.api.erp.v1.main.tenant.domain.service.ITenantDatasourceService;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
+import com.api.erp.v1.main.migration.async.service.MigrationQueueService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -21,6 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class TenantSchemaController implements ITenantDatabaseController, TenantDatabaseOpenApiDocumentation {
     @Autowired
     private ITenantDatasourceService tenantDataSourceService;
+
+    @Autowired
+    private MigrationQueueService migrationQueueService;
 
     @PostMapping("/datasource")
     @RequiresXTenantId
@@ -70,4 +76,50 @@ public class TenantSchemaController implements ITenantDatabaseController, Tenant
             return ResponseEntity.badRequest().body(new DatasourceTesteResponse("Falha ao conectar com o banco de dados", false));
         }
     }
+
+    @PostMapping("/datasource/migrate")
+    @RequiresXTenantId
+    @RequiresPermission(TenantPermissions.ATUALIZAR)
+    public ResponseEntity<?> enqueueDatasourceMigration() {
+        Long tenantId = TenantContext.getTenantId();
+        log.info("[TENANT CONTROLLER] Enfileirando migração de datasource para tenant: {}", tenantId);
+        
+        try {
+            var task = migrationQueueService.enqueueTenantMigration(tenantId);
+            log.info("[TENANT CONTROLLER] ✅ Tarefa enfileirada: {} (TaskID: {})", tenantId, task.getTaskId());
+            
+            // Inicia o processamento da fila em background
+            log.info("[TENANT CONTROLLER] 🚀 Iniciando processamento da fila de migrações...");
+            migrationQueueService.processMigrationQueue();
+            
+            return ResponseEntity.accepted().body(buildMigrationResponse(task));
+        } catch (IllegalArgumentException e) {
+            log.error("[TENANT CONTROLLER] Erro ao enfileirar migração: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(buildErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            log.error("[TENANT CONTROLLER] Erro inesperado ao enfileirar migração", e);
+            return ResponseEntity.internalServerError().body(buildErrorResponse("Erro ao enfileirar migração: " + e.getMessage()));
+        }
+    }
+
+    private Map<String, Object> buildMigrationResponse(com.api.erp.v1.main.migration.async.domain.MigrationQueueTask task) {
+        return new java.util.HashMap<>() {{
+            put("success", true);
+            put("taskId", task.getTaskId());
+            put("tenantId", task.getTenantId());
+            put("tenantName", task.getTenantName());
+            put("status", task.getStatus().name());
+            put("statusDescription", task.getStatus().getDescription());
+            put("enqueuedAt", task.getEnqueuedAt());
+            put("message", "Migração enfileirada com sucesso");
+        }};
+    }
+
+    private Map<String, Object> buildErrorResponse(String errorMessage) {
+        return new java.util.HashMap<>() {{
+            put("success", false);
+            put("error", errorMessage);
+        }};
+    }
 }
+
