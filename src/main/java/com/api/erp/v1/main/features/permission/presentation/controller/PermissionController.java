@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/src/test/java/com/api/v1/permissions")
+@RequestMapping("/api/v1/permissions")
 public class PermissionController implements IPermissionController, PermissionOpenApiDocumentation {
 
     @Autowired

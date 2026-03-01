@@ -10,7 +10,9 @@ import com.api.erp.v1.main.tenant.domain.entity.TenantPermissions;
 import com.api.erp.v1.main.tenant.domain.service.ITenantDatasourceService;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
-import com.api.erp.v1.main.migration.async.service.MigrationQueueService;
+import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
+import com.api.erp.v1.main.migration.service.TenantMigrationQueue;
+import com.api.erp.v1.main.tenant.domain.repository.TenantDatasourceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +22,16 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/src/test/java/com/api/v1/tenant/database")
+@RequestMapping("/api/v1/tenant/database")
 public class TenantSchemaController implements ITenantDatabaseController, TenantDatabaseOpenApiDocumentation {
     @Autowired
     private ITenantDatasourceService tenantDataSourceService;
 
     @Autowired
-    private MigrationQueueService migrationQueueService;
+    private TenantMigrationQueue migrationQueue;
+
+    @Autowired
+    private TenantDatasourceRepository tenantDatasourceRepository;
 
     @PostMapping("/datasource")
     @RequiresXTenantId
@@ -88,17 +93,19 @@ public class TenantSchemaController implements ITenantDatabaseController, Tenant
             }
             log.info("[DATASOURCE CONTROLLER] ✅ Conexão teste bem-sucedida");
             
-            // FASE 3: Enfileirar migração + seed
+            // FASE 3: Enfileirar migração + seed (novo sistema unificado)
             log.info("[DATASOURCE CONTROLLER] 3️⃣  Enfileirando migração + seeders...");
-            var task = migrationQueueService.enqueueTenantMigrationWithSeed(tenantId);
-            log.info("[DATASOURCE CONTROLLER] ✅ Tarefa enfileirada (TaskID: {})", task.getTaskId());
+            var datasource = tenantDatasourceRepository.findByTenantIdAndStatus(tenantId, true);
+            var event = migrationQueue.enqueueEvent(
+                    tenantId,
+                    "Tenant " + tenantId,
+                    datasource,
+                    TenantMigrationEvent.MigrationEventSource.MANUAL_REQUEST
+            );
+            log.info("[DATASOURCE CONTROLLER] ✅ Evento enfileirado (EventID: {})", event.getEventId());
+            log.info("[DATASOURCE CONTROLLER] 🚀 Processamento será iniciado automaticamente");
             
-            // FASE 4: Iniciar processamento
-            log.info("[DATASOURCE CONTROLLER] 4️⃣  Iniciando processamento em background...");
-            migrationQueueService.processMigrationQueue();
-            log.info("[DATASOURCE CONTROLLER] 🚀 Processamento iniciado");
-            
-            return ResponseEntity.accepted().body(buildConfigureAndMigrateResponse(task, datasourceResponse));
+            return ResponseEntity.accepted().body(buildConfigureAndMigrateResponse(event, datasourceResponse));
             
         } catch (IllegalArgumentException e) {
             log.error("[DATASOURCE CONTROLLER] ❌ Erro de validação: {}", e.getMessage());
@@ -156,14 +163,17 @@ public class TenantSchemaController implements ITenantDatabaseController, Tenant
         log.info("[TENANT CONTROLLER] Enfileirando migração de datasource para tenant: {}", tenantId);
         
         try {
-            var task = migrationQueueService.enqueueTenantMigration(tenantId);
-            log.info("[TENANT CONTROLLER] ✅ Tarefa enfileirada: {} (TaskID: {})", tenantId, task.getTaskId());
+            var datasource = tenantDatasourceRepository.findByTenantIdAndStatus(tenantId, true);
+            var event = migrationQueue.enqueueEvent(
+                    tenantId,
+                    "Tenant " + tenantId,
+                    datasource,
+                    TenantMigrationEvent.MigrationEventSource.MANUAL_REQUEST
+            );
+            log.info("[TENANT CONTROLLER] ✅ Evento enfileirado: {} (EventID: {})", tenantId, event.getEventId());
+            log.info("[TENANT CONTROLLER] 🚀 Processamento será iniciado automaticamente");
             
-            // Inicia o processamento da fila em background
-            log.info("[TENANT CONTROLLER] 🚀 Iniciando processamento da fila de migrações...");
-            migrationQueueService.processMigrationQueue();
-            
-            return ResponseEntity.accepted().body(buildMigrationResponse(task));
+            return ResponseEntity.accepted().body(buildMigrationResponse(event));
         } catch (IllegalArgumentException e) {
             log.error("[TENANT CONTROLLER] Erro ao enfileirar migração: {}", e.getMessage());
             return ResponseEntity.badRequest().body(buildErrorResponse(e.getMessage()));
@@ -173,25 +183,25 @@ public class TenantSchemaController implements ITenantDatabaseController, Tenant
         }
     }
 
-    private Map<String, Object> buildMigrationResponse(com.api.erp.v1.main.migration.async.domain.MigrationQueueTask task) {
+    private Map<String, Object> buildMigrationResponse(TenantMigrationEvent event) {
         return new java.util.HashMap<>() {{
             put("success", true);
-            put("taskId", task.getTaskId());
-            put("tenantId", task.getTenantId());
-            put("tenantName", task.getTenantName());
-            put("status", task.getStatus().name());
-            put("statusDescription", task.getStatus().getDescription());
-            put("enqueuedAt", task.getEnqueuedAt());
+            put("eventId", event.getEventId());
+            put("tenantId", event.getTenantId());
+            put("tenantName", event.getTenantName());
+            put("status", event.getStatus().getLabel());
+            put("source", event.getSource().getLabel());
+            put("enqueuedAt", event.getEnqueuedAt());
             put("message", "Migração enfileirada com sucesso");
         }};
     }
     
     private Map<String, Object> buildConfigureAndMigrateResponse(
-            com.api.erp.v1.main.migration.async.domain.MigrationQueueTask task,
+            TenantMigrationEvent event,
             TenantDatasourceResponse datasource) {
         return new java.util.HashMap<>() {{
             put("success", true);
-            put("message", "Datasource configurado com sucesso. Migrações e seeders enfileirados.");
+            put("message", "Datasource configurado com sucesso. Migrações enfileiradas.");
             put("datasource", new java.util.HashMap<>() {{
                 put("id", datasource.id());
                 put("host", datasource.host());
@@ -201,10 +211,10 @@ public class TenantSchemaController implements ITenantDatabaseController, Tenant
                 put("isActive", datasource.isActive());
             }});
             put("migration", new java.util.HashMap<>() {{
-                put("taskId", task.getTaskId());
-                put("status", task.getStatus().name());
-                put("executeSeed", task.isExecuteSeedAfterMigration());
-                put("enqueuedAt", task.getEnqueuedAt());
+                put("eventId", event.getEventId());
+                put("status", event.getStatus().getLabel());
+                put("source", event.getSource().getLabel());
+                put("enqueuedAt", event.getEnqueuedAt());
             }});
         }};
     }

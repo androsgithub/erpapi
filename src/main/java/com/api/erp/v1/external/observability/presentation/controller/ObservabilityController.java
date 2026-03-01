@@ -19,7 +19,7 @@ import java.util.Map;
  * Clean Architecture: Controller → Service → Repository
  */
 @RestController
-@RequestMapping("/src/test/java/com/api/v1/observability")
+@RequestMapping("/api/v1/observability")
 public class ObservabilityController implements IObservabilityController {
 
     private final ObservabilityService observabilityService;

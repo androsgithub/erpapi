@@ -36,17 +36,17 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**").permitAll()
                         // Rotas públicas da autenticação
-                        .requestMatchers("/src/test/java/com/api/v1/users/login").permitAll()
-                        .requestMatchers("/src/test/java/com/api/v1/users/health").permitAll()
+                        .requestMatchers("/api/v1/users/login").permitAll()
+                        .requestMatchers("/api/v1/users/health").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         // Rotas que requerem autenticação
 //                        .requestMatchers("/api/v1/users/**").authenticated()
-                        .requestMatchers("/src/test/java/com/api/v1/users/**").permitAll()
-                        .requestMatchers("/src/test/java/com/api/v1/empresa/**").authenticated()
-                        .requestMatchers("/src/test/java/com/api/v1/unidades-medida/**").authenticated()
-                        .requestMatchers("/src/test/java/com/api/v1/composicoes/**").authenticated()
-                        .requestMatchers("/src/test/java/com/api/v1/lista-expandida/**").authenticated()
-                        .requestMatchers("/src/test/java/com/api/v1/products/**").authenticated()
+                        .requestMatchers("/api/v1/users/**").permitAll()
+                        .requestMatchers("/api/v1/empresa/**").authenticated()
+                        .requestMatchers("/api/v1/unidades-medida/**").authenticated()
+                        .requestMatchers("/api/v1/composicoes/**").authenticated()
+                        .requestMatchers("/api/v1/lista-expandida/**").authenticated()
+                        .requestMatchers("/api/v1/products/**").authenticated()
                         // Websocket
                         .requestMatchers("/ws/**").permitAll() // Permite WebSocket
                         .anyRequest().permitAll())

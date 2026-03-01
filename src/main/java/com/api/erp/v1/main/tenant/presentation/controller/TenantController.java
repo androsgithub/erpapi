@@ -26,7 +26,7 @@ import java.util.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/src/test/java/com/api/v1/tenant")
+@RequestMapping("/api/v1/tenant")
 public class TenantController implements ITenantController, TenantOpenApiDocumentation {
 
     @Autowired
@@ -96,7 +96,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
         
         var tenant = result.getTenant();
         var datasource = result.getDatasource();
-        var migrationTask = result.getMigrationTask();
+        var migrationEvent = result.getMigrationEvent();
         
         return new HashMap<>() {{
             put("success", true);
@@ -114,10 +114,11 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
                 put("dbType", datasource.dbType());
             }});
             put("migration", new HashMap<String, Object>() {{
-                put("taskId", migrationTask.getTaskId());
-                put("status", migrationTask.getStatus().name());
-                put("executeSeed", migrationTask.isExecuteSeedAfterMigration());
-                put("enqueuedAt", migrationTask.getEnqueuedAt());
+                put("eventId", migrationEvent.getEventId());
+                put("status", migrationEvent.getStatus().getLabel());
+                put("tenantId", migrationEvent.getTenantId());
+                put("source", migrationEvent.getSource().name());
+                put("enqueuedAt", migrationEvent.getEnqueuedAt());
             }});
             put("message", "Tenant provisionado com sucesso. Migrações em progresso.");
         }};

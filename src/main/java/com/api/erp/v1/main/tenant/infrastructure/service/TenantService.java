@@ -280,6 +280,17 @@ public class TenantService implements ITenantService {
 
         log.info("[EMPRESA SERVICE] Tenant criada com sucesso: {} (ID: {})",
                 request.nome(), empresaSalva.getId());
+        
+        // Publicar evento de criação para disparar migração automática
+        try {
+            com.api.erp.v1.main.migration.domain.TenantCreatedEvent tenantCreatedEvent = 
+                    new com.api.erp.v1.main.migration.domain.TenantCreatedEvent(this, empresaSalva);
+            eventPublisher.publishEvent(tenantCreatedEvent);
+            log.debug("[EMPRESA SERVICE] Evento TenantCreatedEvent publicado para tenant: {}", empresaSalva.getId());
+        } catch (Exception e) {
+            log.warn("[EMPRESA SERVICE] Erro ao publicar evento de criação de tenant: {}", e.getMessage());
+            // Continua mesmo se o evento não for publicado
+        }
 
         return empresaSalva;
     }

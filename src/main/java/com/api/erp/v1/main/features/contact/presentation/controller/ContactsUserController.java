@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.*;
  * - Controller não contém lógica de negócio, apenas orquestração
  */
 @RestController
-@RequestMapping("/src/test/java/com/api/v1/contacts/user")
+@RequestMapping("/api/v1/contacts/user")
 public class ContactsUserController implements IContactsUserController, ContactsUserOpenApiDocumentation {
 
     @Autowired

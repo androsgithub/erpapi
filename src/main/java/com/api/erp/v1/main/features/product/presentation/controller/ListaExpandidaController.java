@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping("/src/test/java/com/api/v1/lista-expandida")
+@RequestMapping("/api/v1/lista-expandida")
 public class ListaExpandidaController implements IListaExpandidaController, ListaExpandidaOpenApiDocumentation {
 
     @Autowired

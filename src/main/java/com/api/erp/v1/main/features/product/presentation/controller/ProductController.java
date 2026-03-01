@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/src/test/java/com/api/v1/products")
+@RequestMapping("/api/v1/products")
 public class ProductController implements IProductController, ProductOpenApiDocumentation {
     @Autowired
     @Qualifier("productServiceProxy")

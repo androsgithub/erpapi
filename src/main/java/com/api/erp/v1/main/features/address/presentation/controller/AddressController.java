@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/src/test/java/com/api/v1/address")
+@RequestMapping("/api/v1/address")
 @RequiredArgsConstructor
 public class AddressController implements IAddressController, AddressOpenApiDocumentation {
 

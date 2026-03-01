@@ -1,8 +1,8 @@
 package com.api.erp.v1.main.tenant.infrastructure.service;
 
 import com.api.erp.v1.main.datasource.routing.TenantContext;
-import com.api.erp.v1.main.migration.async.domain.MigrationQueueTask;
-import com.api.erp.v1.main.migration.async.service.MigrationQueueService;
+import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
+import com.api.erp.v1.main.migration.service.TenantMigrationQueue;
 import com.api.erp.v1.main.tenant.application.dto.CreateNewTenantWithDatasourceRequest;
 import com.api.erp.v1.main.tenant.application.dto.CriarTenantRequest;
 import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceRequest;
@@ -45,7 +45,7 @@ public class NewTenantProvisionerUseCase {
     
     private final ITenantService tenantService;
     private final ITenantDatasourceService tenantDatasourceService;
-    private final MigrationQueueService migrationQueueService;
+    private final TenantMigrationQueue migrationQueue;
     private final TenantDatasourceRepository tenantDatasourceRepository;
     
     /**
@@ -118,22 +118,20 @@ public class NewTenantProvisionerUseCase {
             }
             
             // ═══════════════════════════════════════════════════════════════════
-            // FASE 3: ENFILEIRAR MIGRAÇÃO + SEED
+            // FASE 3: ENFILEIRAR MIGRAÇÃO + SEED (NOVO SISTEMA)
             // ═══════════════════════════════════════════════════════════════════
             log.info("3️⃣  Enfileirando migração Flyway + MainSeed...");
             
-            MigrationQueueTask migrationTask = 
-                    migrationQueueService.enqueueTenantMigrationWithSeed(tenantCriado.getId());
+            TenantMigrationEvent migrationEvent = migrationQueue.enqueueEvent(
+                    tenantCriado.getId(),
+                    tenantCriado.getNome(),
+                    datasourceResponse != null ? tenantDatasourceRepository
+                            .findByTenantIdAndStatus(tenantCriado.getId(), true) : null,
+                    TenantMigrationEvent.MigrationEventSource.MANUAL_REQUEST
+            );
             
-            log.info("✅ Tarefa enfileirada (TaskID: {})", migrationTask.getTaskId());
-            
-            // ═══════════════════════════════════════════════════════════════════
-            // FASE 4: INICIAR PROCESSAMENTO ASSÍNCRONO
-            // ═══════════════════════════════════════════════════════════════════
-            log.info("4️⃣  Iniciando processamento assíncrono...");
-            
-            migrationQueueService.processMigrationQueue();
-            log.info("✅ Processamento iniciado em background");
+            log.info("✅ Evento enfileirado (EventID: {})", migrationEvent.getEventId());
+            log.info("⏳ Status: {} (será processado automaticamente)", migrationEvent.getStatus().getLabel());
             
             log.info("");
             log.info("╔════════════════════════════════════════════════════════════════╗");
@@ -144,7 +142,7 @@ public class NewTenantProvisionerUseCase {
             return new NewTenantProvisionResult(
                     tenantCriado,
                     datasourceResponse,
-                    migrationTask
+                    migrationEvent
             );
             
         } catch (Exception e) {
@@ -159,19 +157,27 @@ public class NewTenantProvisionerUseCase {
     public static class NewTenantProvisionResult {
         private final Tenant tenant;
         private final TenantDatasourceResponse datasource;
-        private final MigrationQueueTask migrationTask;
+        private final TenantMigrationEvent migrationEvent;
+        
+        public NewTenantProvisionResult(
+                Tenant tenant,
+                TenantDatasourceResponse datasource) {
+            this.tenant = tenant;
+            this.datasource = datasource;
+            this.migrationEvent = null;
+        }
         
         public NewTenantProvisionResult(
                 Tenant tenant,
                 TenantDatasourceResponse datasource,
-                MigrationQueueTask migrationTask) {
+                TenantMigrationEvent migrationEvent) {
             this.tenant = tenant;
             this.datasource = datasource;
-            this.migrationTask = migrationTask;
+            this.migrationEvent = migrationEvent;
         }
         
         public Tenant getTenant() { return tenant; }
         public TenantDatasourceResponse getDatasource() { return datasource; }
-        public MigrationQueueTask getMigrationTask() { return migrationTask; }
+        public TenantMigrationEvent getMigrationEvent() { return migrationEvent; }
     }
 }

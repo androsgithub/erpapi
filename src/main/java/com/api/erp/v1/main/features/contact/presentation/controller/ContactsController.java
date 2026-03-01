@@ -20,7 +20,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/src/test/java/com/api/v1/contacts")
+@RequestMapping("/api/v1/contacts")
 public class ContactsController implements IContactsController, ContactsOpenApiDocumentation {
 
     @Autowired

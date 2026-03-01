@@ -18,18 +18,19 @@ public class EndpointSecurityResolver {
                     "/swagger-ui.html",
                     "/swagger-resources/**",
                     "/webjars/**",
-                    "/health"
+                    "/health",
+                    "/api/v1/migrations/queue/**"
             ),
             TenantAccessType.PUBLIC_WITH_TENANT, List.of(
-                    "/src/test/java/com/api/v1/users/login"
+                    "/api/v1/users/login"
             ),
             TenantAccessType.AUTHENTICATED, List.of(
 
             ),
             TenantAccessType.AUTHENTICATED_WITH_TENANT, List.of(
-                    "/src/test/java/com/api/v1/users/me",
-                    "/src/test/java/com/api/v1/pedidos/**",
-                    "/src/test/java/com/api/v1/financeiro/**"
+                    "/api/v1/users/me",
+                    "/api/v1/pedidos/**",
+                    "/api/v1/financeiro/**"
             )
     );
 
