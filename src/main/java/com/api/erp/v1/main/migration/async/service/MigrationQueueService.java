@@ -1,5 +1,7 @@
 package com.api.erp.v1.main.migration.async.service;
 
+import com.api.erp.v1.main.config.startup.seed.MainSeed;
+import com.api.erp.v1.main.datasource.routing.TenantContext;
 import com.api.erp.v1.main.migration.async.domain.MigrationQueueTask;
 import com.api.erp.v1.main.tenant.domain.entity.TenantDatasource;
 import com.api.erp.v1.main.tenant.domain.repository.TenantDatasourceRepository;
@@ -23,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Responsabilidades:
  * - Enfileirar migrações de tenants
  * - Executar migrações assincronamente
+ * - Executar seeders (MainSeed) após migrações opcionalmente
  * - Rastrear status de cada migração
  * - Fornecer relatório de execução
  * 
@@ -37,6 +40,7 @@ public class MigrationQueueService {
     private final TenantMigrationService tenantMigrationService;
     private final TenantRepository tenantRepository;
     private final TenantDatasourceRepository tenantDatasourceRepository;
+    private final MainSeed mainSeed;
     
     // Fila sincronizada para rastrear tasks
     private final Map<String, MigrationQueueTask> taskRegistry = new ConcurrentHashMap<>();
@@ -112,6 +116,44 @@ public class MigrationQueueService {
         taskRegistry.put(task.getTaskId(), task);
         
         log.info("✅ Tarefa de migração enfileirada para tenant: {} ({})", tenant.getNome(), task.getTaskId());
+        
+        return task;
+    }
+    
+    /**
+     * Enfileira migração de um tenant específico COM SEED
+     * 
+     * Fluxo:
+     * 1. Migra o banco de dados com Flyway
+     * 2. Executa MainSeed (permissões, usuário admin, etc)
+     * 
+     * @param tenantId ID do tenant
+     * @return Task enfileirada com seed habilitado
+     */
+    public MigrationQueueTask enqueueTenantMigrationWithSeed(Long tenantId) {
+        var tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new IllegalArgumentException("Tenant não encontrado: " + tenantId));
+        
+        TenantDatasource datasource = tenantDatasourceRepository
+                .findByTenantIdAndStatus(tenantId, true);
+        
+        if (datasource == null) {
+            throw new IllegalArgumentException("Datasource não configurado para tenant: " + tenantId);
+        }
+        
+        // Cria task com flag executeSeedAfterMigration = true
+        MigrationQueueTask task = new MigrationQueueTask(
+                tenantId, 
+                tenant.getNome(), 
+                datasource, 
+                true  // executeSeedAfterMigration
+        );
+        
+        taskQueue.offer(task);
+        taskRegistry.put(task.getTaskId(), task);
+        
+        log.info("✅ Tarefa de migração + seed enfileirada para tenant: {} ({})", 
+                 tenant.getNome(), task.getTaskId());
         
         return task;
     }
@@ -194,14 +236,44 @@ public class MigrationQueueService {
         log.info("🔄 Executando migração para tenant: {}", task.getTenantName());
         
         try {
+            // ═════════════════════════════════════════════════════════════════
+            // FASE 1: EXECUTAR MIGRAÇÕES FLYWAY
+            // ═════════════════════════════════════════════════════════════════
             tenantMigrationService.migrateTenantById(task.getTenantId());
-            
-            // Simula obtenção do número de migrações (seria melhor ter isso no serviço)
             task.markCompleted(0);
             log.info("✅ Migração concluída com sucesso: {}", task.getTenantName());
             
+            // ═════════════════════════════════════════════════════════════════
+            // FASE 2: EXECUTAR SEED (SE HABILITADO)
+            // ═════════════════════════════════════════════════════════════════
+            if (task.isExecuteSeedAfterMigration()) {
+                log.info("");
+                log.info("🌱 Iniciando execução de seeders para tenant: {}", task.getTenantName());
+                log.info("───────────────────────────────────────────────────────────────");
+                
+                try {
+                    // Define contexto do tenant para executar seed no banco correto
+                    TenantContext.setTenantId(task.getTenantId());
+                    
+                    // Executa seeders
+                    mainSeed.executar();
+                    
+                    task.markSeedCompleted(2); // 2 seeders (PermissionSeed, UserAdminSeed)
+                    log.info("✅ Seeders executados com sucesso para tenant: {}", task.getTenantName());
+                    
+                } catch (Exception e) {
+                    log.error("❌ Erro ao executar seeders para tenant {}: {}", 
+                              task.getTenantName(), e.getMessage());
+                    task.markSeedFailed(e.getMessage());
+                    throw new Exception("Seed falhou: " + e.getMessage(), e);
+                } finally {
+                    TenantContext.clear();
+                }
+            }
+            
         } catch (Exception e) {
-            log.error("❌ Erro ao migrar tenant {}: {}", task.getTenantName(), e.getMessage());
+            log.error("❌ Erro ao processar migração de tenant {}: {}", 
+                      task.getTenantName(), e.getMessage());
             throw e;
         }
     }

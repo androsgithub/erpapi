@@ -110,7 +110,7 @@ public class JdbcTenantConfigProvider implements ITenantConfigProvider {
                     "Tenant configuration not found for tenant_id = {} or is not active in tb_tenant_datasource",
                     tenantId
                 );
-                throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
+                throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
             }
 
             log.info("Tenant configuration {} retrieved successfully", tenantId);

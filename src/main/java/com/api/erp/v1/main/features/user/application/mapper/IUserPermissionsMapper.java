@@ -1,14 +1,13 @@
 package com.api.erp.v1.main.features.user.application.mapper;
 
 import com.api.erp.v1.main.features.contact.application.dto.response.ContactResponse;
+import com.api.erp.v1.main.features.contact.domain.entity.Contact;
 import com.api.erp.v1.main.features.permission.application.dto.response.PermissionResponse;
 import com.api.erp.v1.main.features.permission.application.dto.response.RoleResponse;
-import com.api.erp.v1.main.features.permission.domain.entity.RolePermission;
+import com.api.erp.v1.main.features.permission.domain.entity.Permission;
+import com.api.erp.v1.main.features.permission.domain.entity.Role;
 import com.api.erp.v1.main.features.user.application.dto.response.UserPermissionsResponse;
 import com.api.erp.v1.main.features.user.domain.entity.User;
-import com.api.erp.v1.main.features.user.domain.entity.UserContact;
-import com.api.erp.v1.main.features.user.domain.entity.UserPermission;
-import com.api.erp.v1.main.features.user.domain.entity.UserRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -30,60 +29,59 @@ public interface IUserPermissionsMapper {
      * Mapeia um conjunto de UserContact para um conjunto de ContactResponse
      * Extrai o Contact de dentro de cada UserContact e converte para DTO
      */
-    default Set<ContactResponse> mapearContacts(Set<UserContact> userContacts) {
-        if (userContacts == null || userContacts.isEmpty()) {
+    default Set<ContactResponse> mapearContacts(Set<Contact> contacts) {
+        if (contacts == null || contacts.isEmpty()) {
             return Set.of();
         }
 
-        return userContacts.stream()
-                .filter(uc -> uc.getContact() != null)
+        return contacts.stream()
+                .filter(uc -> uc != null)
                 .map(uc -> new ContactResponse(
-                        uc.getContact().getId(),
-                        uc.getContact().getTipo() != null ? uc.getContact().getTipo().toString() : null,
-                        uc.getContact().getValor(),
-                        uc.getContact().getDescricao(),
-                        uc.getContact().isPrincipal(),
-                        uc.getContact().isAtivo(),
-//                        uc.getContact().getCustomData(),
-                        uc.getContact().getCreatedAt().toLocalDateTime(),
-                        uc.getContact().getUpdatedAt().toLocalDateTime()
+                        uc.getId(),
+                        uc.getTipo() != null ? uc.getTipo().toString() : null,
+                        uc.getValor(),
+                        uc.getDescricao(),
+                        uc.isPrincipal(),
+                        uc.isAtivo(),
+//                        uc.getCustomData(),
+                        uc.getCreatedAt().toLocalDateTime(),
+                        uc.getUpdatedAt().toLocalDateTime()
                 ))
                 .collect(Collectors.toSet());
     }
 
-    default Set<PermissionResponse> mapearPermissions(Set<UserPermission> userPermissions) {
-        if (userPermissions == null || userPermissions.isEmpty()) {
+    default Set<PermissionResponse> mapearPermissions(Set<Permission> permissions) {
+        if (permissions == null || permissions.isEmpty()) {
             return Set.of();
         }
 
-        return userPermissions.stream()
-                .filter(uc -> uc.getPermission() != null)
+        return permissions.stream()
+                .filter(uc -> uc != null)
                 .map(uc -> new PermissionResponse(
-                        uc.getPermission().getId(),
-                        uc.getPermission().getCodigo(),
-                        uc.getPermission().getNome(),
-                        uc.getPermission().getModulo(),
-                        uc.getPermission().getAcao()
+                        uc.getId(),
+                        uc.getCodigo(),
+                        uc.getNome(),
+                        uc.getModulo(),
+                        uc.getAcao()
                 ))
                 .collect(Collectors.toSet());
     }
 
-    default Set<RoleResponse> mapearRoles(Set<UserRole> userRoles) {
-        if (userRoles == null || userRoles.isEmpty()) {
+    default Set<RoleResponse> mapearRoles(Set<Role> roles) {
+        if (roles == null || roles.isEmpty()) {
             return Set.of();
         }
 
-        return userRoles.stream()
-                .filter(uc -> uc.getRole() != null)
+        return roles.stream()
+                .filter(uc -> uc != null)
                 .map(uc -> new RoleResponse(
-                        uc.getRole().getId(),
-                        uc.getRole().getNome(),
+                        uc.getId(),
+                        uc.getNome(),
                         // Extrai as permissões de cada RolePermission
-                        uc.getRole().getPermissions() != null
-                                ? uc.getRole().getPermissions().stream()
-                                    .map(RolePermission::getPermission)
-                                    .filter(Objects::nonNull)
-                                    .collect(Collectors.toSet())
+                        uc.getPermissions() != null
+                                ? uc.getPermissions()
+                                .stream().filter(Objects::nonNull)
+                                .collect(Collectors.toSet())
                                 : Set.of()
                 ))
                 .collect(Collectors.toSet());

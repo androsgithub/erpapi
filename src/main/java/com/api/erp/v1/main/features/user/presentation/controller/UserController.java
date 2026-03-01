@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/src/test/java/com/api/v1/users")
 public class UserController implements IUserController, UserOpenApiDocumentation {
     @Autowired
     private AuthenticationService authenticationService;

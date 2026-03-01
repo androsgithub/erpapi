@@ -21,7 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/customers")
+@RequestMapping("/src/test/java/com/api/v1/customers")
 public class CustomerController implements ICustomerController, CustomerOpenApiDocumentation {
 
     @Qualifier("customerServiceProxy")

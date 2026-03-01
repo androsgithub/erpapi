@@ -116,3 +116,11 @@ server:
 jwt:
   expiration: '86400000'
   secret: your-secret-key-change-this-in-production-environment-very-important
+
+# -----------------------------
+dros:
+  erpapi:
+    bootstrap:
+      schema: false
+      permission: true
+      user-admin: true

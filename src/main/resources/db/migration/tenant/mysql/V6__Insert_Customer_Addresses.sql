@@ -1,3 +1,4 @@
+DO SLEEP(0.125);
 -- Insert Customer Addresses
 INSERT INTO
     TB_CUSTOMER_ADDRESS (customer_id, address_id)

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.*;
+import org.springframework.data.annotation.CreatedBy;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -45,7 +46,7 @@ public abstract class BaseEntity implements Serializable {
     private TenantScope scope = TenantScope.TENANT;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
@@ -53,12 +54,13 @@ public abstract class BaseEntity implements Serializable {
     private OffsetDateTime updatedAt;
 
     @Column(name = "created_by", updatable = false)
+    @CreatedBy
     private Long createdBy;
 
     @Column(name = "updated_by")
     private Long updatedBy;
 
-    @Column(name = "deleted", nullable = false)
+    @Column(name = "deleted")
     private boolean deleted = false;
 
     @Column(name = "deleted_at")

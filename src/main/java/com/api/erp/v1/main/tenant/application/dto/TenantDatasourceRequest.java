@@ -13,6 +13,6 @@ public record TenantDatasourceRequest(
         String databaseName,
         String username,
         String password,
-        DBType dbType
+        String dbType
 ) {
 }

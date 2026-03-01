@@ -2,6 +2,7 @@ package com.api.erp.v1.main.tenant.infrastructure.service;
 
 import com.api.erp.v1.main.features.address.domain.repository.AddressRepository;
 import com.api.erp.v1.main.features.permission.infrastructure.factory.PermissionConfigUpdateEvent;
+import com.api.erp.v1.main.shared.common.error.ErrorHandler;
 import com.api.erp.v1.main.shared.domain.exception.NotFoundException;
 import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
 import com.api.erp.v1.main.shared.domain.valueobject.CNPJ;
@@ -47,7 +48,7 @@ public class TenantService implements ITenantService {
     @Override
     public Tenant getDadosTenant(Long tenantId) {
         return tenantRepository.findById(tenantId)
-            .orElseThrow(() -> TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException());
+            .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND));
     }
 
     @Override
@@ -68,7 +69,7 @@ public class TenantService implements ITenantService {
         log.info("[TENANT SERVICE] Updating Customer configuration");
             Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
+            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
         }
 
         CustomerConfig customerConfig = new CustomerConfig();
@@ -95,7 +96,7 @@ public class TenantService implements ITenantService {
         log.info("[TENANT SERVICE] Updating Contact configuration");
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
+            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
         }
 
         ContactConfig contactConfig = new ContactConfig();
@@ -117,7 +118,7 @@ public class TenantService implements ITenantService {
 
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
+            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
         }
 
         AddressConfig addressConfig = new AddressConfig();
@@ -136,7 +137,7 @@ public class TenantService implements ITenantService {
         log.info("[TENANT SERVICE] Updating User configuration");
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
+            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
         }
 
         UserConfig userConfig = new UserConfig();
@@ -155,7 +156,7 @@ public class TenantService implements ITenantService {
         log.info("[TENANT SERVICE] Updating Permission configuration");
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
+            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
         }
 
         PermissionConfig permissionConfig = new PermissionConfig();
@@ -186,7 +187,7 @@ public class TenantService implements ITenantService {
         log.info("[TENANT SERVICE] Updating Tenant configuration");
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
-            throw TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException();
+            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
         }
 
         InternalTenantConfig tenantConfig = new InternalTenantConfig();

@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/unidades-medida")
+@RequestMapping("/src/test/java/com/api/v1/unidades-medida")
 public class MeasureUnitController implements IMeasureUnitController, MeasureUnitOpenApiDocumentation {
 
     @Autowired

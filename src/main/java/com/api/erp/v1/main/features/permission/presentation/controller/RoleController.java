@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/roles")
+@RequestMapping("/src/test/java/com/api/v1/roles")
 public class RoleController implements IRoleController, RoleOpenApiDocumentation {
 
     @Autowired

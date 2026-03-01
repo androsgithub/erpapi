@@ -80,7 +80,7 @@ public class DataSourceRouter implements IDataSourceRouter {
         var tenantConfig = tenantConfigProvider.getTenantConfig(tenantId)
                 .orElseThrow(() -> {
                     log.error("Tenant configuration not found: {}", finalTenantId);
-                    return TenantErrorMessage.DATASOURCE_NOT_CONFIGURED.toNotFoundException();
+                    throw new ErrorHandler(TenantErrorMessage.DATASOURCE_NOT_CONFIGURED);
                 });
 
         // 3. Create and register DataSource
@@ -91,9 +91,7 @@ public class DataSourceRouter implements IDataSourceRouter {
             return dataSource;
         } catch (Exception e) {
             log.error("Error creating DataSource for tenant: {}", finalTenantId, e);
-            ErrorHandler.logAndThrow(log, TenantErrorMessage.DATASOURCE_CONNECTION_FAILED, 
-                "Failed to create DataSource for tenant: " + finalTenantId);
-            return null;
+            throw new ErrorHandler(TenantErrorMessage.DATASOURCE_CONNECTION_FAILED);
         }
     }
 

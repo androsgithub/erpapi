@@ -21,15 +21,15 @@ public class EndpointSecurityResolver {
                     "/health"
             ),
             TenantAccessType.PUBLIC_WITH_TENANT, List.of(
-                    "/api/v1/users/login"
+                    "/src/test/java/com/api/v1/users/login"
             ),
             TenantAccessType.AUTHENTICATED, List.of(
 
             ),
             TenantAccessType.AUTHENTICATED_WITH_TENANT, List.of(
-                    "/api/v1/users/me",
-                    "/api/v1/pedidos/**",
-                    "/api/v1/financeiro/**"
+                    "/src/test/java/com/api/v1/users/me",
+                    "/src/test/java/com/api/v1/pedidos/**",
+                    "/src/test/java/com/api/v1/financeiro/**"
             )
     );
 

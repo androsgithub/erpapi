@@ -1,9 +1,9 @@
 package com.api.erp.v1.main.features.user.application.mapper;
 
 import com.api.erp.v1.main.features.contact.application.dto.response.ContactResponse;
+import com.api.erp.v1.main.features.contact.domain.entity.Contact;
 import com.api.erp.v1.main.features.user.application.dto.response.UserResponse;
 import com.api.erp.v1.main.features.user.domain.entity.User;
-import com.api.erp.v1.main.features.user.domain.entity.UserContact;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -21,23 +21,22 @@ public interface IUserMapper {
 
     List<UserResponse> toResponseList(List<User> users);
 
-    default Set<ContactResponse> mapearContacts(Set<UserContact> userContacts) {
-        if (userContacts == null || userContacts.isEmpty()) {
+    default Set<ContactResponse> mapearContacts(Set<Contact> contacts) {
+        if (contacts == null || contacts.isEmpty()) {
             return Set.of();
         }
 
-        return userContacts.stream()
-                .filter(uc -> uc.getContact() != null)
+        return contacts.stream()
                 .map(uc -> new ContactResponse(
-                        uc.getContact().getId(),
-                        uc.getContact().getTipo() != null ? uc.getContact().getTipo().toString() : null,
-                        uc.getContact().getValor(),
-                        uc.getContact().getDescricao(),
-                        uc.getContact().isPrincipal(),
-                        uc.getContact().isAtivo(),
-//                        uc.getContact().getCustomData(),
-                        uc.getContact().getCreatedAt().toLocalDateTime(),
-                        uc.getContact().getUpdatedAt().toLocalDateTime()
+                        uc.getId(),
+                        uc.getTipo() != null ? uc.getTipo().toString() : null,
+                        uc.getValor(),
+                        uc.getDescricao(),
+                        uc.isPrincipal(),
+                        uc.isAtivo(),
+//                        uc.getCustomData(),
+                        uc.getCreatedAt().toLocalDateTime(),
+                        uc.getUpdatedAt().toLocalDateTime()
                 ))
                 .collect(Collectors.toSet());
     }

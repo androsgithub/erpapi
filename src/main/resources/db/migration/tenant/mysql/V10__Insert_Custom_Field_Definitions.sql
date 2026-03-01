@@ -1,3 +1,4 @@
+DO SLEEP(0.125);
 -- Insert Custom Field Definitions
 INSERT INTO
     TB_custom_field_definition (

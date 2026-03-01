@@ -1,3 +1,4 @@
+DO SLEEP(0.125);
  -- Insert Product Compositions
  -- Kit Limpeza Completo (PROD019) is composed of:
  INSERT INTO

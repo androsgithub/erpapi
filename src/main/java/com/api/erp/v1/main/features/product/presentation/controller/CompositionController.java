@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/v1/composicoes")
+@RequestMapping("/src/test/java/com/api/v1/composicoes")
 public class CompositionController implements ICompositionController, CompositionOpenApiDocumentation {
 
     @Autowired

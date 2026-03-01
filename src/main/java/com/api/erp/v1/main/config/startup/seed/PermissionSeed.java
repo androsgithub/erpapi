@@ -1,16 +1,16 @@
 package com.api.erp.v1.main.config.startup.seed;
 
+import com.api.erp.v1.main.config.startup.util.PermissionReflectionUtil;
 import com.api.erp.v1.main.features.address.domain.entity.AddressPermissions;
 import com.api.erp.v1.main.features.permission.domain.entity.*;
 import com.api.erp.v1.main.features.permission.domain.repository.PermissionRepository;
 import com.api.erp.v1.main.features.permission.domain.repository.RoleRepository;
-import com.api.erp.v1.main.features.permission.domain.repository.RolePermissionRepository;
 import com.api.erp.v1.main.features.product.domain.entity.CompositionPermissions;
 import com.api.erp.v1.main.features.product.domain.entity.ListaExpandidaPermissions;
 import com.api.erp.v1.main.features.product.domain.entity.ProductPermissions;
 import com.api.erp.v1.main.features.user.domain.entity.UserPermissions;
+import com.api.erp.v1.main.shared.domain.entity.BaseEntity;
 import com.api.erp.v1.main.shared.domain.entity.TenantScope;
-import com.api.erp.v1.main.config.startup.util.PermissionReflectionUtil;
 import com.api.erp.v1.main.tenant.domain.entity.TenantPermissions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,21 +25,21 @@ import java.util.stream.Collectors;
 
 /**
  * COMPONENT - Seeder de Permissões e Roles
- * 
+ * <p>
  * Inicializa as permissões e roles do sistema durante o bootstrap.
  * Extrai permissões de classes anotadas e cria roles padrão.
- * 
+ * <p>
  * Fluxo:
  * 1. Extrai permissões de classes UserPermissions, TenantPermissions, etc
  * 2. Cria permissões não existentes em lote
  * 3. Cria roles padrão (USER, GESTOR, ADMIN)
- * 
+ * <p>
  * Responsabilidades:
  * - Levantar permissões via reflection
  * - Criar permissões não existentes
  * - Criar roles padrão
  * - Logging detalhado de progresso
- * 
+ *
  * @author ERP System
  * @version 1.0
  */
@@ -49,19 +49,18 @@ import java.util.stream.Collectors;
 public class PermissionSeed {
 
     private static final List<Class<?>> PERMISSION_CLASSES = List.of(
-        UserPermissions.class,
-        TenantPermissions.class,
-        AddressPermissions.class,
-        PermissionPermissions.class,
-        RolePermissions.class,
-        ProductPermissions.class,
-        CompositionPermissions.class,
-        ListaExpandidaPermissions.class
+            UserPermissions.class,
+            TenantPermissions.class,
+            AddressPermissions.class,
+            PermissionPermissions.class,
+            RolePermissions.class,
+            ProductPermissions.class,
+            CompositionPermissions.class,
+            ListaExpandidaPermissions.class
     );
 
     private final PermissionRepository permissionRepository;
     private final RoleRepository roleRepository;
-    private final RolePermissionRepository rolePermissionRepository;
 
     @Transactional
     public void executar() {
@@ -116,7 +115,7 @@ public class PermissionSeed {
 
             List<Role> novasRoles = List.of("USER", "GESTOR", "ADMIN").stream()
                     .filter(nome -> !nomesRolesExistentes.contains(nome))
-                    .map(nome -> Role.builder().nome(nome).permissions(List.of()).build())
+                    .map(nome -> Role.builder().nome(nome).build())
                     .toList();
 
             if (!novasRoles.isEmpty()) {
@@ -133,22 +132,18 @@ public class PermissionSeed {
                 // Como é LAZY, isso está dentro da @Transactional — funciona normalmente
                 Set<Long> permissionsJaVinculadas = roleAdmin.getPermissions()
                         .stream()
-                        .map(rp -> rp.getPermission().getId())
+                        .map(BaseEntity::getId)
                         .collect(Collectors.toSet());
 
-                List<RolePermission> novasRolePermissions = permissionsPorCodigo.values().stream()
+                List<Permission> newPermissions = permissionsPorCodigo.values().stream()
                         .filter(p -> !permissionsJaVinculadas.contains(p.getId()))
-                        .map(p -> {
-                            RolePermission rp = new RolePermission();
-                            rp.setRole(roleAdmin);
-                            rp.setPermission(p);
-                            return rp;
-                        })
                         .toList();
 
-                if (!novasRolePermissions.isEmpty()) {
-                    rolePermissionRepository.saveAll(novasRolePermissions);
-                    log.info("✅ {} permissões novas atribuídas à role ADMIN", novasRolePermissions.size());
+
+                if (!newPermissions.isEmpty()) {
+                    roleAdmin.getPermissions().addAll(newPermissions);
+                    roleRepository.save(roleAdmin);
+                    log.info("✅ {} permissões novas atribuídas à role ADMIN", novasPermissions.size());
                 } else {
                     log.info("⏭️  Role ADMIN já possui todas as permissões");
                 }

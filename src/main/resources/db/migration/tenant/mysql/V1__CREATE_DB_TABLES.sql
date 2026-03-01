@@ -1,3 +1,4 @@
+DO SLEEP(0.125);
 create table
    tb_customer (
       id bigint not null auto_increment,
@@ -247,23 +248,11 @@ create table
       primary key (id)
    ) engine = InnoDB;
 
-create table
-   tb_role_permission (
-      id bigint not null auto_increment,
-      created_at datetime (6) not null default current_timestamp(6),
-      created_by bigint,
-      deleted bit not null,
-      deleted_at datetime (6),
-      scope enum ('GLOBAL', 'GROUP', 'TENANT'),
-      tenant_group_id bigint,
-      tenant_id bigint not null,
-      updated_at datetime (6),
-      updated_by bigint,
-      version bigint,
-      permission_id bigint,
-      role_id bigint,
-      primary key (id)
-   ) engine = InnoDB;
+create table tb_role_permission (
+        role_id bigint not null,
+        permission_id bigint not null,
+        primary key (role_id, permission_id)
+    ) engine=InnoDB;
 
 create table
    tb_measure_unit (
@@ -312,59 +301,24 @@ create table
       primary key (id)
    ) engine = InnoDB;
 
-create table
-   tb_user_contact (
-      id bigint not null auto_increment,
-      created_at datetime (6) not null default current_timestamp(6),
-      created_by bigint,
-      deleted bit not null,
-      deleted_at datetime (6),
-      scope enum ('GLOBAL', 'GROUP', 'TENANT'),
-      tenant_group_id bigint,
-      tenant_id bigint not null,
-      updated_at datetime (6),
-      updated_by bigint,
-      version bigint,
-      contact_id bigint,
-      user_id bigint,
-      primary key (id)
-   ) engine = InnoDB;
+create table tb_user_contact (
+        user_id bigint not null,
+        contact_id bigint not null,
+        primary key (user_id, contact_id)
+    ) engine=InnoDB;
 
-create table
-   tb_user_permission (
-      id bigint not null auto_increment,
-      created_at datetime (6) not null default current_timestamp(6),
-      created_by bigint,
-      deleted bit not null,
-      deleted_at datetime (6),
-      scope enum ('GLOBAL', 'GROUP', 'TENANT'),
-      tenant_group_id bigint,
-      tenant_id bigint not null,
-      updated_at datetime (6),
-      updated_by bigint,
-      version bigint,
-      permission_id bigint,
-      user_id bigint,
-      primary key (id)
-   ) engine = InnoDB;
 
-create table
-   tb_user_role (
-      id bigint not null auto_increment,
-      created_at datetime (6) not null default current_timestamp(6),
-      created_by bigint,
-      deleted bit not null,
-      deleted_at datetime (6),
-      scope enum ('GLOBAL', 'GROUP', 'TENANT'),
-      tenant_group_id bigint,
-      tenant_id bigint not null,
-      updated_at datetime (6),
-      updated_by bigint,
-      version bigint,
-      role_id bigint,
-      user_id bigint,
-      primary key (id)
-   ) engine = InnoDB;
+create table tb_user_permission (
+        user_id bigint not null,
+        permission_id bigint not null,
+        primary key (user_id, permission_id)
+    ) engine=InnoDB;
+
+create table tb_user_role (
+        user_id bigint not null,
+        role_id bigint not null,
+        primary key (user_id, role_id)
+    ) engine=InnoDB;
 
 alter table TB_CUSTOMER_CONTACT add constraint UKoyvoyiovpks7mak7a6o9shsjf unique (contact_id);
 

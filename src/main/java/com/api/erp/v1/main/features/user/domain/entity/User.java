@@ -1,5 +1,8 @@
 package com.api.erp.v1.main.features.user.domain.entity;
 
+import com.api.erp.v1.main.features.contact.domain.entity.Contact;
+import com.api.erp.v1.main.features.permission.domain.entity.Permission;
+import com.api.erp.v1.main.features.permission.domain.entity.Role;
 import com.api.erp.v1.main.shared.domain.entity.BaseEntity;
 import com.api.erp.v1.main.shared.domain.valueobject.CPF;
 import com.api.erp.v1.main.shared.domain.valueobject.Email;
@@ -40,14 +43,29 @@ public class User extends BaseEntity {
     @Column
     private LocalDateTime approved_at;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<UserPermission> permissions;
+    @OneToMany
+    @JoinTable(
+            name="tb_user_permission",
+            joinColumns = @JoinColumn( name="user_id"),
+            inverseJoinColumns = @JoinColumn( name="permission_id")
+    )
+    private Set<Permission> permissions;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<UserRole> roles;
+    @OneToMany
+    @JoinTable(
+            name="tb_user_role",
+            joinColumns = @JoinColumn( name="user_id"),
+            inverseJoinColumns = @JoinColumn( name="role_id")
+    )
+    private Set<Role> roles;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<UserContact> contacts;
+    @OneToMany
+    @JoinTable(
+            name="tb_user_contact",
+            joinColumns = @JoinColumn( name="user_id"),
+            inverseJoinColumns = @JoinColumn( name="contact_id")
+    )
+    private Set<Contact> contacts;
 
     // Builder Pattern
     public static class Builder {

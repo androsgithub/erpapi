@@ -28,13 +28,21 @@ public class DSCache {
     public DataSource remove(Long tenantId) {
         DataSource ds = cache.remove(tenantId);
 
-        if (ds instanceof HikariDataSource hikari) {
-            hikari.close();
-        }
+        closeIfNecessary(ds);
         return ds;
     }
 
     public Map<Long, DataSource> getAll() {
         return Collections.unmodifiableMap(cache);
+    }
+
+    public DataSource computeIfAbsent(Long tenantId, java.util.function.Function<Long, DataSource> factory) {
+        return cache.computeIfAbsent(tenantId, factory);
+    }
+
+    private void closeIfNecessary(DataSource ds) {
+        if (ds instanceof HikariDataSource hikari) {
+            hikari.close();
+        }
     }
 }

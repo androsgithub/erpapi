@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/custom-fields")
+@RequestMapping("/src/test/java/com/api/v1/custom-fields")
 public class CustomFieldDefinitionController implements ICustomFieldDefinitionController, CustomFieldDefinitionOpenApiDocumentation {
 
 

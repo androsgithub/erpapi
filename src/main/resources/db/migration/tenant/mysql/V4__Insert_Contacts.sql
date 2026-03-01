@@ -1,3 +1,4 @@
+DO SLEEP(0.125);
 -- Insert Contacts
 INSERT INTO
     tb_contacts (

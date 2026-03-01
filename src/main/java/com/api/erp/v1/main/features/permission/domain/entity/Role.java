@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_role")
@@ -20,6 +21,11 @@ public class Role extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String nome;
 
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<RolePermission> permissions;
+    @OneToMany
+    @JoinTable(
+            name="tb_role_permission",
+            joinColumns = @JoinColumn( name="role_id"),
+            inverseJoinColumns = @JoinColumn( name="permission_id")
+    )
+    private Set<Permission> permissions;
 }

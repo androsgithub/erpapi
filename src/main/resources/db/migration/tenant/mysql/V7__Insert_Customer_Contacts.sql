@@ -1,3 +1,4 @@
+DO SLEEP(0.125);
 -- Insert Customer Contacts
 INSERT INTO
     TB_CUSTOMER_CONTACT (customer_id, contact_id)

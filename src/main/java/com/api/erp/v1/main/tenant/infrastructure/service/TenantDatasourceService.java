@@ -7,6 +7,7 @@ import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
 import com.api.erp.v1.main.shared.common.error.ErrorHandler;
 import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceRequest;
 import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceResponse;
+import com.api.erp.v1.main.tenant.domain.entity.DBType;
 import com.api.erp.v1.main.tenant.domain.entity.Tenant;
 import com.api.erp.v1.main.tenant.domain.entity.TenantDatasource;
 import com.api.erp.v1.main.tenant.domain.repository.TenantDatasourceRepository;
@@ -55,17 +56,17 @@ public class TenantDatasourceService implements ITenantDatasourceService {
 
         // 1. Get tenant
         Tenant tenant = tenantRepository.findById(tenantId)
-            .orElseThrow(() -> TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException());
+            .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND));
 
         // 2. Validate if datasource is already configured
         if (tenantDatasourceRepository.existsByTenant_IdAndIsActive(tenant.getId(), true)) {
-            throw TenantErrorMessage.DATASOURCE_ALREADY_EXISTS.toBusinessException();
+            throw new ErrorHandler(TenantErrorMessage.DATASOURCE_ALREADY_EXISTS);
         }
 
         // 3. Test connection before saving
-        if (!testarConexao(request)) {
+        if (!testarConexao(tenantId, request)) {
             log.error("Failed to test database connection for tenant: {}", tenantId);
-            throw TenantErrorMessage.DATASOURCE_CONNECTION_FAILED.toBusinessException();
+            throw new ErrorHandler(TenantErrorMessage.DATASOURCE_CONNECTION_FAILED);
         }
 
         // 4. Create and save TenantDatasource
@@ -76,7 +77,7 @@ public class TenantDatasourceService implements ITenantDatasourceService {
             .databaseName(request.databaseName())
             .username(request.username())
             .password(request.password())
-            .dbType(request.dbType())
+            .dbType(DBType.fromNome(request.dbType()))
             .isActive(true)
             .testStatus(TenantDatasource.TestStatus.SUCCESS)
             .testedAt(LocalDateTime.now())
@@ -116,17 +117,17 @@ public class TenantDatasourceService implements ITenantDatasourceService {
 
         // 1. Get tenant
         Tenant tenant = tenantRepository.findById(tenantId)
-            .orElseThrow(() -> TenantErrorMessage.TENANT_NOT_FOUND.toNotFoundException());
+            .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND));
 
         // 2. Get active datasource
         TenantDatasource tenantDatasource = tenantDatasourceRepository
             .findByTenant_IdAndIsActive(tenant.getId(), true)
-            .orElseThrow(() -> TenantErrorMessage.DATASOURCE_NOT_CONFIGURED.toNotFoundException());
+            .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.DATASOURCE_NOT_CONFIGURED));
 
         // 3. Test new connection
-        if (!testarConexao(request)) {
+        if (!testarConexao(tenantId, request)) {
             log.error("Failed to test new datasource configuration for tenant: {}", tenantId);
-            throw TenantErrorMessage.DATASOURCE_CONNECTION_FAILED.toBusinessException();
+            throw new ErrorHandler(TenantErrorMessage.DATASOURCE_CONNECTION_FAILED);
         }
 
         // 4. Update entity
@@ -135,7 +136,7 @@ public class TenantDatasourceService implements ITenantDatasourceService {
         tenantDatasource.setDatabaseName(request.databaseName());
         tenantDatasource.setUsername(request.username());
         tenantDatasource.setPassword(request.password());
-        tenantDatasource.setDbType(request.dbType());
+        tenantDatasource.setDbType(DBType.fromNome(request.dbType()));
         tenantDatasource.setTestStatus(TenantDatasource.TestStatus.SUCCESS);
         tenantDatasource.setTestedAt(LocalDateTime.now());
 
@@ -151,17 +152,32 @@ public class TenantDatasourceService implements ITenantDatasourceService {
     }
 
     /**
-     * Tests database connection
+     * Tests database connection with tenantId (internal use)
      */
-    @Override
-    public boolean testarConexao(TenantDatasourceRequest request) {
+    private boolean testarConexao(Long tenantId, TenantDatasourceRequest request) {
         log.debug("Testing database connection: {}:{}/{}", request.host(), request.port(), request.databaseName());
 
         try {
             // Create temporary datasource for testing
-            TenantDatasource tempConfig = TenantDatasource.builder().host(request.host()).port(request.port()).databaseName(request.databaseName()).username(request.username()).password(request.password()).dbType(request.dbType()).build();
+            TenantDatasource tempConfig = TenantDatasource.builder()
+                .host(request.host())
+                .port(request.port())
+                .databaseName(request.databaseName())
+                .username(request.username())
+                .password(request.password())
+                .dbType(DBType.fromNome(request.dbType()))
+                .build();
 
-            DataSource testDataSource = hikariDataSourceFactory.createDataSource(new TenantDSConfig(tempConfig.getTenant().getId(), tempConfig.getJdbcUrl(), tempConfig.getUsername(), tempConfig.getPassword(), tempConfig.getDbType()));
+            // Use tenantId directly instead of trying to get it from temporary object
+            DataSource testDataSource = hikariDataSourceFactory.createDataSource(
+                new TenantDSConfig(
+                    tenantId,
+                    tempConfig.getJdbcUrl(),
+                    tempConfig.getUsername(),
+                    tempConfig.getPassword(),
+                    tempConfig.getDbType()
+                )
+            );
 
             // Try to get connection
             try (Connection connection = testDataSource.getConnection()) {
@@ -176,6 +192,16 @@ public class TenantDatasourceService implements ITenantDatasourceService {
             log.error("Error testing database connection", e);
             return false;
         }
+    }
+
+    /**
+     * Tests database connection without tenant context (for frontend testing)
+     * Uses a dummy tenantId for the DataSourceRouter
+     */
+    @Override
+    public boolean testarConexao(TenantDatasourceRequest request) {
+        log.debug("Testing database connection (frontend): {}:{}/{}", request.host(), request.port(), request.databaseName());
+        return testarConexao(-1L, request);
     }
 
     /**

@@ -1,3 +1,4 @@
+DO SLEEP(0.125);
 -- Insert Custom Data
 -- Categoria Cliente para Distribuidora Brasil
 INSERT INTO

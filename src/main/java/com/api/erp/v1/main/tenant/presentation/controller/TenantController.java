@@ -10,13 +10,15 @@ import com.api.erp.v1.main.tenant.domain.entity.TenantPermissions;
 import com.api.erp.v1.main.tenant.domain.service.ITenantService;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
+import com.api.erp.v1.main.tenant.infrastructure.service.NewTenantProvisionerUseCase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * Controller para gerenciar Tenants
@@ -24,13 +26,15 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/tenant")
+@RequestMapping("/src/test/java/com/api/v1/tenant")
 public class TenantController implements ITenantController, TenantOpenApiDocumentation {
 
     @Autowired
     private ITenantService tenantService;
     @Autowired
     private TenantMapper tenantMapper;
+    @Autowired
+    private NewTenantProvisionerUseCase newTenantProvisionerService;
 
     @GetMapping()
     @RequiresXTenantId
@@ -48,6 +52,84 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
         log.info("[EMPRESA CONTROLLER] Criando nova tenant: {}", request.nome());
         Tenant tenant = tenantService.criarTenant(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(tenantMapper.toResponse(tenant));
+    }
+
+    /**
+     * ═════════════════════════════════════════════════════════════════════════
+     * CRIAR NOVO TENANT COM DATASOURCE E ENFILEIRAR MIGRAÇÕES
+     * 
+     * Lógica complexa delegada para NewTenantProvisionerService
+     * 
+     * Resposta: 201 Created com tenant, datasource e migration task
+     * ═════════════════════════════════════════════════════════════════════════
+     */
+    @PostMapping("/register")
+    public ResponseEntity<?> criarTenantComDatasource(
+            @RequestBody CreateNewTenantWithDatasourceRequest request) {
+        
+        try {
+            // Delega para o serviço de provisionamento
+            NewTenantProvisionerUseCase.NewTenantProvisionResult result =
+                    newTenantProvisionerService.execute(request);
+            
+            // Retorna resposta estruturada
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                    buildSuccessResponse(result)
+            );
+            
+        } catch (IllegalArgumentException e) {
+            log.error("❌ Erro de validação: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    buildErrorResponse("Validação falhou", e.getMessage())
+            );
+            
+        } catch (Exception e) {
+            log.error("❌ Erro ao criar novo tenant", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    buildErrorResponse("Erro interno do servidor", e.getMessage())
+            );
+        }
+    }
+    
+    private Map<String, Object> buildSuccessResponse(
+            NewTenantProvisionerUseCase.NewTenantProvisionResult result) {
+        
+        var tenant = result.getTenant();
+        var datasource = result.getDatasource();
+        var migrationTask = result.getMigrationTask();
+        
+        return new HashMap<>() {{
+            put("success", true);
+            put("timestamp", LocalDateTime.now());
+            put("tenant", new HashMap<String, Object>() {{
+                put("id", tenant.getId());
+                put("nome", tenant.getNome());
+                put("email", tenant.getEmail());
+            }});
+            put("datasource", new HashMap<String, Object>() {{
+                put("id", datasource.id());
+                put("host", datasource.host());
+                put("port", datasource.port());
+                put("database", datasource.databaseName());
+                put("dbType", datasource.dbType());
+            }});
+            put("migration", new HashMap<String, Object>() {{
+                put("taskId", migrationTask.getTaskId());
+                put("status", migrationTask.getStatus().name());
+                put("executeSeed", migrationTask.isExecuteSeedAfterMigration());
+                put("enqueuedAt", migrationTask.getEnqueuedAt());
+            }});
+            put("message", "Tenant provisionado com sucesso. Migrações em progresso.");
+        }};
+    }
+    
+    private Map<String, Object> buildErrorResponse(String error, String message) {
+        return new HashMap<>() {{
+            put("success", false);
+            put("error", error);
+            put("message", message);
+            put("timestamp", LocalDateTime.now());
+        }};
     }
 
     @GetMapping("/listar")    

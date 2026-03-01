@@ -1,3 +1,4 @@
+DO SLEEP(0.125);
 -- Insert Customers
 INSERT INTO
     tb_customer (

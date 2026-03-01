@@ -20,7 +20,7 @@ import java.util.Map;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/api/v1/migrations/queue")
+@RequestMapping("/src/test/java/com/api/v1/migrations/queue")
 @RequiredArgsConstructor
 @Slf4j
 public class MigrationQueueController {

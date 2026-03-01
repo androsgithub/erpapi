@@ -25,12 +25,25 @@ public class MigrationQueueTask {
     private final String tenantName;
     private final TenantDatasource datasource;
     private final LocalDateTime enqueuedAt = LocalDateTime.now();
+    private final boolean executeSeedAfterMigration;
     
     private MigrationStatus status = MigrationStatus.PENDING;
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
     private String errorMessage;
     private int migrationsExecuted = 0;
+    private int seedersExecuted = 0;
+    private boolean seedCompleted = false;
+    
+    /**
+     * Constructor para compatibilidade com código legado (sem seed)
+     */
+    public MigrationQueueTask(Long tenantId, String tenantName, TenantDatasource datasource) {
+        this.tenantId = tenantId;
+        this.tenantName = tenantName;
+        this.datasource = datasource;
+        this.executeSeedAfterMigration = false;
+    }
     
     /**
      * Marca a task como iniciada
@@ -56,6 +69,23 @@ public class MigrationQueueTask {
         this.status = MigrationStatus.FAILED;
         this.completedAt = LocalDateTime.now();
         this.errorMessage = errorMessage;
+    }
+    
+    /**
+     * Marca o seed como completado
+     */
+    public void markSeedCompleted(int seedersExecuted) {
+        this.seedCompleted = true;
+        this.seedersExecuted = seedersExecuted;
+    }
+    
+    /**
+     * Marca o seed como falhado
+     */
+    public void markSeedFailed(String errorMessage) {
+        this.seedCompleted = false;
+        this.errorMessage = "Seed falhou: " + errorMessage;
+        this.status = MigrationStatus.FAILED;
     }
     
     /**

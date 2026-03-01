@@ -11,15 +11,13 @@ import com.api.erp.v1.main.features.user.application.dto.request.CreateUserReque
 import com.api.erp.v1.main.features.user.application.dto.request.UpdateUserRequest;
 import com.api.erp.v1.main.features.user.domain.entity.StatusUser;
 import com.api.erp.v1.main.features.user.domain.entity.User;
-import com.api.erp.v1.main.features.user.domain.entity.UserPermission;
-import com.api.erp.v1.main.features.user.domain.entity.UserRole;
-import com.api.erp.v1.main.features.user.domain.repository.UserPermissionRepository;
 import com.api.erp.v1.main.features.user.domain.repository.UserRepository;
-import com.api.erp.v1.main.features.user.domain.repository.UserRoleRepository;
 import com.api.erp.v1.main.features.user.domain.service.IPasswordEncoder;
 import com.api.erp.v1.main.features.user.domain.service.IUserService;
 import com.api.erp.v1.main.features.user.domain.validator.IUserValidator;
-import com.api.erp.v1.main.shared.domain.entity.TenantScope;
+import com.api.erp.v1.main.shared.common.error.ErrorHandler;
+import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
+import com.api.erp.v1.main.shared.common.error.UserErrorMessage;
 import com.api.erp.v1.main.shared.domain.exception.BusinessException;
 import com.api.erp.v1.main.shared.domain.exception.NotFoundException;
 import com.api.erp.v1.main.shared.domain.valueobject.CPF;
@@ -39,18 +37,18 @@ public class UserService implements IUserService {
     private final IPasswordEncoder passwordEncoder;
     private final PermissionRepository permissionRepository;
     private final RoleRepository roleRepository;
-    private final UserPermissionRepository userPermissionRepository;
-    private final UserRoleRepository userRoleRepository;
     private final IUserValidator validator;
 
     @Autowired
-    public UserService(UserRepository userRepository, IPasswordEncoder passwordEncoder, PermissionRepository permissionRepository, RoleRepository roleRepository, UserPermissionRepository userPermissionRepository, UserRoleRepository userRoleRepository, @Qualifier("userValidatorProxy") IUserValidator validator) {
+    public UserService(UserRepository userRepository,
+                       IPasswordEncoder passwordEncoder,
+                       PermissionRepository permissionRepository,
+                       RoleRepository roleRepository,
+                       @Qualifier("userValidatorProxy") IUserValidator validator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.permissionRepository = permissionRepository;
         this.roleRepository = roleRepository;
-        this.userPermissionRepository = userPermissionRepository;
-        this.userRoleRepository = userRoleRepository;
         this.validator = validator;
     }
 
@@ -79,7 +77,7 @@ public class UserService implements IUserService {
 
     @Override
     public User atualizar(Long id, UpdateUserRequest request) {
-        User user = buscarPorId(id);
+        User user = userRepository.findById(id).orElseThrow(()-> new ErrorHandler(UserErrorMessage.USER_NOT_FOUND));
 
         if (request.getNomeCompleto() != null) {
             user = User.builder().id(user.getId()).nomeCompleto(request.getNomeCompleto()).email(user.getEmail()).cpf(user.getCpf()).senhaHash(user.getSenha_hash()).status(user.getStatus()).build();
@@ -91,7 +89,7 @@ public class UserService implements IUserService {
     @Override
     @Transactional(readOnly = true)
     public User buscarPorId(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
+        return userRepository.findById(id).orElseThrow(()-> new ErrorHandler(UserErrorMessage.USER_NOT_FOUND));
     }
 
     @Override
@@ -109,7 +107,8 @@ public class UserService implements IUserService {
     @Override
     @Transactional
     public void inativar(Long id) {
-        User user = buscarPorId(id);
+        User user = userRepository.findById(id).orElseThrow(()-> new ErrorHandler(UserErrorMessage.USER_NOT_FOUND));
+
         user.inativar();
         userRepository.save(user);
     }
@@ -117,7 +116,7 @@ public class UserService implements IUserService {
     @Override
     @Transactional
     public User aprovar(Long userId, Long gestorId) {
-            throw new BusinessException("Tenant does not require manager approval");
+        throw new BusinessException("Tenant does not require manager approval");
     }
 
     @Override
@@ -130,7 +129,9 @@ public class UserService implements IUserService {
     @Transactional
     public void adicionarPermissions(Long userId, AdicionarPermissionsRequest request) {
 
-        User user = buscarPorId(userId);
+
+        User user = userRepository.findById(userId).orElseThrow(()-> new ErrorHandler(UserErrorMessage.USER_NOT_FOUND));
+
 
         Long tenantId = TenantContext.getTenantId();
         Long tenantGroupId = TenantContext.getGroupId();
@@ -139,7 +140,7 @@ public class UserService implements IUserService {
 
             Permission permission = permissionRepository.findById(permissionId).orElseThrow(() -> new NotFoundException("Permission not found"));
 
-            boolean exists = userPermissionRepository.existsByUserIdAndPermissionIdAndTenantIdAndTenantGroupId(
+            boolean exists = userRepository.existsByIdAndPermissions_IdAndTenantIdAndTenantGroupId(
                     userId,
                     permissionId,
                     tenantId,
@@ -148,15 +149,8 @@ public class UserService implements IUserService {
 
             if (exists) continue;
 
-            UserPermission up = new UserPermission();
-
-            up.setUser(user);
-            up.setPermission(permission);
-            up.setTenantId(tenantId);
-            up.setTenantGroupId(tenantGroupId);
-            up.setScope(TenantScope.TENANT);
-
-            userPermissionRepository.save(up);
+            user.getPermissions().add(permission);
+            userRepository.save(user);
         }
     }
 
@@ -164,7 +158,8 @@ public class UserService implements IUserService {
     @Override
     @Transactional
     public void removerPermission(Long userId, Long permissionId) {
-        User user = buscarPorId(userId);
+        User user = userRepository.findById(userId).orElseThrow(()-> new ErrorHandler(UserErrorMessage.USER_NOT_FOUND));
+
 
         Permission permission = permissionRepository.findById(permissionId).orElseThrow(() -> new NotFoundException("Permissão não encontrada"));
 
@@ -175,15 +170,17 @@ public class UserService implements IUserService {
     @Override
     @Transactional(readOnly = true)
     public List<Permission> listarPermissions(Long userId) {
-        User user = buscarPorId(userId);
-        return user.getPermissions().stream().map(UserPermission::getPermission).toList();
+        User user = userRepository.findById(userId).orElseThrow(()-> new ErrorHandler(UserErrorMessage.USER_NOT_FOUND));
+
+        return user.getPermissions().stream().toList();
     }
 
     @Override
     @Transactional
     public void adicionarRoles(Long userId, AdicionarRolesRequest request) {
 
-        User user = buscarPorId(userId);
+        User user = userRepository.findById(userId).orElseThrow(()-> new ErrorHandler(UserErrorMessage.USER_NOT_FOUND));
+
 
         Long tenantId = TenantContext.getTenantId();
         Long tenantGroupId = TenantContext.getGroupId();
@@ -192,19 +189,12 @@ public class UserService implements IUserService {
 
             Role role = roleRepository.findById(roleId).orElseThrow(() -> new NotFoundException("Role not found"));
 
-            boolean exists = userRoleRepository.existsByUserIdAndRoleIdAndTenantIdAndTenantGroupId(userId, roleId, tenantId, tenantGroupId);
+            boolean exists = userRepository.existsByIdAndRoles_IdAndTenantIdAndTenantGroupId(userId, roleId, tenantId, tenantGroupId);
 
             if (exists) continue;
 
-            UserRole ur = new UserRole();
-
-            ur.setUser(user);
-            ur.setRole(role);
-            ur.setTenantId(tenantId);
-            ur.setTenantGroupId(tenantGroupId);
-            ur.setScope(TenantScope.TENANT); // se tiver
-
-            userRoleRepository.save(ur);
+            user.getRoles().add(role);
+            userRepository.save(user);
         }
     }
 
@@ -212,20 +202,19 @@ public class UserService implements IUserService {
     @Override
     @Transactional
     public void removerRole(Long userId, Long roleId) {
-
-        Long tenantId = TenantContext.getTenantId();
-        Long tenantGroupId = TenantContext.getGroupId();
-
-        UserRole userRole = userRoleRepository.findByUserIdAndRoleIdAndTenantIdAndTenantGroupId(userId, roleId, tenantId, tenantGroupId).orElseThrow(() -> new NotFoundException("Role not linked to user"));
-
-        userRoleRepository.delete(userRole);
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return;
+        user.getRoles().removeIf(rl -> rl.getId().equals(roleId));
+        userRepository.save(user);
     }
 
 
     @Override
     @Transactional(readOnly = true)
     public List<Role> listarRoles(Long userId) {
-        return userRoleRepository.listarRoles(userId, TenantContext.getTenantId(), TenantContext.getGroupId());
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return List.of();
+        return user.getRoles().stream().toList();
     }
 
 }

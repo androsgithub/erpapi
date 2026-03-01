@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  */
 public record TenantDatasourceResponse(
         Long id,
-        Long empresaId,
+        Long tenantId,
         String host,
         Integer port,
         String databaseName,

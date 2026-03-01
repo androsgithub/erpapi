@@ -37,8 +37,7 @@ import java.util.stream.Collectors;
  * </p>
  */
 @Slf4j
-public class
-SchemaGenerator {
+public class SchemaGenerator {
 
     // ================= CONFIGURAÇÕES =================
 
@@ -55,30 +54,15 @@ SchemaGenerator {
 
     // ================= REGEX PATTERNS =================
 
-    private static final Pattern CREATE_TABLE = Pattern.compile(
-            "create\\s+table\\s+(if\\s+not\\s+exists\\s+)?([`\"\\[]?\\w+[`\"\\]]?)",
-            Pattern.CASE_INSENSITIVE
-    );
+    private static final Pattern CREATE_TABLE = Pattern.compile("create\\s+table\\s+(if\\s+not\\s+exists\\s+)?([`\"\\[]?\\w+[`\"\\]]?)", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern ALTER_TABLE = Pattern.compile(
-            "alter\\s+table\\s+(if\\s+exists\\s+)?([`\"\\[]?\\w+[`\"\\]]?)",
-            Pattern.CASE_INSENSITIVE
-    );
+    private static final Pattern ALTER_TABLE = Pattern.compile("alter\\s+table\\s+(if\\s+exists\\s+)?([`\"\\[]?\\w+[`\"\\]]?)", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern CREATE_SEQUENCE = Pattern.compile(
-            "create\\s+sequence\\s+([`\"\\[]?\\w+[`\"\\]]?)",
-            Pattern.CASE_INSENSITIVE
-    );
+    private static final Pattern CREATE_SEQUENCE = Pattern.compile("create\\s+sequence\\s+([`\"\\[]?\\w+[`\"\\]]?)", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern CREATE_INDEX = Pattern.compile(
-            "create\\s+(unique\\s+)?index\\s+\\w+\\s+on\\s+([`\"\\[]?\\w+[`\"\\]]?)",
-            Pattern.CASE_INSENSITIVE
-    );
+    private static final Pattern CREATE_INDEX = Pattern.compile("create\\s+(unique\\s+)?index\\s+\\w+\\s+on\\s+([`\"\\[]?\\w+[`\"\\]]?)", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern REFERENCES = Pattern.compile(
-            "references\\s+([`\"\\[]?\\w+[`\"\\]]?)",
-            Pattern.CASE_INSENSITIVE
-    );
+    private static final Pattern REFERENCES = Pattern.compile("references\\s+([`\"\\[]?\\w+[`\"\\]]?)", Pattern.CASE_INSENSITIVE);
 
     // ================= MÉTODOS PÚBLICOS =================
 
@@ -143,10 +127,7 @@ SchemaGenerator {
      * Cria e configura o ServiceRegistry do Hibernate.
      */
     private static StandardServiceRegistry criarServiceRegistry(DBType dbType) {
-        return new StandardServiceRegistryBuilder()
-                .applySetting("hibernate.connection.driver_class", dbType.getDriver())
-                .applySetting("hibernate.dialect", dbType.getDialeto())
-                .build();
+        return new StandardServiceRegistryBuilder().applySetting("hibernate.connection.driver_class", dbType.getDriver()).applySetting("hibernate.dialect", dbType.getDialeto()).build();
     }
 
     /**
@@ -194,11 +175,7 @@ SchemaGenerator {
         export.setFormat(true);
         export.setDelimiter(";");
         export.setOutputFile(arquivoTemp.toString());
-        export.execute(
-                EnumSet.of(TargetType.SCRIPT),
-                SchemaExport.Action.CREATE,
-                metadata
-        );
+        export.execute(EnumSet.of(TargetType.SCRIPT), SchemaExport.Action.CREATE, metadata);
 
         log.debug("Schema completo gerado em: {}", arquivoTemp);
         return arquivoTemp;
@@ -209,8 +186,7 @@ SchemaGenerator {
     /**
      * Divide o schema completo em arquivos individuais por tabela.
      */
-    private static void dividirSchemaEmArquivos(Path arquivoSchema, Path pastaOutput, Metadata metadata)
-            throws IOException {
+    private static void dividirSchemaEmArquivos(Path arquivoSchema, Path pastaOutput, Metadata metadata) throws IOException {
 
         String sqlCompleto = Files.readString(arquivoSchema);
         List<String> statements = parseStatements(sqlCompleto);
@@ -239,18 +215,13 @@ SchemaGenerator {
      * Faz o parse dos statements SQL do arquivo completo.
      */
     private static List<String> parseStatements(String sql) {
-        return Arrays.stream(sql.split(";"))
-                .map(String::trim)
-                .filter(stmt -> !stmt.isEmpty())
-                .collect(Collectors.toList());
+        return Arrays.stream(sql.split(";")).map(String::trim).filter(stmt -> !stmt.isEmpty()).collect(Collectors.toList());
     }
 
     /**
      * Agrupa os statements SQL por tabela relacionada.
      */
-    private static Map<String, List<String>> agruparStatementsPorTabela(
-            List<String> statements,
-            Map<String, EntityInfo> metadataInfo) {
+    private static Map<String, List<String>> agruparStatementsPorTabela(List<String> statements, Map<String, EntityInfo> metadataInfo) {
 
         Map<String, List<String>> agrupamento = new HashMap<>();
 
@@ -259,9 +230,7 @@ SchemaGenerator {
 
             for (String tabela : tabelasRelacionadas) {
                 if (metadataInfo.containsKey(tabela)) {
-                    agrupamento
-                            .computeIfAbsent(tabela, k -> new ArrayList<>())
-                            .add(statement + ";");
+                    agrupamento.computeIfAbsent(tabela, k -> new ArrayList<>()).add(statement + ";");
                 }
             }
         }
@@ -395,12 +364,7 @@ SchemaGenerator {
     /**
      * Escreve o arquivo de migração para uma tabela específica.
      */
-    private static void escreverArquivoMigracao(
-            Path pastaBase,
-            String nomeTabela,
-            List<String> statements,
-            EntityInfo entityInfo,
-            int versao) throws IOException {
+    private static void escreverArquivoMigracao(Path pastaBase, String nomeTabela, List<String> statements, EntityInfo entityInfo, int versao) throws IOException {
 
         Path pastaDestino = determinarPastaDestino(pastaBase, entityInfo);
         Files.createDirectories(pastaDestino);
@@ -433,11 +397,7 @@ SchemaGenerator {
     /**
      * Escreve o conteúdo completo do arquivo de migração.
      */
-    private static void escreverConteudoArquivo(
-            Path arquivo,
-            String nomeTabela,
-            EntityInfo entityInfo,
-            List<String> statements) throws IOException {
+    private static void escreverConteudoArquivo(Path arquivo, String nomeTabela, EntityInfo entityInfo, List<String> statements) throws IOException {
 
         StringBuilder conteudo = new StringBuilder();
 
@@ -479,11 +439,7 @@ SchemaGenerator {
     /**
      * Extrai tabelas usando um pattern regex específico.
      */
-    private static void extrairTabelasComPattern(
-            Set<String> tabelas,
-            Pattern pattern,
-            String statement,
-            int grupoCaptura) {
+    private static void extrairTabelasComPattern(Set<String> tabelas, Pattern pattern, String statement, int grupoCaptura) {
 
         Matcher matcher = pattern.matcher(statement);
         while (matcher.find()) {
@@ -524,12 +480,7 @@ SchemaGenerator {
      * Normaliza o nome da tabela removendo delimitadores e convertendo para lowercase.
      */
     private static String normalizarNomeTabela(String nome) {
-        return nome.replace("`", "")
-                .replace("\"", "")
-                .replace("[", "")
-                .replace("]", "")
-                .toLowerCase()
-                .trim();
+        return nome.replace("`", "").replace("\"", "").replace("[", "").replace("]", "").toLowerCase().trim();
     }
 
     // ================= METADADOS DAS ENTIDADES =================
@@ -559,9 +510,7 @@ SchemaGenerator {
      */
     private static String extrairNomeSimpllesClasse(String nomeCompletoClasse) {
         int ultimoPonto = nomeCompletoClasse.lastIndexOf('.');
-        return ultimoPonto >= 0
-                ? nomeCompletoClasse.substring(ultimoPonto + 1)
-                : nomeCompletoClasse;
+        return ultimoPonto >= 0 ? nomeCompletoClasse.substring(ultimoPonto + 1) : nomeCompletoClasse;
     }
 
     /**
@@ -615,7 +564,8 @@ SchemaGenerator {
      *
      * @param nomeTabela nome da tabela no banco de dados
      * @param nomeClasse nome simples da classe da entidade
-     * @param feature nome da feature/módulo (pode ser null)
+     * @param feature    nome da feature/módulo (pode ser null)
      */
-    record EntityInfo(String nomeTabela, String nomeClasse, String feature) {}
+    record EntityInfo(String nomeTabela, String nomeClasse, String feature) {
+    }
 }

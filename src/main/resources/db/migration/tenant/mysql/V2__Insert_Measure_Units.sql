@@ -1,3 +1,4 @@
+DO SLEEP(0.125);
  -- Insert Measure Units
  INSERT INTO
      tb_measure_unit (
