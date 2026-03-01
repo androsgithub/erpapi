@@ -38,7 +38,7 @@ public class UserValidatorProxy implements IUserValidator {
             Long tenantId = Long.valueOf(strTenantId);
             Tenant tenant = tenantService.getDadosTenant(tenantId);
             String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
-            String beanName = "userValidator_" + tenantType;
+            String beanName = "userValidator" + tenantType;
             userConfig = tenant.getConfig().getUserConfig();
 
             try {

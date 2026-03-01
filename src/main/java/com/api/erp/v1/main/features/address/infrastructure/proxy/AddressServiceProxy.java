@@ -40,7 +40,7 @@ public class AddressServiceProxy implements IAddressService {
             Long tenantId = Long.valueOf(strTenantId);
             Tenant tenant = tenantService.getDadosTenant(tenantId);
             String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
-            String beanName = "addressService_" + tenantType;
+            String beanName = "addressService" + tenantType;
             addressConfig = tenant.getConfig().getAddressConfig();
 
             try {

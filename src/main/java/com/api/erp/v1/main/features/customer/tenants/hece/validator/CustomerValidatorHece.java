@@ -2,20 +2,20 @@ package com.api.erp.v1.main.features.customer.tenants.hece.validator;
 
 import com.api.erp.v1.main.features.customer.application.dto.request.CreateCustomerDto;
 import com.api.erp.v1.main.features.customer.domain.validator.ICustomerValidator;
+import com.api.erp.v1.main.features.customer.infrastructure.validator.CustomerValidatorDefault;
 import com.api.erp.v1.main.shared.domain.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("customerValidatorHECE")
 public class CustomerValidatorHece implements ICustomerValidator {
 
-    @Qualifier("customerValidatorDefault")
-    private final ICustomerValidator defaultValidator;
+    private final CustomerValidatorDefault defaultValidator;
 
     @Autowired
-    public CustomerValidatorHece(ICustomerValidator defaultValidator) {
+    public CustomerValidatorHece(CustomerValidatorDefault defaultValidator) {
         this.defaultValidator = defaultValidator;
     }
 

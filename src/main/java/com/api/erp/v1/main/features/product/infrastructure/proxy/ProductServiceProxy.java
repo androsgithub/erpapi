@@ -41,7 +41,7 @@ public class ProductServiceProxy implements IProductService {
             Long tenantId = Long.valueOf(strTenantId);
             Tenant tenant = tenantService.getDadosTenant(tenantId);
             String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
-            String beanName = "productService_" + tenantType;
+            String beanName = "productService" + tenantType;
             productConfig = tenant.getConfig().getProductConfig();
 
             try {

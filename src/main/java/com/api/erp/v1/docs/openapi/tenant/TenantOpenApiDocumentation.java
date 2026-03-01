@@ -36,20 +36,6 @@ public interface TenantOpenApiDocumentation extends ITenantController {
 
     @Override
     @Operation(
-            summary = "Criar/Registrar novo tenant (tenant)",
-            description = "Registra uma nova tenant (tenant) no sistema com seus dados básicos e opcionalmente com um datasource próprio."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Tenant criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos"),
-            @ApiResponse(responseCode = "409", description = "Tenant com CNPJ já existente")
-    })
-    ResponseEntity<TenantResponse> criar(
-            @RequestBody CriarTenantRequest request
-    );
-
-    @Override
-    @Operation(
             summary = "Listar todas as tenants",
             description = "Retorna a lista de todas as tenants cadastradas no sistema."
     )
@@ -75,85 +61,33 @@ public interface TenantOpenApiDocumentation extends ITenantController {
 
     @Override
     @Operation(
-            summary = "Atualizar configurações de customer",
-            description = "Atualiza as configurações relacionadas ao módulo de customers da tenant."
+            summary = "Atualizar configurações unificadas da tenant (PATCH)",
+            description = """
+                    Atualiza uma ou múltiplas configurações da tenant em uma única requisição.
+                    
+                    Substitui os 6 endpoints antigos:
+                    - PUT /config/customer
+                    - PUT /config/user
+                    - PUT /config/permission
+                    - PUT /config/tenant
+                    - PUT /config/address
+                    - PUT /config/contact
+                    
+                    Envie apenas os campos que deseja atualizar (todos são opcionais).
+                    Exemplo:
+                    {
+                      "customerValidationEnabled": true,
+                      "userApprovalRequired": false,
+                      "permissionCacheEnabled": true
+                    }
+                    """
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Configurações de customer atualizadas"),
+            @ApiResponse(responseCode = "200", description = "Configurações atualizadas com sucesso"),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
             @ApiResponse(responseCode = "400", description = "Configuração inválida")
     })
-    ResponseEntity<TenantResponse> atualizarCustomerConfig(
-            @RequestBody CustomerConfigRequest request
-    );
-
-    @Override
-    @Operation(
-            summary = "Atualizar configurações de usuário",
-            description = "Atualiza as configurações relacionadas aos usuários da tenant, como permissões padrão e regras internas."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Configurações de usuário atualizadas"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "400", description = "Configuração inválida")
-    })
-    ResponseEntity<TenantResponse> atualizarUserConfig(
-            @RequestBody UserConfigRequest request
-    );
-
-    @Override
-    @Operation(
-            summary = "Atualizar configurações de permissões",
-            description = "Atualiza as regras e políticas de permissões da tenant."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Configurações de permissões atualizadas"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "400", description = "Configuração inválida")
-    })
-    ResponseEntity<TenantResponse> atualizarPermissionConfig(
-            @RequestBody PermissionConfigRequest request
-    );
-
-    @Override
-    @Operation(
-            summary = "Atualizar configurações do tenant",
-            description = "Atualiza configurações específicas do tenant, como limites, features habilitadas e comportamento do sistema."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Configurações do tenant atualizadas"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "400", description = "Configuração inválida")
-    })
-    ResponseEntity<TenantResponse> atualizarTenantConfig(
-            @RequestBody InternalTenantConfigRequest request
-    );
-
-    @Override
-    @Operation(
-            summary = "Atualizar endereço da tenant",
-            description = "Atualiza os dados de endereço da tenant, utilizados em documentos fiscais e relatórios."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Endereço atualizado com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "400", description = "Dados de endereço inválidos")
-    })
-    ResponseEntity<TenantResponse> atualizarAddressConfig(
-            @RequestBody AddressConfigRequest request
-    );
-
-    @Override
-    @Operation(
-            summary = "Atualizar informações de contact da tenant",
-            description = "Atualiza informações de contact da tenant, como telefone, e-mail e canais de comunicação."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact atualizado com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "400", description = "Dados de contact inválidos")
-    })
-    ResponseEntity<TenantResponse> atualizarContactConfig(
-            @RequestBody ContactConfigRequest request
+    ResponseEntity<TenantResponse> atualizarConfigUnificada(
+            @RequestBody UnifiedTenantConfigRequest request
     );
 }

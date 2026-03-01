@@ -2,6 +2,7 @@ package com.api.erp.v1.main.config.startup.seed;
 
 import com.api.erp.v1.main.config.startup.util.PermissionReflectionUtil;
 import com.api.erp.v1.main.features.address.domain.entity.AddressPermissions;
+import com.api.erp.v1.main.features.customer.domain.entity.CustomerPermissions;
 import com.api.erp.v1.main.features.permission.domain.entity.*;
 import com.api.erp.v1.main.features.permission.domain.repository.PermissionRepository;
 import com.api.erp.v1.main.features.permission.domain.repository.RoleRepository;
@@ -56,7 +57,8 @@ public class PermissionSeed {
             RolePermissions.class,
             ProductPermissions.class,
             CompositionPermissions.class,
-            ListaExpandidaPermissions.class
+            ListaExpandidaPermissions.class,
+            CustomerPermissions.class
     );
 
     private final PermissionRepository permissionRepository;

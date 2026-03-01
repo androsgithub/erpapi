@@ -49,7 +49,7 @@ public class UserServiceProxy implements IUserService {
         Long tenantId = Long.valueOf(strTenantId);
         Tenant tenant = tenantService.getDadosTenant(tenantId);
         String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
-        String beanName = "userService_" + tenantType;
+        String beanName = "userService" + tenantType;
         userConfig = tenant.getConfig().getUserConfig();
 
         try {

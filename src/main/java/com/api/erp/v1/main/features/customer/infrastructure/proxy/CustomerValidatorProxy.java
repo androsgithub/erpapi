@@ -38,7 +38,7 @@ public class CustomerValidatorProxy implements ICustomerValidator {
             Long tenantId = Long.valueOf(strTenantId);
             Tenant tenant = tenantService.getDadosTenant(tenantId);
             String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
-            String beanName = "customerValidator_" + tenantType;
+            String beanName = "customerValidator" + tenantType;
 
             ICustomerValidator validator = applicationContext.getBean(beanName, ICustomerValidator.class);
             log.debug("[CUSTOMER VALIDATOR] Validator resolvido para tenant {}: {}", tenantId, beanName);

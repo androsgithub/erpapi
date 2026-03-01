@@ -3,7 +3,6 @@ package com.api.erp.v1.main.tenant.infrastructure.service;
 import com.api.erp.v1.main.features.address.domain.repository.AddressRepository;
 import com.api.erp.v1.main.features.permission.infrastructure.factory.PermissionConfigUpdateEvent;
 import com.api.erp.v1.main.shared.common.error.ErrorHandler;
-import com.api.erp.v1.main.shared.domain.exception.NotFoundException;
 import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
 import com.api.erp.v1.main.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.main.shared.domain.valueobject.Email;
@@ -62,145 +61,6 @@ public class TenantService implements ITenantService {
         // empresa.setAddress(address);
 
         return tenantRepository.save(empresa);
-    }
-
-    @Override
-    public Tenant updateCustomerConfig(Long tenantId, CustomerConfigRequest customerConfigRequest) {
-        log.info("[TENANT SERVICE] Updating Customer configuration");
-            Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
-        if (empresa == null) {
-            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
-        }
-
-        CustomerConfig customerConfig = new CustomerConfig();
-        customerConfig.setCustomerAuditEnabled(customerConfigRequest.customerAuditEnabled());
-        customerConfig.setCustomerCacheEnabled(customerConfigRequest.customerCacheEnabled());
-        customerConfig.setCustomerValidationEnabled(customerConfigRequest.customerValidationEnabled());
-        customerConfig.setCustomerNotificationEnabled(customerConfigRequest.customerNotificationEnabled());
-        customerConfig.setCustomerTenantCustomizationEnabled(customerConfigRequest.customerTenantCustomizationEnabled());
-        empresa.getConfig().setCustomerConfig(customerConfig);
-
-        Tenant empresaSalva = tenantRepository.save(empresa);
-
-        // Get current user for audit
-        String user = obterUserAtual();
-
-        // Publica evento para recarregar decorators de Customer
-        log.info("[TENANT SERVICE] Publishing CustomerConfigUpdateEvent");
-
-        return empresaSalva;
-    }
-
-    @Override
-    public Tenant updateContactConfig(Long tenantId, ContactConfigRequest contactConfigRequest) {
-        log.info("[TENANT SERVICE] Updating Contact configuration");
-        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
-        if (empresa == null) {
-            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
-        }
-
-        ContactConfig contactConfig = new ContactConfig();
-        contactConfig.setContactAuditEnabled(contactConfigRequest.contactAuditEnabled());
-        contactConfig.setContactCacheEnabled(contactConfigRequest.contactCacheEnabled());
-        contactConfig.setContactValidationEnabled(contactConfigRequest.contactValidationEnabled());
-        contactConfig.setContactNotificationEnabled(contactConfigRequest.contactNotificationEnabled());
-        empresa.getConfig().setContactConfig(contactConfig);
-
-        Tenant empresaSalva = tenantRepository.save(empresa);
-
-        return empresaSalva;
-    }
-
-    @Override
-    public Tenant updateAddressConfig(Long tenantId, AddressConfigRequest addressConfigRequest) {
-        log.info("[TENANT SERVICE] Updating Address configuration");
-
-
-        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
-        if (empresa == null) {
-            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
-        }
-
-        AddressConfig addressConfig = new AddressConfig();
-        addressConfig.setAddressAuditEnabled(addressConfigRequest.addressAuditEnabled());
-        addressConfig.setAddressCacheEnabled(addressConfigRequest.addressCacheEnabled());
-        addressConfig.setAddressValidationEnabled(addressConfigRequest.addressValidationEnabled());
-        empresa.getConfig().setAddressConfig(addressConfig);
-
-        Tenant empresaSalva = tenantRepository.save(empresa);
-
-        return empresaSalva;
-    }
-
-    @Override
-    public Tenant updateUserConfig(Long tenantId, UserConfigRequest userConfigRequest) {
-        log.info("[TENANT SERVICE] Updating User configuration");
-        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
-        if (empresa == null) {
-            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
-        }
-
-        UserConfig userConfig = new UserConfig();
-        userConfig.setUserApprovalRequired(userConfigRequest.userApprovalRequired());
-        userConfig.setUserCorporateEmailRequired(userConfigRequest.userCorporateEmailRequired());
-        userConfig.setAllowedEmailDomains(userConfigRequest.allowedEmailDomains());
-        empresa.getConfig().setUserConfig(userConfig);
-
-        Tenant empresaSalva = tenantRepository.save(empresa);
-
-        return empresaSalva;
-    }
-
-    @Override
-    public Tenant updatePermissionConfig(Long tenantId, PermissionConfigRequest permissionConfigRequest) {
-        log.info("[TENANT SERVICE] Updating Permission configuration");
-        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
-        if (empresa == null) {
-            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
-        }
-
-        PermissionConfig permissionConfig = new PermissionConfig();
-        permissionConfig.setPermissionAuditEnabled(permissionConfigRequest.permissionAuditEnabled());
-        permissionConfig.setPermissionCacheEnabled(permissionConfigRequest.permissionCacheEnabled());
-        permissionConfig.setPermissionValidationEnabled(permissionConfigRequest.permissionValidationEnabled());
-        empresa.getConfig().setPermissionConfig(permissionConfig);
-
-        Tenant empresaSalva = tenantRepository.save(empresa);
-
-        // Get current user for audit
-        String user = obterUserAtual();
-
-        // Publish event to reload Permission decorators
-        log.info("[TENANT SERVICE] Publishing PermissionConfigUpdateEvent");
-        eventPublisher.publishEvent(new PermissionConfigUpdateEvent(
-                this,
-                permissionConfig,
-                empresa.getId(),
-                user
-        ));
-
-        return empresaSalva;
-    }
-
-    @Override
-    public Tenant updateInternalTenantConfig(Long tenantId, InternalTenantConfigRequest internalTenantConfigRequest) {
-        log.info("[TENANT SERVICE] Updating Tenant configuration");
-        Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
-        if (empresa == null) {
-            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
-        }
-
-        InternalTenantConfig tenantConfig = new InternalTenantConfig();
-        tenantConfig.setTenantCustomCode(internalTenantConfigRequest.tenantCustomCode());
-        tenantConfig.setTenantType(internalTenantConfigRequest.tenantType());
-        tenantConfig.setTenantSubdomain(internalTenantConfigRequest.tenantSubdomain());
-        tenantConfig.setTenantFeaturesEnabled(internalTenantConfigRequest.tenantFeaturesEnabled());
-        empresa.getConfig().setInternalTenantConfig(tenantConfig);
-
-        Tenant empresaSalva = tenantRepository.save(empresa);
-
-
-        return empresaSalva;
     }
 
     /**
@@ -302,6 +162,161 @@ public class TenantService implements ITenantService {
                 .stream()
                 .filter(Tenant::isAtiva)
                 .toList();
+    }
+
+    @Override
+    public Tenant updateConfig(Long tenantId, UnifiedTenantConfigRequest request) {
+        log.info("[TENANT SERVICE] ═══════════════════════════════════════════════════");
+        log.info("[TENANT SERVICE] Updating Unified Tenant Configuration");
+        log.info("[TENANT SERVICE] Tenant ID: {}", tenantId);
+        log.info("[TENANT SERVICE] ═══════════════════════════════════════════════════");
+        
+        Tenant tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND));
+        
+        TenantConfig tenantConfig = tenant.getConfig();
+        
+        // CUSTOMER CONFIG
+        if (hasCustomerConfig(request)) {
+            log.info("[TENANT SERVICE] Updating Customer Config");
+            CustomerConfig customerConfig = new CustomerConfig();
+            if (request.customerValidationEnabled() != null) 
+                customerConfig.setCustomerValidationEnabled(request.customerValidationEnabled());
+            if (request.customerAuditEnabled() != null) 
+                customerConfig.setCustomerAuditEnabled(request.customerAuditEnabled());
+            if (request.customerCacheEnabled() != null) 
+                customerConfig.setCustomerCacheEnabled(request.customerCacheEnabled());
+            if (request.customerNotificationEnabled() != null) 
+                customerConfig.setCustomerNotificationEnabled(request.customerNotificationEnabled());
+            if (request.customerTenantCustomizationEnabled() != null) 
+                customerConfig.setCustomerTenantCustomizationEnabled(request.customerTenantCustomizationEnabled());
+            tenantConfig.setCustomerConfig(customerConfig);
+        }
+        
+        // USER CONFIG
+        if (hasUserConfig(request)) {
+            log.info("[TENANT SERVICE] Updating User Config");
+            UserConfig userConfig = new UserConfig();
+            if (request.userApprovalRequired() != null) 
+                userConfig.setUserApprovalRequired(request.userApprovalRequired());
+            if (request.userCorporateEmailRequired() != null) 
+                userConfig.setUserCorporateEmailRequired(request.userCorporateEmailRequired());
+            if (request.allowedEmailDomains() != null) 
+                userConfig.setAllowedEmailDomains(request.allowedEmailDomains());
+            tenantConfig.setUserConfig(userConfig);
+        }
+        
+        // PERMISSION CONFIG
+        if (hasPermissionConfig(request)) {
+            log.info("[TENANT SERVICE] Updating Permission Config");
+            PermissionConfig permissionConfig = new PermissionConfig();
+            if (request.permissionValidationEnabled() != null) 
+                permissionConfig.setPermissionValidationEnabled(request.permissionValidationEnabled());
+            if (request.permissionCacheEnabled() != null) 
+                permissionConfig.setPermissionCacheEnabled(request.permissionCacheEnabled());
+            if (request.permissionAuditEnabled() != null) 
+                permissionConfig.setPermissionAuditEnabled(request.permissionAuditEnabled());
+            tenantConfig.setPermissionConfig(permissionConfig);
+            
+            // Publish event for Permission decorators
+            String user = obterUserAtual();
+            eventPublisher.publishEvent(new PermissionConfigUpdateEvent(
+                    this,
+                    permissionConfig,
+                    tenantId,
+                    user
+            ));
+        }
+        
+        // INTERNAL TENANT CONFIG
+        if (hasInternalTenantConfig(request)) {
+            log.info("[TENANT SERVICE] Updating Internal Tenant Config");
+            InternalTenantConfig internalTenantConfig = new InternalTenantConfig();
+            if (request.tenantType() != null) 
+                internalTenantConfig.setTenantType(request.tenantType());
+            if (request.tenantSubdomain() != null) 
+                internalTenantConfig.setTenantSubdomain(request.tenantSubdomain());
+            if (request.tenantCustomCode() != null) 
+                internalTenantConfig.setTenantCustomCode(request.tenantCustomCode());
+            if (request.tenantFeaturesEnabled() != null) 
+                internalTenantConfig.setTenantFeaturesEnabled(request.tenantFeaturesEnabled());
+            tenantConfig.setInternalTenantConfig(internalTenantConfig);
+        }
+        
+        // ADDRESS CONFIG
+        if (hasAddressConfig(request)) {
+            log.info("[TENANT SERVICE] Updating Address Config");
+            AddressConfig addressConfig = new AddressConfig();
+            if (request.addressValidationEnabled() != null) 
+                addressConfig.setAddressValidationEnabled(request.addressValidationEnabled());
+            if (request.addressAuditEnabled() != null) 
+                addressConfig.setAddressAuditEnabled(request.addressAuditEnabled());
+            if (request.addressCacheEnabled() != null) 
+                addressConfig.setAddressCacheEnabled(request.addressCacheEnabled());
+            tenantConfig.setAddressConfig(addressConfig);
+        }
+        
+        // CONTACT CONFIG
+        if (hasContactConfig(request)) {
+            log.info("[TENANT SERVICE] Updating Contact Config");
+            ContactConfig contactConfig = new ContactConfig();
+            if (request.contactValidationEnabled() != null) 
+                contactConfig.setContactValidationEnabled(request.contactValidationEnabled());
+            if (request.contactAuditEnabled() != null) 
+                contactConfig.setContactAuditEnabled(request.contactAuditEnabled());
+            if (request.contactCacheEnabled() != null) 
+                contactConfig.setContactCacheEnabled(request.contactCacheEnabled());
+            if (request.contactNotificationEnabled() != null) 
+                contactConfig.setContactNotificationEnabled(request.contactNotificationEnabled());
+            tenantConfig.setContactConfig(contactConfig);
+        }
+        
+        Tenant tenantSalvo = tenantRepository.save(tenant);
+        log.info("[TENANT SERVICE] ✅ Configurations updated successfully for tenant: {}", tenantId);
+        
+        return tenantSalvo;
+    }
+    
+    // HELPER METHODS para detectar quais configs foram preenchidas
+    private boolean hasCustomerConfig(UnifiedTenantConfigRequest request) {
+        return request.customerValidationEnabled() != null ||
+               request.customerAuditEnabled() != null ||
+               request.customerCacheEnabled() != null ||
+               request.customerNotificationEnabled() != null ||
+               request.customerTenantCustomizationEnabled() != null;
+    }
+    
+    private boolean hasUserConfig(UnifiedTenantConfigRequest request) {
+        return request.userApprovalRequired() != null ||
+               request.userCorporateEmailRequired() != null ||
+               request.allowedEmailDomains() != null;
+    }
+    
+    private boolean hasPermissionConfig(UnifiedTenantConfigRequest request) {
+        return request.permissionValidationEnabled() != null ||
+               request.permissionCacheEnabled() != null ||
+               request.permissionAuditEnabled() != null;
+    }
+    
+    private boolean hasInternalTenantConfig(UnifiedTenantConfigRequest request) {
+        return request.tenantType() != null ||
+               request.tenantSubdomain() != null ||
+               request.tenantCustomCode() != null ||
+               request.tenantFeaturesEnabled() != null;
+    }
+    
+    private boolean hasAddressConfig(UnifiedTenantConfigRequest request) {
+        return request.addressValidationEnabled() != null ||
+               request.addressAuditEnabled() != null ||
+               request.addressCacheEnabled() != null;
+    }
+    
+    private boolean hasContactConfig(UnifiedTenantConfigRequest request) {
+        return request.contactValidationEnabled() != null ||
+               request.contactAuditEnabled() != null ||
+               request.contactCacheEnabled() != null ||
+               request.contactFormatValidationEnabled() != null ||
+               request.contactNotificationEnabled() != null;
     }
 
     @Override

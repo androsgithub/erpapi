@@ -44,7 +44,7 @@ public class CustomerServiceProxy implements ICustomerService {
             Long tenantId = Long.valueOf(strTenantId);
             Tenant tenant = tenantService.getDadosTenant(tenantId);
             String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
-            String beanName = "customerService_" + tenantType;
+            String beanName = "customerService" + tenantType;
 
             customerConfig = tenant.getConfig().getCustomerConfig();
             

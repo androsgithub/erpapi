@@ -45,15 +45,6 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 
-    @PostMapping
-    @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> criar(@RequestBody CriarTenantRequest request) {
-        log.info("[EMPRESA CONTROLLER] Criando nova tenant: {}", request.nome());
-        Tenant tenant = tenantService.criarTenant(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(tenantMapper.toResponse(tenant));
-    }
-
     /**
      * ═════════════════════════════════════════════════════════════════════════
      * CRIAR NOVO TENANT COM DATASOURCE E ENFILEIRAR MIGRAÇÕES
@@ -156,69 +147,38 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 
-    @PutMapping("/config/customer")
+    /**
+     * ═════════════════════════════════════════════════════════════════════════
+     * UNIFIED CONFIG PATCH - Consolidação dos 6 PUTs antigos em 1 PATCH
+     * 
+     * Substitui:
+     * - PUT /config/customer
+     * - PUT /config/user
+     * - PUT /config/permission
+     * - PUT /config/tenant
+     * - PUT /config/address
+     * - PUT /config/contact
+     * 
+     * Agora: PATCH /config (com campos opcionais para cada tipo de config)
+     * 
+     * Envie apenas os campos que deseja atualizar:
+     * {
+     *   "customerValidationEnabled": true,
+     *   "userApprovalRequired": false,
+     *   "permissionCacheEnabled": true,
+     *   ...outros campos opcionais
+     * }
+     * 
+     * Resposta: 200 OK com tenant atualizado
+     * ═════════════════════════════════════════════════════════════════════════
+     */
+    @PatchMapping("/config")
     @RequiresXTenantId
     @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarCustomerConfig(
-
-            @RequestBody CustomerConfigRequest request) {
+    public ResponseEntity<TenantResponse> atualizarConfigUnificada(
+            @RequestBody UnifiedTenantConfigRequest request) {
         Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateCustomerConfig(tenantId,request);
-        return ResponseEntity.ok(tenantMapper.toResponse(tenant));
-    }
-
-    @PutMapping("/config/user")
-    @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarUserConfig(
-
-            @RequestBody UserConfigRequest request) {
-        Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateUserConfig(tenantId,request);
-        return ResponseEntity.ok(tenantMapper.toResponse(tenant));
-    }
-
-    @PutMapping("/config/permission")
-    @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarPermissionConfig(
-
-            @RequestBody PermissionConfigRequest request) {
-        Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updatePermissionConfig(tenantId,request);
-        return ResponseEntity.ok(tenantMapper.toResponse(tenant));
-    }
-
-    @PutMapping("/config/tenant")
-    @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarTenantConfig(
-
-            @RequestBody InternalTenantConfigRequest request) {
-        Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateInternalTenantConfig(tenantId,request);
-        return ResponseEntity.ok(tenantMapper.toResponse(tenant));
-    }
-
-    @PutMapping("/config/address")
-    @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarAddressConfig(
-
-            @RequestBody AddressConfigRequest request) {
-        Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateAddressConfig(tenantId, request);
-        return ResponseEntity.ok(tenantMapper.toResponse(tenant));
-    }
-
-    @PutMapping("/config/contact")
-    @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.ATUALIZAR)
-    public ResponseEntity<TenantResponse> atualizarContactConfig(
-
-            @RequestBody ContactConfigRequest request) {
-        Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateContactConfig(tenantId,request);
+        Tenant tenant = tenantService.updateConfig(tenantId, request);
         return ResponseEntity.ok(tenantMapper.toResponse(tenant));
     }
 }

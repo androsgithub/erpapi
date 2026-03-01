@@ -36,7 +36,7 @@ public class ContactServiceProxy implements IContactService {
             Long tenantId = Long.valueOf(strTenantId);
             Tenant tenant = tenantService.getDadosTenant(tenantId);
             String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
-            String beanName = "contactService_" + tenantType;
+            String beanName = "contactService" + tenantType;
 
             contactConfig = tenant.getConfig().getContactConfig();
 

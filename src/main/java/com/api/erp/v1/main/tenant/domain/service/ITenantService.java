@@ -17,17 +17,11 @@ public interface ITenantService {
 
     Tenant updateDadosTenant(Long tenantId, TenantRequest empresaRequest);
 
-    Tenant updateCustomerConfig(Long tenantId, CustomerConfigRequest customerConfigRequest);
-
-    Tenant updateContactConfig(Long tenantId, ContactConfigRequest contactConfigRequest);
-
-    Tenant updateAddressConfig(Long tenantId, AddressConfigRequest addressConfigRequest);
-
-    Tenant updatePermissionConfig(Long tenantId, PermissionConfigRequest permissionConfigRequest);
-
-    Tenant updateInternalTenantConfig(Long tenantId, InternalTenantConfigRequest internalTenantConfigRequest);
-
-    Tenant updateUserConfig(Long tenantId, UserConfigRequest userConfigRequest);
+    /**
+     * UNIFIED CONFIG UPDATE - Consolidação de todos os 6 métodos antigos de config em 1
+     * Processa apenas os campos que foram preenchidos (não-null)
+     */
+    Tenant updateConfig(Long tenantId, UnifiedTenantConfigRequest request);
 
     // DELETE Operations
     void deletarTenant(Long tenantId);

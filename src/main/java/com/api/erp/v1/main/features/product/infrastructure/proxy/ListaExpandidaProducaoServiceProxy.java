@@ -37,7 +37,7 @@ public class ListaExpandidaProducaoServiceProxy implements IListaExpandidaProduc
             Long tenantId = Long.valueOf(strTenantId);
             Tenant tenant = tenantService.getDadosTenant(tenantId);
             String tenantType = tenant.getConfig().getInternalTenantConfig().getTenantType().name();
-            String beanName = "listaExpandidaProducaoService_" + tenantType;
+            String beanName = "listaExpandidaProducaoService" + tenantType;
             productConfig = tenant.getConfig().getProductConfig();
 
             try {
