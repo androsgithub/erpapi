@@ -69,14 +69,32 @@ import java.util.Map;
  * @version 1.0
  */
 public class TenantDatabaseController implements ITenantDatabaseController, TenantDatabaseOpenApiDocumentation {
-    @Autowired
-    private ITenantDatasourceService tenantDataSourceService;
+    private static final String SUCCESS = "success";
+    private static final String MESSAGE = "message";
+    private static final String ERROR = "error";
+    private static final String DATASOURCE = "datasource";
+    private static final String STATUS = "status";
+    private static final String EVENT_ID = "eventId";
+    private static final String ENQUEUED_AT = "enqueuedAt";
+    private static final String SOURCE = "source";
+    private static final String HOST = "host";
+    private static final String PORT = "port";
+    private static final String DATABASE_NAME = "databaseName";
+    private static final String DB_TYPE = "dbType";
+    private static final String USERNAME = "username";
 
-    @Autowired
-    private TenantMigrationQueue migrationQueue;
+    private final ITenantDatasourceService tenantDataSourceService;
+    private final TenantMigrationQueue migrationQueue;
+    private final TenantDatasourceRepository tenantDatasourceRepository;
 
-    @Autowired
-    private TenantDatasourceRepository tenantDatasourceRepository;
+    public TenantDatabaseController(
+            ITenantDatasourceService tenantDataSourceService,
+            TenantMigrationQueue migrationQueue,
+            TenantDatasourceRepository tenantDatasourceRepository) {
+        this.tenantDataSourceService = tenantDataSourceService;
+        this.migrationQueue = migrationQueue;
+        this.tenantDatasourceRepository = tenantDatasourceRepository;
+    }
 
     /**
      * ═════════════════════════════════════════════════════════════════════════
@@ -105,8 +123,7 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
             if (!isValid) {
                 log.error("[DATASOURCE CONTROLLER] ❌ Failed to validate datasource");
                 return ResponseEntity.badRequest().body(buildErrorResponse(
-                        "Failed to connect to database. Check your credentials and settings."
-                ));
+                        "Failed to connect to database. Check your credentials and settings."));
             }
             
             log.info("[DATASOURCE CONTROLLER] ✅ Datasource validated successfully");
@@ -121,17 +138,19 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
     }
     
     private Map<String, Object> buildValidationSuccessResponse(TenantDatasourceRequest request) {
-        return new java.util.HashMap<>() {{
-            put("success", true);
-            put("message", "Datasource is valid and connectable");
-            put("datasource", new java.util.HashMap<String, Object>() {{
-                put("host", request.host());
-                put("port", request.port());
-                put("databaseName", request.databaseName());
-                put("dbType", request.dbType());
-                put("username", request.username());
-            }});
-        }};
+        Map<String, Object> response = new java.util.HashMap<>();
+        response.put(SUCCESS, true);
+        response.put(MESSAGE, "Datasource is valid and connectable");
+        
+        Map<String, Object> datasourceMap = new java.util.HashMap<>();
+        datasourceMap.put(HOST, request.host());
+        datasourceMap.put(PORT, request.port());
+        datasourceMap.put(DATABASE_NAME, request.databaseName());
+        datasourceMap.put(DB_TYPE, request.dbType());
+        datasourceMap.put(USERNAME, request.username());
+        response.put(DATASOURCE, datasourceMap);
+        
+        return response;
     }
     
     /**
@@ -176,9 +195,9 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
             if (!testeConexao) {
                 log.error("[DATASOURCE CONTROLLER] ❌ Falha ao conectar com datasource");
                 Map<String, Object> error = new java.util.HashMap<>();
-                error.put("success", false);
-                error.put("error", "Falha ao conectar com datasource");
-                error.put("datasource", datasourceResponse);
+                error.put(SUCCESS, false);
+                error.put(ERROR, "Falha ao conectar com datasource");
+                error.put(DATASOURCE, datasourceResponse);
                 return ResponseEntity.badRequest().body(error);
             }
             log.info("[DATASOURCE CONTROLLER] ✅ Conexão teste bem-sucedida");
@@ -256,15 +275,15 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
                     log.info("[DATASOURCE CONTROLLER] 🚀 Migrações serão processadas automaticamente");
                     
                     // Returns response com info de migração enfileirada
+                    Map<String, Object> migrationInfo = new java.util.HashMap<>();
+                    migrationInfo.put(EVENT_ID, event.getEventId());
+                    migrationInfo.put(STATUS, event.getStatus().getLabel());
+                    migrationInfo.put(SOURCE, event.getSource().getLabel());
+                    migrationInfo.put(ENQUEUED_AT, event.getEnqueuedAt());
+                    migrationInfo.put(MESSAGE, "Migrações enfileiradas com sucesso");
                     UpdateDatasourceResponse responseWithMigration = new UpdateDatasourceResponse(
                             datasourceResponse,
-                            new java.util.HashMap<>() {{
-                                put("eventId", event.getEventId());
-                                put("status", event.getStatus().getLabel());
-                                put("source", event.getSource().getLabel());
-                                put("enqueuedAt", event.getEnqueuedAt());
-                                put("message", "Migrações enfileiradas com sucesso");
-                            }},
+                            migrationInfo,
                             null
                     );
                     return ResponseEntity.accepted().body(responseWithMigration);
@@ -351,48 +370,53 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
     }
 
     private Map<String, Object> buildMigrationQueuedResponse(TenantMigrationEvent event) {
-        return new java.util.HashMap<>() {{
-            put("success", true);
-            put("message", "Migração enfileirada com sucesso");
-            put("migration", new java.util.HashMap<>() {{
-                put("eventId", event.getEventId());
-                put("tenantId", event.getTenantId());
-                put("tenantName", event.getTenantName());
-                put("status", event.getStatus().getLabel());
-                put("source", event.getSource().getLabel());
-                put("enqueuedAt", event.getEnqueuedAt());
-            }});
-        }};
+        Map<String, Object> response = new java.util.HashMap<>();
+        response.put(SUCCESS, true);
+        response.put(MESSAGE, "Migração enfileirada com sucesso");
+        
+        Map<String, Object> migrationMap = new java.util.HashMap<>();
+        migrationMap.put(EVENT_ID, event.getEventId());
+        migrationMap.put("tenantId", event.getTenantId());
+        migrationMap.put("tenantName", event.getTenantName());
+        migrationMap.put(STATUS, event.getStatus().getLabel());
+        migrationMap.put(SOURCE, event.getSource().getLabel());
+        migrationMap.put(ENQUEUED_AT, event.getEnqueuedAt());
+        response.put("migration", migrationMap);
+        
+        return response;
     }
 
     private Map<String, Object> buildConfigureAndMigrateResponse(
             TenantMigrationEvent event,
             TenantDatasourceResponse datasource) {
-        return new java.util.HashMap<>() {{
-            put("success", true);
-            put("message", "Datasource configurado com sucesso. Migrações enfileiradas.");
-            put("datasource", new java.util.HashMap<>() {{
-                put("id", datasource.id());
-                put("host", datasource.host());
-                put("port", datasource.port());
-                put("databaseName", datasource.databaseName());
-                put("dbType", datasource.dbType());
-                put("isActive", datasource.isActive());
-            }});
-            put("migration", new java.util.HashMap<>() {{
-                put("eventId", event.getEventId());
-                put("status", event.getStatus().getLabel());
-                put("source", event.getSource().getLabel());
-                put("enqueuedAt", event.getEnqueuedAt());
-            }});
-        }};
+        Map<String, Object> response = new java.util.HashMap<>();
+        response.put(SUCCESS, true);
+        response.put(MESSAGE, "Datasource configurado com sucesso. Migrações enfileiradas.");
+        
+        Map<String, Object> datasourceMap = new java.util.HashMap<>();
+        datasourceMap.put("id", datasource.id());
+        datasourceMap.put(HOST, datasource.host());
+        datasourceMap.put(PORT, datasource.port());
+        datasourceMap.put(DATABASE_NAME, datasource.databaseName());
+        datasourceMap.put(DB_TYPE, datasource.dbType());
+        datasourceMap.put("isActive", datasource.isActive());
+        response.put(DATASOURCE, datasourceMap);
+        
+        Map<String, Object> migrationMap = new java.util.HashMap<>();
+        migrationMap.put(EVENT_ID, event.getEventId());
+        migrationMap.put(STATUS, event.getStatus().getLabel());
+        migrationMap.put(SOURCE, event.getSource().getLabel());
+        migrationMap.put(ENQUEUED_AT, event.getEnqueuedAt());
+        response.put("migration", migrationMap);
+        
+        return response;
     }
 
     private Map<String, Object> buildErrorResponse(String errorMessage) {
-        return new java.util.HashMap<>() {{
-            put("success", false);
-            put("error", errorMessage);
-        }};
+        Map<String, Object> response = new java.util.HashMap<>();
+        response.put(SUCCESS, false);
+        response.put(ERROR, errorMessage);
+        return response;
     }
 }
 

@@ -29,17 +29,24 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController implements IUserController, UserOpenApiDocumentation {
-    @Autowired
-    private AuthenticationService authenticationService;
-    @Autowired
-    private IUserMapper userMapper;
-    @Autowired
-    private IUserPermissionsMapper userPermissionsMapper;
-    @Autowired
-    @Qualifier("userServiceProxy")
-    private IUserService userService;
-    @Autowired
-    private SecurityService securityService;
+    private final AuthenticationService authenticationService;
+    private final IUserMapper userMapper;
+    private final IUserPermissionsMapper userPermissionsMapper;
+    private final IUserService userService;
+    private final SecurityService securityService;
+
+    public UserController(
+            AuthenticationService authenticationService,
+            IUserMapper userMapper,
+            IUserPermissionsMapper userPermissionsMapper,
+            @Qualifier("userServiceProxy") IUserService userService,
+            SecurityService securityService) {
+        this.authenticationService = authenticationService;
+        this.userMapper = userMapper;
+        this.userPermissionsMapper = userPermissionsMapper;
+        this.userService = userService;
+        this.securityService = securityService;
+    }
 
 
     @PostMapping("/login")

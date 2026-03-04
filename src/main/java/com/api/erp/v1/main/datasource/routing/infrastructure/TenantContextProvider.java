@@ -38,12 +38,10 @@ public class TenantContextProvider implements ITenantContextProvider {
         
         // Tenta armazenar em RequestContext se houver uma request ativa
         try {
-            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            if (attrs != null) {
-                attrs.setAttribute(REQUEST_TENANT_ATTRIBUTE, tenantId, ServletRequestAttributes.SCOPE_REQUEST);
-                log.debug("Tenant context setado em RequestScope: {}", tenantId);
-                return;
-            }
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            attrs.setAttribute(REQUEST_TENANT_ATTRIBUTE, tenantId, ServletRequestAttributes.SCOPE_REQUEST);
+            log.debug("Tenant context setado em RequestScope: {}", tenantId);
+            return;
         } catch (IllegalStateException e) {
             log.debug("Sem request context, usando ThreadLocal para tenant: {}", tenantId);
         }
@@ -57,13 +55,11 @@ public class TenantContextProvider implements ITenantContextProvider {
     public String getCurrentTenant() {
         // 1. Tentar pegar de RequestContext primeiro
         try {
-            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            if (attrs != null) {
-                String tenant = (String) attrs.getAttribute(REQUEST_TENANT_ATTRIBUTE, ServletRequestAttributes.SCOPE_REQUEST);
-                if (tenant != null) {
-                    log.debug("Tenant retrieved from RequestScope: {}", tenant);
-                    return tenant;
-                }
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            String tenant = (String) attrs.getAttribute(REQUEST_TENANT_ATTRIBUTE, ServletRequestAttributes.SCOPE_REQUEST);
+            if (tenant != null) {
+                log.debug("Tenant retrieved from RequestScope: {}", tenant);
+                return tenant;
             }
         } catch (IllegalStateException e) {
             log.debug("No active request context");
@@ -85,13 +81,11 @@ public class TenantContextProvider implements ITenantContextProvider {
     public void clearContext() {
         // Tenta limpar RequestContext
         try {
-            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            if (attrs != null) {
-                String tenant = (String) attrs.getAttribute(REQUEST_TENANT_ATTRIBUTE, ServletRequestAttributes.SCOPE_REQUEST);
-                if (tenant != null) {
-                    log.debug("Cleaning tenant context from RequestScope: {}", tenant);
-                    attrs.removeAttribute(REQUEST_TENANT_ATTRIBUTE, ServletRequestAttributes.SCOPE_REQUEST);
-                }
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            String tenant = (String) attrs.getAttribute(REQUEST_TENANT_ATTRIBUTE, ServletRequestAttributes.SCOPE_REQUEST);
+            if (tenant != null) {
+                log.debug("Cleaning tenant context from RequestScope: {}", tenant);
+                attrs.removeAttribute(REQUEST_TENANT_ATTRIBUTE, ServletRequestAttributes.SCOPE_REQUEST);
             }
         } catch (IllegalStateException e) {
             log.debug("Sem request context, limpando ThreadLocal");

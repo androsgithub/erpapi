@@ -29,12 +29,18 @@ import java.util.*;
 @RequestMapping("/api/v1/tenant")
 public class TenantController implements ITenantController, TenantOpenApiDocumentation {
 
-    @Autowired
-    private ITenantService tenantService;
-    @Autowired
-    private TenantMapper tenantMapper;
-    @Autowired
-    private NewTenantProvisionerUseCase newTenantProvisionerService;
+    private final ITenantService tenantService;
+    private final TenantMapper tenantMapper;
+    private final NewTenantProvisionerUseCase newTenantProvisionerService;
+
+    public TenantController(
+            ITenantService tenantService,
+            TenantMapper tenantMapper,
+            NewTenantProvisionerUseCase newTenantProvisionerService) {
+        this.tenantService = tenantService;
+        this.tenantMapper = tenantMapper;
+        this.newTenantProvisionerService = newTenantProvisionerService;
+    }
 
     @GetMapping()
     @RequiresXTenantId

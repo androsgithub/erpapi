@@ -14,7 +14,7 @@ import java.util.List;
  * @author ERP System
  * @version 1.0
  */
-public final class TenantContext {
+public class TenantContext {
 
     private static final ThreadLocal<Long> TENANT_ID = new ThreadLocal<>();
     private static final ThreadLocal<List<Long>> GROUP_IDS = new ThreadLocal<>();

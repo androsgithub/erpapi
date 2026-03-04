@@ -19,14 +19,21 @@ import java.util.List;
 @Service
 @Slf4j
 public class ContactServiceProxy implements IContactService {
-    @Autowired
-    private ApplicationContext applicationContext;
-    @Autowired
-    private ContactService contactServiceDefault;
-    @Autowired
-    private SecurityService securityService;
-    @Autowired
-    private ITenantService tenantService;
+    private final ApplicationContext applicationContext;
+    private final ContactService contactServiceDefault;
+    private final SecurityService securityService;
+    private final ITenantService tenantService;
+
+    public ContactServiceProxy(
+            ApplicationContext applicationContext,
+            ContactService contactServiceDefault,
+            SecurityService securityService,
+            ITenantService tenantService) {
+        this.applicationContext = applicationContext;
+        this.contactServiceDefault = contactServiceDefault;
+        this.securityService = securityService;
+        this.tenantService = tenantService;
+    }
 
     private IContactService resolverService() {
         IContactService response = contactServiceDefault;

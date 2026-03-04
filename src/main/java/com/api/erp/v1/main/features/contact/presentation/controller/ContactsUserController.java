@@ -42,11 +42,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/contacts/user")
 public class ContactsUserController implements IContactsUserController, ContactsUserOpenApiDocumentation {
 
-    @Autowired
+    private final IManagementContactService gerenciamentoContactService;
+    private final IContactMapper contactMapper;
 
-    private IManagementContactService gerenciamentoContactService;
-    @Autowired
-    private IContactMapper contactMapper;
+    public ContactsUserController(
+            IManagementContactService gerenciamentoContactService,
+            IContactMapper contactMapper) {
+        this.gerenciamentoContactService = gerenciamentoContactService;
+        this.contactMapper = contactMapper;
+    }
 
     @PostMapping("/associar")
     @RequiresXTenantId

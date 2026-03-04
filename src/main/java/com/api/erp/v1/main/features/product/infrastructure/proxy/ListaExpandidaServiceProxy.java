@@ -18,14 +18,21 @@ import java.math.BigDecimal;
 @Service
 @Slf4j
 public class ListaExpandidaServiceProxy implements IListaExpandidaService {
-    @Autowired
-    private ApplicationContext applicationContext;
-    @Autowired
-    private ListaExpandidaService listaExpandidaServiceDefault;
-    @Autowired
-    private SecurityService securityService;
-    @Autowired
-    private ITenantService tenantService;
+    private final ApplicationContext applicationContext;
+    private final ListaExpandidaService listaExpandidaServiceDefault;
+    private final SecurityService securityService;
+    private final ITenantService tenantService;
+
+    public ListaExpandidaServiceProxy(
+            ApplicationContext applicationContext,
+            ListaExpandidaService listaExpandidaServiceDefault,
+            SecurityService securityService,
+            ITenantService tenantService) {
+        this.applicationContext = applicationContext;
+        this.listaExpandidaServiceDefault = listaExpandidaServiceDefault;
+        this.securityService = securityService;
+        this.tenantService = tenantService;
+    }
 
     private IListaExpandidaService resolverService() {
         IListaExpandidaService response = listaExpandidaServiceDefault;

@@ -46,7 +46,7 @@ public class ObservabilityService {
         return flowEventRepository.findByTraceIdOrderByTimestamp(traceId)
                 .stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -63,7 +63,7 @@ public class ObservabilityService {
         return flowEventRepository.findEventsBetween(start, end)
                 .stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -80,7 +80,7 @@ public class ObservabilityService {
         return flowEventRepository.findErrorsBetween(start, end)
                 .stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -96,7 +96,7 @@ public class ObservabilityService {
                 .findEventsBetween(start, Instant.now())
                 .stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
 
         long totalEvents = events.size();
         long totalErrors = events.stream()
@@ -122,7 +122,7 @@ public class ObservabilityService {
         List<FlowEventDto> recent = events.stream()
                 .sorted((a, b) -> b.timestamp().compareTo(a.timestamp()))
                 .limit(10)
-                .collect(Collectors.toList());
+                .toList();
 
         return new ObservabilityStatsDto(
                 totalEvents,
@@ -147,7 +147,7 @@ public class ObservabilityService {
                 .stream()
                 .limit(limit)
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -178,18 +178,12 @@ public class ObservabilityService {
 
         // Aplicar filtros adicionais
         List<FlowEventEntity> filtered = allEvents.stream()
-                .filter(e -> {
-                    if (!filter.hasStatus()) return true;
-                    if (e.getStatus() == null) return false;
-                    // Comparar código numérico do status
-                    Integer statusCode = filter.getStatusCode();
-                    return statusCode >= 0 && e.getStatus().equals(statusCode);
-                })
-                .filter(e -> filter.hasStepName() ? e.getStepName() != null && e.getStepName().contains(filter.getStepName()) : true)
-                .filter(e -> filter.hasTraceId() ? e.getTraceId() != null && e.getTraceId().equals(filter.getTraceId()) : true)
-                .filter(e -> filter.getMinExecutionTime() != null && e.getExecutionTimeMs() != null ? e.getExecutionTimeMs() >= filter.getMinExecutionTime() : true)
-                .filter(e -> filter.getMaxExecutionTime() != null && e.getExecutionTimeMs() != null ? e.getExecutionTimeMs() <= filter.getMaxExecutionTime() : true)
-                .collect(Collectors.toList());
+                .filter(e -> !filter.hasStatus() || (e.getStatus() != null && e.getStatus().equals(filter.getStatusCode())))
+                .filter(e -> !filter.hasStepName() || (e.getStepName() != null && e.getStepName().contains(filter.getStepName())))
+                .filter(e -> !filter.hasTraceId() || (e.getTraceId() != null && e.getTraceId().equals(filter.getTraceId())))
+                .filter(e -> filter.getMinExecutionTime() == null || e.getExecutionTimeMs() == null || e.getExecutionTimeMs() >= filter.getMinExecutionTime())
+                .filter(e -> filter.getMaxExecutionTime() == null || e.getExecutionTimeMs() == null || e.getExecutionTimeMs() <= filter.getMaxExecutionTime())
+                .toList();
 
         long totalElements = filtered.size();
 
@@ -215,7 +209,7 @@ public class ObservabilityService {
                 .skip((long) searchBuilder.getPage() * searchBuilder.getPageSize())
                 .limit(searchBuilder.getPageSize())
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return PageableResponse.of(page, searchBuilder.getPage(), searchBuilder.getPageSize(), totalElements);
     }
@@ -319,7 +313,7 @@ public class ObservabilityService {
         return flowEventRepository.findErrorsBetween(start, Instant.now())
                 .stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

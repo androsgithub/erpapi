@@ -23,11 +23,15 @@ import java.util.List;
 @RequestMapping("/api/v1/contacts")
 public class ContactsController implements IContactsController, ContactsOpenApiDocumentation {
 
-    @Autowired
-    @Qualifier("contactServiceProxy")
-    private IContactService contactService;
-    @Autowired
-    private IContactMapper contactMapper;
+    private final IContactService contactService;
+    private final IContactMapper contactMapper;
+
+    public ContactsController(
+            @Qualifier("contactServiceProxy") IContactService contactService,
+            IContactMapper contactMapper) {
+        this.contactService = contactService;
+        this.contactMapper = contactMapper;
+    }
 
     @PostMapping
     @RequiresXTenantId

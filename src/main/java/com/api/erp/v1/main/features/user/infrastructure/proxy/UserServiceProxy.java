@@ -25,14 +25,21 @@ import java.util.List;
 @Service
 @Slf4j
 public class UserServiceProxy implements IUserService {
-    @Autowired
-    private ApplicationContext applicationContext;
-    @Autowired
-    private UserService userServiceDefault;
-    @Autowired
-    private SecurityService securityService;
-    @Autowired
-    private ITenantService tenantService;
+    private final ApplicationContext applicationContext;
+    private final UserService userServiceDefault;
+    private final SecurityService securityService;
+    private final ITenantService tenantService;
+
+    public UserServiceProxy(
+            ApplicationContext applicationContext,
+            UserService userServiceDefault,
+            SecurityService securityService,
+            ITenantService tenantService) {
+        this.applicationContext = applicationContext;
+        this.userServiceDefault = userServiceDefault;
+        this.securityService = securityService;
+        this.tenantService = tenantService;
+    }
 
     private IUserService resolverService() {
         IUserService response = userServiceDefault;

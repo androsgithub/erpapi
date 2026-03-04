@@ -20,14 +20,21 @@ import java.util.Map;
 @Service
 @Slf4j
 public class ListaExpandidaProducaoServiceProxy implements IListaExpandidaProducaoService {
-    @Autowired
-    private ApplicationContext applicationContext;
-    @Autowired
-    private ListaExpandidaProducaoService listaExpandidaProducaoServiceDefault;
-    @Autowired
-    private SecurityService securityService;
-    @Autowired
-    private ITenantService tenantService;
+    private final ApplicationContext applicationContext;
+    private final ListaExpandidaProducaoService listaExpandidaProducaoServiceDefault;
+    private final SecurityService securityService;
+    private final ITenantService tenantService;
+
+    public ListaExpandidaProducaoServiceProxy(
+            ApplicationContext applicationContext,
+            ListaExpandidaProducaoService listaExpandidaProducaoServiceDefault,
+            SecurityService securityService,
+            ITenantService tenantService) {
+        this.applicationContext = applicationContext;
+        this.listaExpandidaProducaoServiceDefault = listaExpandidaProducaoServiceDefault;
+        this.securityService = securityService;
+        this.tenantService = tenantService;
+    }
 
     private IListaExpandidaProducaoService resolverService() {
         IListaExpandidaProducaoService response = listaExpandidaProducaoServiceDefault;
