@@ -34,24 +34,24 @@ public class TenantIdentifierAspect {
     public void setTenantIdentifier() {
         Long tenantId = TenantContext.getTenantId();
         if (tenantId == null) {
-            log.warn("⚠️ TenantId não encontrado no contexto");
+            log.warn("⚠️ TenantId not found in context");
             return;
         }
 
-        // Buscar todos os TenantGroups que contêm este tenant
-        // TODO: Futuramente ativar filtro por groupIds quando compartimento de dados estiver implementado
+        // Fetch all TenantGroups containing this tenant
+        // TODO: In the future enable filter by groupIds when data compartmentalization is implemented
         List<Long> groupIds = tenantGroupRepository.findGroupIdsByTenantId(tenantId);
 
         // ✅ Set GROUP_IDS (lista) no TenantContext - sempre, mesmo que vazia
         TenantContext.setGroupIds(groupIds);
         
         // ✅ Set GROUP_ID (singular) no TenantContext APENAS se houver grupos
-        // Para tenants sem particionamento por grupos, GROUP_ID fica null
+        // Para tenants without group partitioning, GROUP_ID fica null
         if (!groupIds.isEmpty()) {
-            TenantContext.setGroupId(groupIds.get(0));
+            TenantContext.setGroupIds(groupIds);
             log.debug("✅ Tenant {} com grupos: {}", tenantId, groupIds);
         } else {
-            log.debug("ℹ️ Tenant {} sem particionamento por grupos", tenantId);
+            log.debug("ℹ️ Tenant {} without group partitioning", tenantId);
         }
 
         Session session = entityManager.unwrap(Session.class);
@@ -60,7 +60,7 @@ public class TenantIdentifierAspect {
         if (session.getEnabledFilter("tenantIdFilter") == null) {
             session.enableFilter("tenantIdFilter")
                     .setParameter("tenantId", tenantId);
-            log.info("✅ Tenant filter aplicado. TenantId: {}", tenantId);
+            log.info("✅ Tenant filter applied. TenantId: {}", tenantId);
         }
     }
 }

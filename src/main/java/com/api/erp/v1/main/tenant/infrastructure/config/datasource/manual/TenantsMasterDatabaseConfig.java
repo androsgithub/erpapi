@@ -17,7 +17,7 @@
 // * Esta configuração foi substituída pela arquitetura consolidada e limpa.
 // * Migre para: com.api.erp.v1.main.datasource.routing.config.MasterJpaConfig
 // *
-// * Configuração específica de DataSource, EntityManager e TransactionManager
+// * Configuration específica de DataSource, EntityManager e TransactionManager
 // * para o banco master (erpapi) - TB_TENANT.
 // *
 // * Esta classe garante que TB_TENANT SEMPRE usa o defaultDataSource (master database),
@@ -51,7 +51,7 @@
 //        em.setPackagesToScan(
 //                "com.api.erp.v1.main.tenant.domain.entity",
 //                "com.api.erp.v1.main.features.address.domain.entity",
-//                "com.api.erp.v1.main.features.customer.domain.entity",
+//                "com.api.erp.v1.main.features.businesspartner.domain.entity",
 //                "com.api.erp.v1.main.features.contact.domain.entity",
 //                "com.api.erp.v1.main.features.user.domain.entity",
 //                "com.api.erp.v1.main.features.permission.domain.entity",

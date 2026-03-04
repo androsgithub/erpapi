@@ -1,9 +1,9 @@
 package com.api.erp.v1.main.features.address.application.dto;
 
-import com.api.erp.v1.main.features.address.domain.entity.AddressTipo;
+import com.api.erp.v1.main.features.address.domain.entity.AddressType;
 
 public record AddressPropriedadesDto(
-        AddressTipo tipo,
+        AddressType tipo,
         Boolean principal
 ) {
 }

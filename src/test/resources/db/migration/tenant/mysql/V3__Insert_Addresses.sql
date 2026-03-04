@@ -22,7 +22,7 @@ INSERT INTO
         tipo
     )
 VALUES
-    -- Customer Addresses
+    -- BusinessPartner Addresses
     (
         CURRENT_TIMESTAMP,
         1,

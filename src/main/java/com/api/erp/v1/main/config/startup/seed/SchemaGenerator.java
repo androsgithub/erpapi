@@ -31,15 +31,15 @@ import java.util.stream.Collectors;
  * os scripts SQL em arquivos separados por tabela e feature (opcional).
  * </p>
  * <p>
- * <b>Ordenação por Dependências:</b> As migrations são numeradas respeitando
- * as dependências entre tabelas (foreign keys), garantindo que tabelas
- * referenciadas sejam criadas antes das tabelas que as referenciam.
+ * <b>Dependency Ordering:</b> Migrations are numbered respecting
+ * table dependencies (foreign keys), ensuring that tables
+ * referenced are created before the tables that reference them.
  * </p>
  */
 @Slf4j
 public class SchemaGenerator {
 
-    // ================= CONFIGURAÇÕES =================
+    // ================= CONFIGURATIONS =================
 
     private static final String OUTPUT_DIR = "schemas";
     private static final String BASE_PACKAGE = "com.api.erp.v1";
@@ -64,42 +64,42 @@ public class SchemaGenerator {
 
     private static final Pattern REFERENCES = Pattern.compile("references\\s+([`\"\\[]?\\w+[`\"\\]]?)", Pattern.CASE_INSENSITIVE);
 
-    // ================= MÉTODOS PÚBLICOS =================
+    // ================= PUBLIC METHODS =================
 
     /**
-     * Executa a geração de schemas para todos os tipos de banco de dados disponíveis.
+     * Executes schema generation for all available database types.
      */
     public static void executar() {
         executar(DBType.values());
     }
 
     /**
-     * Executa a geração de schemas para os tipos de banco de dados especificados.
+     * Executes schema generation for specified database types.
      *
-     * @param dbTypes tipos de banco de dados para gerar os schemas
+     * @param dbTypes database types for which to generate schemas
      */
     public static void executar(DBType... dbTypes) {
-        log.info("=== Iniciando geração de schemas ===");
+        log.info("=== Starting schema generation ===");
 
         for (DBType dbType : dbTypes) {
             try {
-                log.info("Gerando schemas para banco: {}", dbType.getNome());
+                log.info("Generating schemas for database: {}", dbType.getNome());
                 gerarSchemaPorTabela(dbType);
-                log.info("Schemas gerados com sucesso para: {}", dbType.getNome());
+                log.info("Schemas generated successfully for: {}", dbType.getNome());
             } catch (Exception e) {
-                log.error("Erro ao gerar schema para banco {}: {}", dbType.getNome(), e.getMessage(), e);
+                log.error("Error generating schema for database {}: {}", dbType.getNome(), e.getMessage(), e);
             }
         }
 
-        log.info("=== Geração de schemas finalizada ===");
+        log.info("=== Schema generation completed ===");
     }
 
-    // ================= GERAÇÃO DE SCHEMA =================
+    // ================= SCHEMA GENERATION =================
 
     /**
-     * Gera os schemas SQL organizados por tabela para um tipo específico de banco.
+     * Generates SQL schemas organized by table for a specific database type.
      *
-     * @param dbType tipo de banco de dados
+     * @param dbType database type
      */
     private static void gerarSchemaPorTabela(DBType dbType) {
         StandardServiceRegistry registry = criarServiceRegistry(dbType);
@@ -114,8 +114,8 @@ public class SchemaGenerator {
 //            Files.deleteIfExists(arquivoTemp);
 
         } catch (IOException e) {
-            log.error("Erro de I/O ao gerar schema: {}", e.getMessage(), e);
-            throw new RuntimeException("Falha na geração do schema", e);
+            log.error("I/O error generating schema: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to generate schema", e);
         } finally {
             if (registry != null) {
                 StandardServiceRegistryBuilder.destroy(registry);
@@ -131,24 +131,24 @@ public class SchemaGenerator {
     }
 
     /**
-     * Prepara o diretório de output, limpando conteúdo anterior se existir.
+     * Prepares output directory, cleaning previous content if it exists.
      */
     private static Path prepararDiretorioOutput(DBType dbType) throws IOException {
         Path pastaOutput = Paths.get(OUTPUT_DIR, dbType.getNome());
 
         if (Files.exists(pastaOutput)) {
-            log.debug("Limpando diretório existente: {}", pastaOutput);
+            log.debug("Cleaning existing directory: {}", pastaOutput);
             deletarDiretorioRecursivamente(pastaOutput.toFile());
         }
 
         Files.createDirectories(pastaOutput);
-        log.debug("Diretório criado: {}", pastaOutput);
+        log.debug("Directory created: {}", pastaOutput);
 
         return pastaOutput;
     }
 
     /**
-     * Constrói os metadados do Hibernate escaneando as entidades.
+     * Builds Hibernate metadata by scanning entities.
      */
     private static Metadata construirMetadata(StandardServiceRegistry registry) {
         MetadataSources sources = new MetadataSources(registry);
@@ -157,7 +157,7 @@ public class SchemaGenerator {
         Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
         Set<Class<?>> converters = reflections.getTypesAnnotatedWith(Converter.class);
 
-        log.debug("Encontradas {} entidades e {} conversores", entities.size(), converters.size());
+        log.debug("Found {} entities and {} converters", entities.size(), converters.size());
 
         entities.forEach(sources::addAnnotatedClass);
         converters.forEach(sources::addAnnotatedClass);
@@ -166,7 +166,7 @@ public class SchemaGenerator {
     }
 
     /**
-     * Gera o arquivo SQL completo antes da divisão.
+     * Generates the complete SQL file before splitting.
      */
     private static Path gerarSchemaCompleto(DBType dbType, Path pastaOutput, Metadata metadata) {
         Path arquivoTemp = pastaOutput.resolve(TEMP_SCHEMA_FILE);
@@ -177,14 +177,14 @@ public class SchemaGenerator {
         export.setOutputFile(arquivoTemp.toString());
         export.execute(EnumSet.of(TargetType.SCRIPT), SchemaExport.Action.CREATE, metadata);
 
-        log.debug("Schema completo gerado em: {}", arquivoTemp);
+        log.debug("Full schema generated in: {}", arquivoTemp);
         return arquivoTemp;
     }
 
-    // ================= DIVISÃO DO SCHEMA =================
+    // ================= SCHEMA SPLIT =================
 
     /**
-     * Divide o schema completo em arquivos individuais por tabela.
+     * Splits the complete schema into individual files per table.
      */
     private static void dividirSchemaEmArquivos(Path arquivoSchema, Path pastaOutput, Metadata metadata) throws IOException {
 
@@ -194,11 +194,11 @@ public class SchemaGenerator {
         Map<String, EntityInfo> metadataInfo = extrairInformacoesEntidades(metadata);
         Map<String, List<String>> statementsPorTabela = agruparStatementsPorTabela(statements, metadataInfo);
 
-        // NOVA LÓGICA: Analisar dependências e ordenar
+        // NEW LOGIC: Analyze dependencies and sort
         Map<String, Set<String>> dependencias = analisarDependencias(statementsPorTabela);
         List<String> ordemTabelas = ordenarPorDependencias(dependencias);
 
-        log.info("Ordem de criação das tabelas (respeitando dependências):");
+        log.info("Table creation order (respecting dependencies):");
         ordemTabelas.forEach(tabela -> log.info("  → {}", tabela));
 
         // Escrever arquivos na ordem correta
@@ -238,13 +238,13 @@ public class SchemaGenerator {
         return agrupamento;
     }
 
-    // ================= ANÁLISE DE DEPENDÊNCIAS =================
+    // ================= DEPENDENCY ANALYSIS =================
 
     /**
      * Analisa as dependências entre tabelas baseado em foreign keys (REFERENCES).
      *
-     * @param statementsPorTabela statements agrupados por tabela
-     * @return mapa onde a chave é a tabela e o valor são as tabelas das quais ela depende
+     * @param statementsPorTabela statements grouped by table
+     * @return map where the key is the table and the value are the tables from which it depends
      */
     private static Map<String, Set<String>> analisarDependencias(Map<String, List<String>> statementsPorTabela) {
         Map<String, Set<String>> dependencias = new HashMap<>();
@@ -259,7 +259,7 @@ public class SchemaGenerator {
                 while (matcher.find()) {
                     String tabelaReferenciada = normalizarNomeTabela(matcher.group(1));
 
-                    // Só adiciona se não for auto-referência
+                    // Only add if not a self-reference
                     if (!tabelaReferenciada.equals(tabela) && statementsPorTabela.containsKey(tabelaReferenciada)) {
                         deps.add(tabelaReferenciada);
                     }
@@ -280,12 +280,12 @@ public class SchemaGenerator {
     }
 
     /**
-     * Ordena as tabelas usando algoritmo de ordenação topológica (Kahn's Algorithm).
-     * Garante que tabelas referenciadas sejam criadas antes das tabelas que as referenciam.
+     * Sorts tables using topological sorting algorithm (Kahn's Algorithm).
+     * Garante que tabelas referenced are created before the tables that reference them.
      *
-     * @param dependencias mapa de dependências entre tabelas
-     * @return lista de tabelas na ordem correta de criação
-     * @throws IllegalStateException se houver dependência circular
+     * @param dependencias map of dependencies between tables
+     * @return list of tables in the correct creation order
+     * @throws IllegalStateException if there is a circular dependency
      */
     private static List<String> ordenarPorDependencias(Map<String, Set<String>> dependencias) {
         List<String> ordemFinal = new ArrayList<>();
@@ -299,7 +299,7 @@ public class SchemaGenerator {
             }
         }
 
-        // Processa a fila
+        // Processes a fila
         while (!fila.isEmpty()) {
             String tabela = fila.poll();
             ordemFinal.add(tabela);
@@ -320,15 +320,15 @@ public class SchemaGenerator {
 
         // Verifica se todas as tabelas foram processadas (detecta ciclos)
         if (ordemFinal.size() != dependencias.size()) {
-            Set<String> tabelasNaoProcessadas = new HashSet<>(dependencias.keySet());
-            tabelasNaoProcessadas.removeAll(ordemFinal);
+            Set<String> tabelasNaoProcessesdas = new HashSet<>(dependencias.keySet());
+            tabelasNaoProcessesdas.removeAll(ordemFinal);
 
-            log.warn("⚠️  ATENÇÃO: Dependência circular detectada!");
-            log.warn("Tabelas com dependência circular: {}", tabelasNaoProcessadas);
-            log.warn("Estas tabelas serão adicionadas ao final da ordem:");
+            log.warn("⚠️  ATTENTION: Circular dependency detected!");
+            log.warn("Tables with circular dependency: {}", tabelasNaoProcessesdas);
+            log.warn("These tables will be added at the end of the order:");
 
             // Adiciona as tabelas restantes ao final (melhor que falhar completamente)
-            ordemFinal.addAll(tabelasNaoProcessadas);
+            ordemFinal.addAll(tabelasNaoProcessesdas);
         }
 
         return ordemFinal;
@@ -359,10 +359,10 @@ public class SchemaGenerator {
         return grauEntrada;
     }
 
-    // ================= ESCRITA DE ARQUIVOS =================
+    // ================= FILE WRITING =================
 
     /**
-     * Escreve o arquivo de migração para uma tabela específica.
+     * Writes the migration file for a specific table.
      */
     private static void escreverArquivoMigracao(Path pastaBase, String nomeTabela, List<String> statements, EntityInfo entityInfo, int versao) throws IOException {
 
@@ -378,7 +378,7 @@ public class SchemaGenerator {
     }
 
     /**
-     * Determina a pasta de destino baseado na feature (se organização por feature estiver ativa).
+     * Determines the destination folder based on the feature (if feature organization is active).
      */
     private static Path determinarPastaDestino(Path pastaBase, EntityInfo entityInfo) {
         if (ORGANIZAR_POR_FEATURE && entityInfo.feature() != null) {
@@ -388,22 +388,22 @@ public class SchemaGenerator {
     }
 
     /**
-     * Constrói o nome do arquivo de migração seguindo o padrão Flyway.
+     * Builds the migration file name following the Flyway pattern.
      */
     private static String construirNomeArquivo(String nomeTabela, int versao) {
         return MIGRATION_PREFIX + versao + TABLE_PREFIX + nomeTabela.toUpperCase() + SQL_EXTENSION;
     }
 
     /**
-     * Escreve o conteúdo completo do arquivo de migração.
+     * Writes the complete content of the migration file.
      */
     private static void escreverConteudoArquivo(Path arquivo, String nomeTabela, EntityInfo entityInfo, List<String> statements) throws IOException {
 
         StringBuilder conteudo = new StringBuilder();
 
-        // Cabeçalho com metadados
-        conteudo.append("-- Tabela: ").append(nomeTabela).append("\n");
-        conteudo.append("-- Entidade: ").append(entityInfo.nomeClasse()).append("\n");
+        // Header with metadata
+        conteudo.append("-- Table: ").append(nomeTabela).append("\n");
+        conteudo.append("-- Entity: ").append(entityInfo.nomeClasse()).append("\n");
 
         if (entityInfo.feature() != null) {
             conteudo.append("-- Feature: ").append(entityInfo.feature()).append("\n");
@@ -411,7 +411,7 @@ public class SchemaGenerator {
 
         conteudo.append("\n");
 
-        // Statements SQL
+        // SQL statements
         for (String statement : statements) {
             conteudo.append(statement).append("\n\n");
         }
@@ -419,10 +419,10 @@ public class SchemaGenerator {
         Files.writeString(arquivo, conteudo.toString());
     }
 
-    // ================= EXTRAÇÃO DE TABELAS =================
+    // ================= TABLE EXTRACTION =================
 
     /**
-     * Extrai todos os nomes de tabelas referenciados em um statement SQL.
+     * Extracts all table names referenced in an SQL statement.
      */
     private static Set<String> extrairTabelasDoStatement(String statement) {
         Set<String> tabelas = new HashSet<>();
@@ -437,7 +437,7 @@ public class SchemaGenerator {
     }
 
     /**
-     * Extrai tabelas usando um pattern regex específico.
+     * Extracts tables using a specific regex pattern.
      */
     private static void extrairTabelasComPattern(Set<String> tabelas, Pattern pattern, String statement, int grupoCaptura) {
 
@@ -449,7 +449,7 @@ public class SchemaGenerator {
     }
 
     /**
-     * Extrai tabelas relacionadas a sequences (removendo sufixo _seq).
+     * Extracts tables related to sequences (removing _seq suffix).
      */
     private static void extrairTabelasDeSequences(Set<String> tabelas, String statement) {
         Matcher matcher = CREATE_SEQUENCE.matcher(statement);
@@ -465,7 +465,7 @@ public class SchemaGenerator {
     }
 
     /**
-     * Extrai tabelas de cláusulas REFERENCES (foreign keys).
+     * Extracts tables from REFERENCES clauses (foreign keys).
      */
     private static void extrairTabelasDeReferences(Set<String> tabelas, String statement) {
         Matcher matcher = REFERENCES.matcher(statement);
@@ -477,16 +477,16 @@ public class SchemaGenerator {
     }
 
     /**
-     * Normaliza o nome da tabela removendo delimitadores e convertendo para lowercase.
+     * Normalizes table name by removing delimiters and converting to lowercase.
      */
     private static String normalizarNomeTabela(String nome) {
         return nome.replace("`", "").replace("\"", "").replace("[", "").replace("]", "").toLowerCase().trim();
     }
 
-    // ================= METADADOS DAS ENTIDADES =================
+    // ================= ENTITY METADATA =================
 
     /**
-     * Extrai informações das entidades a partir dos metadados do Hibernate.
+     * Extracts entity information from Hibernate metadata.
      */
     private static Map<String, EntityInfo> extrairInformacoesEntidades(Metadata metadata) {
         Map<String, EntityInfo> mapa = new HashMap<>();
@@ -501,12 +501,12 @@ public class SchemaGenerator {
             mapa.put(nomeTabela, info);
         }
 
-        log.debug("Extraídas informações de {} entidades", mapa.size());
+        log.debug("Extracted information from {} entities", mapa.size());
         return mapa;
     }
 
     /**
-     * Extrai o nome simples da classe (sem o pacote completo).
+     * Extracts the simple class name (without the full package).
      */
     private static String extrairNomeSimpllesClasse(String nomeCompletoClasse) {
         int ultimoPonto = nomeCompletoClasse.lastIndexOf('.');
@@ -514,9 +514,9 @@ public class SchemaGenerator {
     }
 
     /**
-     * Extrai o nome da feature a partir do nome completo da classe.
+     * Extracts the feature name from the complete class name.
      * <p>
-     * Procura por '.features.' no package e retorna o próximo segmento.
+     * Searches for '.features.' in the package and returns the next segment.
      * </p>
      */
     private static String extrairFeatureDaClasse(String nomeCompletoClasse) {
@@ -535,10 +535,10 @@ public class SchemaGenerator {
         return null;
     }
 
-    // ================= UTILITÁRIOS =================
+    // ================= UTILITIES =================
 
     /**
-     * Deleta um diretório e todo seu conteúdo recursivamente.
+     * Deletes a directory and all its content recursively.
      */
     private static void deletarDiretorioRecursivamente(File diretorio) throws IOException {
         if (!diretorio.exists()) {
@@ -560,11 +560,11 @@ public class SchemaGenerator {
     // ================= CLASSES INTERNAS =================
 
     /**
-     * Record que armazena informações sobre uma entidade JPA.
+     * Record that stores information about a JPA entity.
      *
-     * @param nomeTabela nome da tabela no banco de dados
-     * @param nomeClasse nome simples da classe da entidade
-     * @param feature    nome da feature/módulo (pode ser null)
+     * @param nomeTabela table name in the database
+     * @param nomeClasse simple name of the entity class
+     * @param feature    feature/module name (can be null)
      */
     record EntityInfo(String nomeTabela, String nomeClasse, String feature) {
     }

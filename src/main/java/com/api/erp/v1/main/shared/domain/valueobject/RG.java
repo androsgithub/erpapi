@@ -16,7 +16,7 @@ public class RG {
     }
 
     /**
-     * Validação estrutural de RG
+     * Validation estrutural de RG
      * - Aceita dígito X
      * - Tamanho entre 7 e 14 (varia por estado)
      */
@@ -49,7 +49,7 @@ public class RG {
 
     /**
      * RG não tem formatação padrão nacional
-     * Retorna o valor limpo
+     * Returns o valor limpo
      */
     public String getFormatado() {
         return valor;

@@ -3,7 +3,7 @@ package com.api.erp.v1.main.datasource.routing.domain;
 import com.api.erp.v1.main.tenant.domain.entity.DBType;
 
 /**
- * DOMAIN - Value Object para Configuração de DataSource de Tenant
+ * DOMAIN - Value Object para Configuration de DataSource de Tenant
  *
  * Encapsula as informações necessárias para criar uma conexão de banco de dados
  * para um tenant específico. Objetos imutáveis que representam valores do domínio.
@@ -37,7 +37,7 @@ public class TenantDSConfig {
         this.dbPassword = validateNotBlank(dbPassword, "dbPassword");
 
         if (dbType == null) {
-            throw new IllegalArgumentException("DBType não pode ser null");
+            throw new IllegalArgumentException("DBType cannot be null");
         }
 
         this.dbType = dbType;
@@ -59,14 +59,14 @@ public class TenantDSConfig {
         this.dbPassword = validateNotBlank(dbPassword, "dbPassword");
 
         if (dbTypeString == null || dbTypeString.trim().isEmpty()) {
-            throw new IllegalArgumentException("dbTypeString não pode ser nulo ou vazio");
+            throw new IllegalArgumentException("dbTypeString cannot be null or empty");
         }
 
         try {
             this.dbType = DBType.fromNome(dbTypeString);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(
-                "Tipo de banco de dados não suportado: " + dbTypeString, e);
+                "Unsupported database type: " + dbTypeString, e);
         }
     }
 

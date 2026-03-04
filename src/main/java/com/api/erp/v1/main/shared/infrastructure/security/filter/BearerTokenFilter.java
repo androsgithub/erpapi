@@ -45,7 +45,7 @@ public class BearerTokenFilter extends OncePerRequestFilter {
 
                 log.debug("🔍 JWT Claims | email: {} | userId: {} | tenantId: {}", email, userId, tenantId);
 
-                // Validação: se userId é null/vazio, não processa
+                // Validation: se userId é null/vazio, não processa
                 if (userId == null || userId.isEmpty()) {
                     log.warn("Valid JWT but userId is empty! Claims: email={}, tenantId={}", email, tenantId);
                     filterChain.doFilter(request, response);

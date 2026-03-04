@@ -66,7 +66,7 @@ public interface TenantOpenApiDocumentation extends ITenantController {
                     Atualiza uma ou múltiplas configurações da tenant em uma única requisição.
                     
                     Substitui os 6 endpoints antigos:
-                    - PUT /config/customer
+                    - PUT /config/businesspartner
                     - PUT /config/user
                     - PUT /config/permission
                     - PUT /config/tenant
@@ -76,7 +76,7 @@ public interface TenantOpenApiDocumentation extends ITenantController {
                     Envie apenas os campos que deseja atualizar (todos são opcionais).
                     Exemplo:
                     {
-                      "customerValidationEnabled": true,
+                      "businesspartnerValidationEnabled": true,
                       "userApprovalRequired": false,
                       "permissionCacheEnabled": true
                     }

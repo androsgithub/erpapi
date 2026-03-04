@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 public interface ITenantDatabaseController {
 
     /**
-     * Obtém a configuração de datasource atual do tenant
+     * Gets a configuração de datasource atual do tenant
      * GET /api/v1/tenant/database/datasource
      */
     ResponseEntity<TenantDatasourceResponse> obterDatasource();

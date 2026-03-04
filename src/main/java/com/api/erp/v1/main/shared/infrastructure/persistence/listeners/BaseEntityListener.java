@@ -14,7 +14,6 @@ public class BaseEntityListener {
     @PrePersist
     public void beforeCreate(BaseEntity entity) {
         entity.setTenantId(TenantContext.getTenantId());
-        entity.setTenantGroupId(TenantContext.getGroupId());
         entity.setCreatedBy(0L);
     }
 

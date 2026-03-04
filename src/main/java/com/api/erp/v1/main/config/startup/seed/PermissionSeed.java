@@ -2,14 +2,16 @@ package com.api.erp.v1.main.config.startup.seed;
 
 import com.api.erp.v1.main.config.startup.util.PermissionReflectionUtil;
 import com.api.erp.v1.main.features.address.domain.entity.AddressPermissions;
-import com.api.erp.v1.main.features.customer.domain.entity.CustomerPermissions;
+import com.api.erp.v1.main.features.contact.domain.entity.ContactPermissions;
+import com.api.erp.v1.main.features.businesspartner.domain.entity.BusinessPartnerPermissions;
 import com.api.erp.v1.main.features.permission.domain.entity.*;
 import com.api.erp.v1.main.features.permission.domain.repository.PermissionRepository;
 import com.api.erp.v1.main.features.permission.domain.repository.RoleRepository;
 import com.api.erp.v1.main.features.product.domain.entity.CompositionPermissions;
-import com.api.erp.v1.main.features.product.domain.entity.ListaExpandidaPermissions;
+import com.api.erp.v1.main.features.product.domain.entity.ExpandedListPermissions;
 import com.api.erp.v1.main.features.product.domain.entity.ProductPermissions;
 import com.api.erp.v1.main.features.user.domain.entity.UserPermissions;
+import com.api.erp.v1.main.migration.domain.MigrationPermissions;
 import com.api.erp.v1.main.shared.domain.entity.BaseEntity;
 import com.api.erp.v1.main.shared.domain.entity.TenantScope;
 import com.api.erp.v1.main.tenant.domain.entity.TenantPermissions;
@@ -28,17 +30,17 @@ import java.util.stream.Collectors;
  * COMPONENT - Seeder de Permissões e Roles
  * <p>
  * Inicializa as permissões e roles do sistema durante o bootstrap.
- * Extrai permissões de classes anotadas e cria roles padrão.
+ * Extracts permissions from annotated classes and creates default roles.
  * <p>
  * Fluxo:
  * 1. Extrai permissões de classes UserPermissions, TenantPermissions, etc
- * 2. Cria permissões não existentes em lote
- * 3. Cria roles padrão (USER, GESTOR, ADMIN)
+ * 2. Creates non-existing permissions in batch
+ * 3. Creates default roles (USER, MANAGER, ADMIN)
  * <p>
- * Responsabilidades:
+ * Responsibilities:
  * - Levantar permissões via reflection
- * - Criar permissões não existentes
- * - Criar roles padrão
+ * - Create non-existing permissions
+ * - Create default roles
  * - Logging detalhado de progresso
  *
  * @author ERP System
@@ -57,8 +59,10 @@ public class PermissionSeed {
             RolePermissions.class,
             ProductPermissions.class,
             CompositionPermissions.class,
-            ListaExpandidaPermissions.class,
-            CustomerPermissions.class
+            ExpandedListPermissions.class,
+            BusinessPartnerPermissions.class,
+            MigrationPermissions.class,
+            ContactPermissions.class
     );
 
     private final PermissionRepository permissionRepository;
@@ -67,7 +71,7 @@ public class PermissionSeed {
     @Transactional
     public void executar() {
         try {
-            log.info("📋 Inicializando permissões e roles padrão...");
+            log.info("📋 Initializing default permissions and roles...");
 
             /* ===================== PERMISSÕES ===================== */
 
@@ -96,16 +100,16 @@ public class PermissionSeed {
                         }
                     }
                 } catch (Exception e) {
-                    log.warn("⚠️  Erro ao processar classe {}: {}", permissionClass.getSimpleName(), e.getMessage());
+                    log.warn("⚠️  Error processing class {}: {}", permissionClass.getSimpleName(), e.getMessage());
                 }
             }
 
             if (!novasPermissions.isEmpty()) {
                 List<Permission> salvas = permissionRepository.saveAll(novasPermissions);
                 salvas.forEach(p -> permissionsPorCodigo.put(p.getCodigo(), p));
-                log.info("✅ {} permissões criadas", novasPermissions.size());
+                log.info("✅ {} permissions created", novasPermissions.size());
             } else {
-                log.info("⏭️  Nenhuma permissão nova para criar");
+                log.info("⏭️  No new permissions to create");
             }
 
             /* ===================== ROLES ===================== */
@@ -122,9 +126,9 @@ public class PermissionSeed {
 
             if (!novasRoles.isEmpty()) {
                 roleRepository.saveAll(novasRoles);
-                log.info("✅ {} roles criadas", novasRoles.size());
+                log.info("✅ {} roles created", novasRoles.size());
             } else {
-                log.info("⏭️  Nenhuma role nova para criar");
+                log.info("⏭️  No new role to create");
             }
 
             /* ===================== ADMIN: só atribui permissões novas ===================== */
@@ -145,16 +149,16 @@ public class PermissionSeed {
                 if (!newPermissions.isEmpty()) {
                     roleAdmin.getPermissions().addAll(newPermissions);
                     roleRepository.save(roleAdmin);
-                    log.info("✅ {} permissões novas atribuídas à role ADMIN", novasPermissions.size());
+                    log.info("✅ {} new permissions assigned to ADMIN role", novasPermissions.size());
                 } else {
-                    log.info("⏭️  Role ADMIN já possui todas as permissões");
+                    log.info("⏭️  ADMIN role already has all permissions");
                 }
             });
 
-            log.info("✅ Permissões e roles inicializadas com sucesso");
+            log.info("✅ Permissions and roles initialized successfully");
 
         } catch (Exception e) {
-            log.error("❌ Erro ao inicializar permissões e roles:", e);
+            log.error("❌ Error initializing permissions and roles:", e);
             throw new RuntimeException("Falha ao inicializar permissões e roles", e);
         }
     }

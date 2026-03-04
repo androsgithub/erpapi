@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * UTILITY - Contexto de Tenant com suporte a ThreadLocal
  * 
- * Armazena informações do tenant para a thread atual.
+ * Stores informações do tenant para a thread atual.
  * Compatível com estrutura anterior do sistema.
  * 
  * Para requisições HTTP, usar TenantContextProvider (via RequestContextHolder).
@@ -17,7 +17,6 @@ import java.util.List;
 public final class TenantContext {
 
     private static final ThreadLocal<Long> TENANT_ID = new ThreadLocal<>();
-    private static final ThreadLocal<Long> GROUP_ID = new ThreadLocal<>();
     private static final ThreadLocal<List<Long>> GROUP_IDS = new ThreadLocal<>();
 
     private TenantContext() {
@@ -32,14 +31,6 @@ public final class TenantContext {
         return TENANT_ID.get();
     }
 
-    public static void setGroupId(Long groupId) {
-        GROUP_ID.set(groupId);
-    }
-
-    public static Long getGroupId() {
-        return GROUP_ID.get();
-    }
-
     public static void setGroupIds(List<Long> groupIds) {
         GROUP_IDS.set(groupIds);
     }
@@ -50,7 +41,6 @@ public final class TenantContext {
 
     public static void clear() {
         TENANT_ID.remove();
-        GROUP_ID.remove();
         GROUP_IDS.remove();
     }
 }

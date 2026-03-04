@@ -19,23 +19,23 @@ import javax.sql.DataSource;
 public class FlywayConfig {
 
     @Bean(name = "flywayMaster")
-    public Flyway flywayMaster(@Qualifier("masterDataSource") DataSource defaultDataSource,
+    public Flyway flywayMaster(@Qualifier("masterDataSource") DataSource masterDataSource,
                                FlywayProperties flywayProperties) {
-        log.info("🚀 Iniciando configuração do Flyway para o banco master");
+        log.info("🚀 Starting Flyway configuration for master database");
 
         DBType dbType;
         try {
-            dbType = DBType.fromDriver(defaultDataSource.getConnection().getMetaData().getDriverName());
+            dbType = DBType.fromDriver(masterDataSource.getConnection().getMetaData().getDriverName());
         } catch (Exception e) {
             dbType = DBType.MYSQL;
-            log.error("Erro ao pegar o dbType pelo driver ao rodar as migrações! Utilizando DBType.MYSQL por padrão");
+            log.error("Error getting dbType from driver while running migrations! Using DBType.MYSQL as default");
         }
 
         String flywayLocation = "classpath:db/migration/master/" + dbType.getNome().toLowerCase();
 
 
         Flyway flyway = Flyway.configure()
-                .dataSource(defaultDataSource)
+                .dataSource(masterDataSource)
                 .locations(flywayLocation)
                 .baselineOnMigrate(true)
                 .validateOnMigrate(false)
@@ -44,20 +44,20 @@ public class FlywayConfig {
 
         // Repair: remove failed migrations from history
         try {
-            log.info("🔧 Executando repair para limpar migrações falhadas...");
+            log.info("🔧 Running repair to clean failed migrations...");
             flyway.repair();
-            log.info("✅ Repair executado com sucesso");
+            log.info("✅ Repair executed successfully");
         } catch (Exception e) {
             log.warn("⚠️ Erro ao executar repair (pode ser normal): {}", e.getMessage());
         }
 
-        // Executa as migrações automaticamente
+        // Executes migrations automatically
         try {
-            log.info("📊 Executando migrações do Flyway...");
+            log.info("📊 Running Flyway migrations...");
             var result = flyway.migrate();
-            log.info("✅ Flyway executado com sucesso! Migrações aplicadas: {}", result.migrationsExecuted);
+            log.info("✅ Flyway executed successfully! Migrations applied: {}", result.migrationsExecuted);
         } catch (Exception e) {
-            log.error("❌ Erro ao executar migrações do Flyway: {}", e.getMessage(), e);
+            log.error("❌ Error executing Flyway migrations: {}", e.getMessage(), e);
             throw e;
         }
 

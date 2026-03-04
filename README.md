@@ -85,7 +85,7 @@ Catálogo completo de products com categorização e gestão de estoque.
 Sistema de unidades de medida para products e operações.
 
 ### Endereço
-Gestão centralizada de endereços para empresas, filiais e customers.
+Gestão centralizada de endereços para empresas, filiais e businesspartners.
 
 ### Permissão
 Sistema granular de permissões e controle de acesso.

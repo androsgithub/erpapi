@@ -60,27 +60,27 @@ public class ValidationDecoratorAddressService implements IAddressService {
      */
     private void validarRequest(CreateAddressRequest request) {
         if (request == null) {
-            throw new BusinessException("Request de endereço não pode ser nulo");
+            throw new BusinessException("Address request cannot be null");
         }
 
         if (request.rua() == null || request.rua().isBlank()) {
-            throw new BusinessException("Rua é obrigatória");
+            throw new BusinessException("Street is required");
         }
 
         if (request.numero() == null || request.numero().isBlank()) {
-            throw new BusinessException("Número é obrigatório");
+            throw new BusinessException("Number is required");
         }
 
         if (request.cep() == null || request.cep().isBlank()) {
-            throw new BusinessException("CEP é obrigatório");
+            throw new BusinessException("ZIP code is required");
         }
 
         if (request.cidade() == null || request.cidade().isBlank()) {
-            throw new BusinessException("Cidade é obrigatória");
+            throw new BusinessException("City is required");
         }
 
         if (request.estado() == null || request.estado().isBlank()) {
-            throw new BusinessException("Estado é obrigatório");
+            throw new BusinessException("State is required");
         }
     }
 
@@ -89,7 +89,7 @@ public class ValidationDecoratorAddressService implements IAddressService {
      */
     private void validarId(Long id) {
         if (id == null || id <= 0) {
-            throw new BusinessException("ID do endereço deve ser um número positivo");
+            throw new BusinessException("Address ID must be a positive number");
         }
     }
 }

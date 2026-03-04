@@ -1,13 +1,23 @@
 package com.api.erp.v1.main.features.address.domain.entity;
 
+import com.api.erp.v1.main.features.permission.domain.entity.BasePermissions;
+
+/**
+ * Address-specific permission constants.
+ * <p>
+ * Defines all permissions related to Address management.
+ * Uses BasePermissions for standard operations.
+ */
 public final class AddressPermissions {
 
     private AddressPermissions() {
     }
 
-    public static final String PREFIX = "addresss";
-    public static final String CRIAR = PREFIX + ".criar";
-    public static final String ATUALIZAR = PREFIX + ".atualizar";
-    public static final String VISUALIZAR = PREFIX + ".visualizar";
-    public static final String DELETAR = PREFIX + ".deletar";
+    public static final String PREFIX = "address";
+    
+    // Standard CRUD operations
+    public static final String CREATE = PREFIX + "." + BasePermissions.OPERATION_CREATE;
+    public static final String UPDATE = PREFIX + "." + BasePermissions.OPERATION_UPDATE;
+    public static final String VIEW = PREFIX + "." + BasePermissions.OPERATION_VIEW;
+    public static final String DELETE = PREFIX + "." + BasePermissions.OPERATION_DELETE;
 }

@@ -6,7 +6,7 @@ import com.api.erp.v1.main.features.permission.application.mapper.PermissionMapp
 import com.api.erp.v1.main.features.permission.domain.controller.IPermissionController;
 import com.api.erp.v1.docs.openapi.features.permission.PermissionOpenApiDocumentation;
 import com.api.erp.v1.main.features.permission.domain.entity.PermissionPermissions;
-import com.api.erp.v1.main.features.permission.domain.service.IGerenciamentoPermissionService;
+import com.api.erp.v1.main.features.permission.domain.service.IManagementPermissionService;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +21,13 @@ import java.util.List;
 public class PermissionController implements IPermissionController, PermissionOpenApiDocumentation {
 
     @Autowired
-    private IGerenciamentoPermissionService gerenciamentoPermissionService;
+    private IManagementPermissionService gerenciamentoPermissionService;
     @Autowired
     private PermissionMapper permissionMapper;
 
     @PostMapping
     @RequiresXTenantId
-    @RequiresPermission(PermissionPermissions.CRIAR)
+    @RequiresPermission(PermissionPermissions.CREATE)
     public ResponseEntity<PermissionResponse> createPermission(@RequestBody CreatePermissionRequest request) {
         var permission = gerenciamentoPermissionService.createPermission(request);
         return new ResponseEntity<>(permissionMapper.toResponse(permission), HttpStatus.CREATED);
@@ -35,7 +35,7 @@ public class PermissionController implements IPermissionController, PermissionOp
 
     @GetMapping
     @RequiresXTenantId
-    @RequiresPermission(PermissionPermissions.VISUALIZAR)
+    @RequiresPermission(PermissionPermissions.VIEW)
     public ResponseEntity<List<PermissionResponse>> getAllPermissions() {
         var permissions = gerenciamentoPermissionService.getAllPermissions();
         return ResponseEntity.ok(permissionMapper.toResponseList(permissions));

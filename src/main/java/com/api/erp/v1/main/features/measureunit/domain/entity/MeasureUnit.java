@@ -7,9 +7,9 @@ import lombok.*;
 /**
  * Entidade de domínio que representa uma Unidade de Medida.
  * <p>
- * Responsabilidades:
- * - Armazenar dados da unidade de medida
- * - Validar estado da entidade através de métodos de comportamento
+ * Responsibilities:
+ * - Storesr dados da unidade de medida
+ * - Validate estado da entidade através de métodos de comportamento
  * <p>
  * SRP: Uma única responsabilidade - representar uma unidade de medida
  */

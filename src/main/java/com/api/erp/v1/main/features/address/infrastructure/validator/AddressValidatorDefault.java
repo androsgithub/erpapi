@@ -1,7 +1,7 @@
 package com.api.erp.v1.main.features.address.infrastructure.validator;
 
 import com.api.erp.v1.main.features.address.application.dto.request.CreateAddressRequest;
-import com.api.erp.v1.main.features.address.domain.entity.AddressTipo;
+import com.api.erp.v1.main.features.address.domain.entity.AddressType;
 import com.api.erp.v1.main.features.address.domain.validator.IAddressValidator;
 import com.api.erp.v1.main.shared.domain.exception.BusinessException;
 import org.springframework.data.domain.Pageable;
@@ -107,7 +107,7 @@ public class AddressValidatorDefault implements IAddressValidator {
         }
     }
 
-    private void validarTipo(AddressTipo tipo) {
+    private void validarTipo(AddressType tipo) {
         if (tipo == null) {
             throw new BusinessException("Address type is required");
         }

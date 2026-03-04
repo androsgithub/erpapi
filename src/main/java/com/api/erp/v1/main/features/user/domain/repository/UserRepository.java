@@ -31,19 +31,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(Email email);
 
     void deleteById(UUID id);
-
-    boolean existsByIdAndPermissions_IdAndTenantIdAndTenantGroupId(
+    boolean existsByIdAndPermissions_IdAndTenantIdAndTenantGroupIdIn(
             @Param("userId") Long userId,
             @Param("permissionId") Long permissionId,
             @Param("tenantId") Long tenantId,
-            @Param("tenantGroupId") Long tenantGroupId
+            @Param("tenantGroupIds") List<Long> tenantGroupIds
     );
 
-    boolean existsByIdAndRoles_IdAndTenantIdAndTenantGroupId(
+    boolean existsByIdAndRoles_IdAndTenantIdAndTenantGroupIdIn(
             Long userId,
             Long roleId,
             Long tenantId,
-            Long tenantGroupId
+            List<Long> tenantGroupIds
     );
 
 }

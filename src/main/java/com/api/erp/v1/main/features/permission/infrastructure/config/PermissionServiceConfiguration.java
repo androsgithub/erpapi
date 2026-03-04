@@ -39,7 +39,7 @@ public class PermissionServiceConfiguration {
     @Bean
     @Primary
     public IPermissionService permissionServiceProxy(PermissionServiceHolder holder) {
-        log.info("[PERMISSION CONFIG] Registrando PermissionServiceProxy como bean principal");
+        log.info("[PERMISSION CONFIG] Logsndo PermissionServiceProxy como bean principal");
         return new PermissionServiceProxy(holder);
     }
 }

@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 /**
  * Entidade de domínio que representa uma Composição de Product (Bill of Materials - BOM).
  * <p>
- * Responsabilidades:
+ * Responsibilities:
  * - Representar os insumos necessários para fabricar um product
- * - Validar quantidade e unidade de medida compatível
+ * - Validate quantidade e unidade de medida compatível
  * - Manter integridade de composições
  * <p>
  * Restrições:

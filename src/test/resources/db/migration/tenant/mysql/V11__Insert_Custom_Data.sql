@@ -9,7 +9,7 @@ SELECT
     NULL
 FROM
     TB_custom_field_definition cfd,
-    tb_customer c
+    tb_business_partner c
 WHERE
     cfd.field_key = 'categoria_cliente'
     AND c.nome = 'DISTRIBUIDORA BRASIL'
@@ -26,7 +26,7 @@ SELECT
     NULL
 FROM
     TB_custom_field_definition cfd,
-    tb_customer c
+    tb_business_partner c
 WHERE
     cfd.field_key = 'categoria_cliente'
     AND c.nome = 'LOJA CENTRAL'
@@ -43,7 +43,7 @@ SELECT
     NULL
 FROM
     TB_custom_field_definition cfd,
-    tb_customer c
+    tb_business_partner c
 WHERE
     cfd.field_key = 'categoria_cliente'
     AND c.nome = 'João da Silva'
@@ -60,7 +60,7 @@ SELECT
     NULL
 FROM
     TB_custom_field_definition cfd,
-    tb_customer c
+    tb_business_partner c
 WHERE
     cfd.field_key = 'cliente_ativo_marketing'
     AND c.nome = 'DISTRIBUIDORA BRASIL'
@@ -77,7 +77,7 @@ SELECT
     NULL
 FROM
     TB_custom_field_definition cfd,
-    tb_customer c
+    tb_business_partner c
 WHERE
     cfd.field_key = 'cliente_ativo_marketing'
     AND c.nome = 'FORNECEDOR ABC'
@@ -94,7 +94,7 @@ SELECT
     NULL
 FROM
     TB_custom_field_definition cfd,
-    tb_customer c
+    tb_business_partner c
 WHERE
     cfd.field_key = 'observacoes_internas'
     AND c.nome = 'LOJA CENTRAL'
@@ -264,7 +264,7 @@ SELECT
     NULL
 FROM
     TB_custom_field_definition cfd,
-    tb_customer c
+    tb_business_partner c
 WHERE
     cfd.field_key = 'volume_anual_estimado'
     AND c.nome = 'DISTRIBUIDORA BRASIL'
@@ -281,7 +281,7 @@ SELECT
     NULL
 FROM
     TB_custom_field_definition cfd,
-    tb_customer c
+    tb_business_partner c
 WHERE
     cfd.field_key = 'volume_anual_estimado'
     AND c.nome = 'LOJA CENTRAL'

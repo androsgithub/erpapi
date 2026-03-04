@@ -6,7 +6,7 @@ import jakarta.persistence.Converter;
 
 /**
  * Converter para UnidadeTributavel.
- * Armazena na forma "CODIGO|DESCRICAO" para permitir reconstrução completa do value object.
+ * Stores na forma "CODIGO|DESCRICAO" para permitir reconstrução completa do value object.
  */
 @Converter(autoApply = true)
 public class UnidadeTributavelConverter implements AttributeConverter<UnidadeTributavel, String> {

@@ -115,11 +115,11 @@ class TenantContextTest {
     @DisplayName("dado_groupId_quando_setGroupId_entao_getGroupIdRetornaValorDefinido")
     void testGivenGroupId_WhenSetGroupId_ThenGetGroupIdReturnsValue() {
         // Arrange
-        Long expectedGroupId = 10L;
+        List<Long> expectedGroupId = List.of(10L);
 
         // Act
-        TenantContext.setGroupId(expectedGroupId);
-        Long actualGroupId = TenantContext.getGroupId();
+        TenantContext.setGroupIds(expectedGroupId);
+        List<Long> actualGroupId = TenantContext.getGroupIds();
 
         // Assert
         assertThat(actualGroupId)
@@ -131,7 +131,7 @@ class TenantContextTest {
     @DisplayName("dado_nenhunGroupIdDefinido_quando_getGroupId_entao_retornaNull")
     void testGivenNoGroupIdDefined_WhenGetGroupId_ThenReturnsNull() {
         // Act
-        Long groupId = TenantContext.getGroupId();
+        List<Long> groupId = TenantContext.getGroupIds();
 
         // Assert
         assertThat(groupId)
@@ -143,16 +143,16 @@ class TenantContextTest {
     @DisplayName("dado_groupIdDefinido_quando_clear_entao_getGroupIdRetornaNull")
     void testGivenGroupIdDefined_WhenClear_ThenGetGroupIdReturnsNull() {
         // Arrange
-        TenantContext.setGroupId(10L);
+        TenantContext.setGroupIds(List.of(10L));
 
         // Act
         TenantContext.clear();
-        Long groupId = TenantContext.getGroupId();
+        List<Long> groupId = TenantContext.getGroupIds();
 
         // Assert
         assertThat(groupId)
-                .as("Group ID deve ser null após limpeza")
-                .isNull();
+                .as("Group ID deve ser vazio após limpeza")
+                .isEmpty();
     }
 
     // ===== Testes de Group IDs (Lista) =====
@@ -226,7 +226,6 @@ class TenantContextTest {
     void testGivenAllFieldsDefined_WhenClear_ThenAllValuesNulled() {
         // Arrange - definir todos os campos
         TenantContext.setTenantId(1L);
-        TenantContext.setGroupId(10L);
         TenantContext.setGroupIds(Arrays.asList(1L, 2L));
 
         // Act
@@ -235,9 +234,6 @@ class TenantContextTest {
         // Assert - todos os campos devem estar null
         assertThat(TenantContext.getTenantId())
                 .as("Tenant ID deve ser null após clear")
-                .isNull();
-        assertThat(TenantContext.getGroupId())
-                .as("Group ID deve ser null após clear")
                 .isNull();
         assertThat(TenantContext.getGroupIds())
                 .as("Group IDs deve ser null após clear")

@@ -25,7 +25,7 @@
 // * 2. TenantContext.setTenantId(id)
 // * 3. MultiTenantRoutingDataSource obtém tenantId do contexto
 // * 4. Busca datasource correspondente no cache
-// * 5. Retorna conexão para o banco do tenant
+// * 5. Returns conexão para o banco do tenant
 // */
 //@Deprecated(since = "2.0", forRemoval = true)
 //@Slf4j
@@ -41,15 +41,15 @@
 //    }
 //
 //    /**
-//     * Registra um novo datasource no cache
+//     * Logs um novo datasource no cache
 //     */
 //    public void addDataSource(Long tenantId, DataSource dataSource) {
-//        log.info("Registrando datasource para tenant: {}", tenantId);
+//        log.info("Logsndo datasource para tenant: {}", tenantId);
 //        dataSources.put(tenantId, dataSource);
 //    }
 //
 //    /**
-//     * Obtém conexão para o banco do tenant
+//     * Gets conexão para o banco do tenant
 //     *
 //     * Se TenantContext estiver vazio (inicialização da app), usa defaultDataSource (master)
 //     */
@@ -95,7 +95,7 @@
 //    }
 //
 //    /**
-//     * Obtém conexão com username e password
+//     * Gets conexão com username e password
 //     */
 //    @Override
 //    public Connection getConnection(String username, String password) throws SQLException {
@@ -103,7 +103,7 @@
 //    }
 //
 //    /**
-//     * Retorna lista de datasources registrados (para DEBUG)
+//     * Returns lista de datasources registrados (para DEBUG)
 //     */
 //    public Map<Long, DataSource> getAllDataSources() {
 //        return new HashMap<>(dataSources);

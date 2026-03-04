@@ -8,7 +8,7 @@ import javax.sql.DataSource;
  * Define contrato para gerenciar e rotear conexões de banco de dados
  * para diferentes tenants dinamicamente.
  * 
- * Responsabilidade: Abstrair o mecanismo de roteamento de datasources
+ * Responsibility: Abstrair o mecanismo de roteamento de datasources
  * Não conhece detalhes de implementação (HikariCP, Query, etc)
  * 
  * @author ERP System
@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 public interface IDataSourceRouter {
 
     /**
-     * Registra um novo DataSource para um tenant específico
+     * Logs um novo DataSource para um tenant específico
      * 
      * @param tenantId Identificador único do tenant
      * @param dataSource DataSource configurado e pronto para uso
@@ -27,7 +27,7 @@ public interface IDataSourceRouter {
     void registerDataSource(Long tenantId, DataSource dataSource);
 
     /**
-     * Obtém o DataSource para um tenant
+     * Gets o DataSource para um tenant
      * 
      * Se não estiver em cache, recupera da configuração de tenants
      * e registra automaticamente para futuras requisições.
@@ -56,7 +56,7 @@ public interface IDataSourceRouter {
     void invalidateDataSourceCache(Long tenantId);
 
     /**
-     * Obtém o DataSource do Master (banco centralizado)
+     * Gets o DataSource do Master (banco centralizado)
      * 
      * @return DataSource do master
      */

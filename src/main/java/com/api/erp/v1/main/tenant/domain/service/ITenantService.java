@@ -11,7 +11,7 @@ public interface ITenantService {
 
     boolean isTenantAtiva(Long tenantId);
 
-    Tenant criarTenant(CriarTenantRequest request);
+    Tenant criarTenant(CreateTenantRequest request);
 
     java.util.List<Tenant> listarTenants();
 
@@ -19,7 +19,7 @@ public interface ITenantService {
 
     /**
      * UNIFIED CONFIG UPDATE - Consolidação de todos os 6 métodos antigos de config em 1
-     * Processa apenas os campos que foram preenchidos (não-null)
+     * Processes apenas os campos que foram preenchidos (não-null)
      */
     Tenant updateConfig(Long tenantId, UnifiedTenantConfigRequest request);
 

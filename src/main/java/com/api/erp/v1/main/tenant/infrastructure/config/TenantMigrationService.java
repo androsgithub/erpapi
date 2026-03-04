@@ -54,7 +54,7 @@ public class TenantMigrationService {
                     var tenant = (Tenant) tenantObj;
                     log.info("");
                     log.info("─────────────────────────────────────────");
-                    log.info("🔄 Processando Tenant: {} (ID: {})", tenant.getNome(), tenant.getId());
+                    log.info("🔄 Processesndo Tenant: {} (ID: {})", tenant.getNome(), tenant.getId());
                     log.info("─────────────────────────────────────────");
 
                     // Busca datasource do tenant
@@ -73,7 +73,7 @@ public class TenantMigrationService {
                             datasource.getPort(),
                             datasource.getDatabaseName());
 
-                    // Executa migração para este tenant
+                    // Executes migração para este tenant
                     migrateTenant(tenant.getNome(), datasource);
                     report.addSuccess(tenant.getNome());
                     log.info("Migration successfully completed for: {}", tenant.getNome());
@@ -108,7 +108,7 @@ public class TenantMigrationService {
     }
 
     private void migrateTenant(String tenantName, TenantDatasource datasource) throws Exception {
-        // Cria DataSource temporário para o tenant
+        // Creates temporary DataSource for tenant
         HikariDataSource tenantDataSource = createDataSourceForTenant(datasource);
 
         try {

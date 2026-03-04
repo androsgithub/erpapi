@@ -10,7 +10,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 /**
  * INFRASTRUCTURE - Implementação de ITenantContextProvider
  * 
- * Armazena o contexto do tenant para cada thread/request.
+ * Stores o contexto do tenant para cada thread/request.
  * Usa RequestContextHolder durante requests HTTP e ThreadLocal como fallback.
  * 
  * Thread-safe: cada thread tem seu próprio contexto
@@ -31,7 +31,7 @@ public class TenantContextProvider implements ITenantContextProvider {
     @Override
     public void setCurrentTenant(String tenantId) {
         if (tenantId == null || tenantId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Tenant ID não pode ser nulo ou vazio");
+            throw new IllegalArgumentException("Tenant ID cannot be null or empty");
         }
         
         tenantId = tenantId.trim();
@@ -61,23 +61,23 @@ public class TenantContextProvider implements ITenantContextProvider {
             if (attrs != null) {
                 String tenant = (String) attrs.getAttribute(REQUEST_TENANT_ATTRIBUTE, ServletRequestAttributes.SCOPE_REQUEST);
                 if (tenant != null) {
-                    log.debug("Tenant recuperado do RequestScope: {}", tenant);
+                    log.debug("Tenant retrieved from RequestScope: {}", tenant);
                     return tenant;
                 }
             }
         } catch (IllegalStateException e) {
-            log.debug("Sem request context ativo");
+            log.debug("No active request context");
         }
         
         // 2. Tentar pegar de ThreadLocal
         String tenant = TENANT_FALLBACK.get();
         if (tenant != null) {
-            log.debug("Tenant recuperado do ThreadLocal: {}", tenant);
+            log.debug("Tenant retrieved from ThreadLocal: {}", tenant);
             return tenant;
         }
         
         // 3. Usar default tenant
-        log.debug("Nenhum tenant definido, usando tenant padrão: {}", defaultTenant);
+        log.debug("No tenant defined, using default tenant: {}", defaultTenant);
         return defaultTenant;
     }
 
@@ -89,7 +89,7 @@ public class TenantContextProvider implements ITenantContextProvider {
             if (attrs != null) {
                 String tenant = (String) attrs.getAttribute(REQUEST_TENANT_ATTRIBUTE, ServletRequestAttributes.SCOPE_REQUEST);
                 if (tenant != null) {
-                    log.debug("Limpando tenant context do RequestScope: {}", tenant);
+                    log.debug("Cleaning tenant context from RequestScope: {}", tenant);
                     attrs.removeAttribute(REQUEST_TENANT_ATTRIBUTE, ServletRequestAttributes.SCOPE_REQUEST);
                 }
             }
@@ -100,7 +100,7 @@ public class TenantContextProvider implements ITenantContextProvider {
         // Sempre limpa ThreadLocal como fallback
         String tenant = TENANT_FALLBACK.get();
         if (tenant != null) {
-            log.debug("Limpando tenant context do ThreadLocal: {}", tenant);
+            log.debug("Cleaning tenant context from ThreadLocal: {}", tenant);
             TENANT_FALLBACK.remove();
         }
     }

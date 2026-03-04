@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Decorator para adicionar auditoria ao serviço de Contact
  * <p>
- * Registra todas as operações de contact para fins de rastreabilidade.
+ * Logs todas as operações de contact para fins de rastreabilidade.
  * Útil para compliance e investigação de problemas.
  * <p>
  * Exemplo de composição:

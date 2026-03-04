@@ -32,7 +32,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
 
     @GetMapping
     @RequiresXTenantId
-    @RequiresPermission(CustomFieldPermissions.VISUALIZAR)
+    @RequiresPermission(CustomFieldPermissions.VIEW)
     public List<CustomFieldResponse> getCustomFields(@RequestParam String table) {
         Long tenantId = TenantContext.getTenantId();
         return service.listByTable(tenantId, table);
@@ -42,7 +42,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
 
     @PostMapping
     @RequiresXTenantId
-    @RequiresPermission(CustomFieldPermissions.CRIAR)
+    @RequiresPermission(CustomFieldPermissions.CREATE)
     public CustomFieldResponse create(
 
             @RequestBody CreateCustomFieldRequest request
@@ -55,7 +55,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
 
     @PutMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(CustomFieldPermissions.ATUALIZAR)
+    @RequiresPermission(CustomFieldPermissions.UPDATE)
     public CustomFieldResponse update(
 
             @PathVariable Long id,
@@ -69,7 +69,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
 
     @PatchMapping("/{id}/status")
     @RequiresXTenantId
-    @RequiresPermission(CustomFieldPermissions.ATUALIZAR)
+    @RequiresPermission(CustomFieldPermissions.UPDATE)
     public CustomFieldResponse changeStatus(
 
             @PathVariable Long id,
@@ -83,7 +83,7 @@ public class CustomFieldDefinitionController implements ICustomFieldDefinitionCo
 
     @DeleteMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(CustomFieldPermissions.DELETAR)
+    @RequiresPermission(CustomFieldPermissions.DELETE)
     public void delete(
 
             @PathVariable Long id

@@ -24,7 +24,7 @@ import java.util.Optional;
  * - Natureza da operação (CFOP)
  * - UF origem/destino
  * - Regime tributário
- * - Tipo de customer
+ * - Tipo de businesspartner
  */
 @Embeddable
 @Getter
@@ -91,29 +91,29 @@ public class ClassificacaoFiscal {
 
     private static void validarDescricaoFiscal(String descricao) {
         if (descricao == null || descricao.isBlank()) {
-            throw new IllegalArgumentException("Descrição fiscal é obrigatória");
+            throw new IllegalArgumentException("Fiscal description is required");
         }
         if (descricao.length() > 120) {
-            throw new IllegalArgumentException("Descrição fiscal não pode ter mais de 120 caracteres");
+            throw new IllegalArgumentException("Fiscal description cannot have more than 120 characters");
         }
     }
 
     /**
-     * Retorna o NCM como Value Object
+     * Returns o NCM como Value Object
      */
     public NCM obterNCM() {
         return NCM.de(this.ncm);
     }
 
     /**
-     * Retorna a origem da mercadoria como Value Object
+     * Returns a origem da mercadoria como Value Object
      */
     public OrigemMercadoria obterOrigemMercadoria() {
         return OrigemMercadoria.doCodigo(this.origemMercadoria);
     }
 
     /**
-     * Retorna o código de benefício fiscal se existir
+     * Returns o código de benefício fiscal se existir
      */
     public Optional<CodigoBeneficioFiscal> obterCodigoBeneficioFiscal() {
         return codigoBeneficioFiscal != null && !codigoBeneficioFiscal.isBlank()
@@ -122,7 +122,7 @@ public class ClassificacaoFiscal {
     }
 
     /**
-     * Retorna o CEST se existir
+     * Returns o CEST se existir
      */
     public Optional<CEST> obterCEST() {
         return cest != null && !cest.isBlank()
@@ -131,7 +131,7 @@ public class ClassificacaoFiscal {
     }
 
     /**
-     * Retorna a unidade tributável como Value Object
+     * Returns a unidade tributável como Value Object
      */
     public UnidadeTributavel obterUnidadeTributavel() {
         return UnidadeTributavel.de(unidadeTributavelCodigo, unidadeTributavelDescricao);

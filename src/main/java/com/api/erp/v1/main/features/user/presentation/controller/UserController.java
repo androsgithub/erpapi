@@ -59,7 +59,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
 
     @PostMapping
     @RequiresXTenantId
-    @RequiresPermission(UserPermissions.CRIAR)
+    @RequiresPermission(UserPermissions.CREATE)
     @TrackFlow("CREATE_USER")
     public UserResponse criar(@RequestBody CreateUserRequest request) {
         User user = userService.criar(request);
@@ -68,7 +68,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
 
     @GetMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(UserPermissions.VISUALIZAR_OUTRO_USER)
+    @RequiresPermission(UserPermissions.VIEW_OTHER_USER)
     @TrackFlow("READ_OTHER_USER")
     public UserPermissionsResponse buscar(Long id) {
         User user = userService.buscarPorId(id);
@@ -77,7 +77,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
 
     @GetMapping
     @RequiresXTenantId
-    @RequiresPermission(UserPermissions.LISTAR)
+    @RequiresPermission(UserPermissions.LIST)
     @TrackFlow("LIST_USERS")
     public List<UserResponse> listar() {
         return userMapper.toResponseList(userService.listarTodos());
@@ -85,7 +85,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
 
     @PatchMapping("/{id}/aprovar")
     @RequiresXTenantId
-    @RequiresPermission(UserPermissions.APROVAR)
+    @RequiresPermission(UserPermissions.APPROVE)
     @TrackFlow("APPROVE_USER")
     public UserPermissionsResponse aprovar(Long id, Long gestorId) {
         User user = userService.aprovar(id, gestorId);
@@ -94,7 +94,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
 
     @PatchMapping("/{id}/rejeitar")
     @RequiresXTenantId
-    @RequiresPermission(UserPermissions.REJEITAR)
+    @RequiresPermission(UserPermissions.REJECT)
     @TrackFlow("REJECT_USER")
     public UserPermissionsResponse rejeitar(Long id, Long gestorId, String motivo) {
 
@@ -104,7 +104,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
 
     @PutMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(UserPermissions.ATUALIZAR)
+    @RequiresPermission(UserPermissions.UPDATE)
     @TrackFlow("UPDATE_USER")
     public UserPermissionsResponse atualizar(
             @PathVariable Long id,
@@ -116,7 +116,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
 
     @DeleteMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(UserPermissions.DESATIVAR)
+    @RequiresPermission(UserPermissions.DEACTIVATE)
     @TrackFlow("DISABLE_USER")
     public void inativar(@PathVariable Long id) {
         userService.inativar(id);
@@ -126,7 +126,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
 
     @PostMapping("/{userId}/permissions")
     @RequiresXTenantId
-    @RequiresPermission(UserPermissions.GERENCIAR_PERMISSIONS)
+    @RequiresPermission(UserPermissions.MANAGE_PERMISSIONS)
     @TrackFlow("ADD_USER_PERMS")
     public ResponseEntity<Void> adicionarPermissions(
             @PathVariable Long userId,
@@ -137,7 +137,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
 
     @DeleteMapping("/{userId}/permissions/{permissionId}")
     @RequiresXTenantId
-    @RequiresPermission(UserPermissions.REMOVER_PERMISSION)
+    @RequiresPermission(UserPermissions.REMOVE_PERMISSION)
     @TrackFlow("REMOVE_USER_PERMS")
     public ResponseEntity<Void> removerPermission(
             @PathVariable Long userId,
@@ -158,7 +158,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
     // NOVOS ENDPOINTS PARA GERENCIAMENTO DE ROLES
 
     @PostMapping("/{userId}/roles")
-    @RequiresPermission(UserPermissions.GERENCIAR_ROLES)
+    @RequiresPermission(UserPermissions.MANAGE_ROLES)
     @TrackFlow("LIST_USER_ROLES")
     public ResponseEntity<Void> adicionarRoles(
             @PathVariable Long userId,
@@ -168,7 +168,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
     }
 
     @DeleteMapping("/{userId}/roles/{roleId}")
-    @RequiresPermission(UserPermissions.REMOVER_ROLE)
+    @RequiresPermission(UserPermissions.REMOVE_ROLE)
     @TrackFlow("REMOVE_USER_ROLE")
     public ResponseEntity<Void> removerRole(
             @PathVariable Long userId,
@@ -178,7 +178,7 @@ public class UserController implements IUserController, UserOpenApiDocumentation
     }
 
     @GetMapping("/{userId}/roles")
-    @RequiresPermission(UserPermissions.LISTAR_ROLES)
+    @RequiresPermission(UserPermissions.LIST_ROLES)
     @TrackFlow("LIST_USER_ROLES")
     public ResponseEntity<List<Role>> listarRoles(
             @PathVariable Long userId) {

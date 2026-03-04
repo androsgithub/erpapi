@@ -6,7 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
 /**
- * Entidade que representa um contact de uma entidade (Usuário, Empresa, Customer, etc.)
+ * Entidade que representa um contact de uma entidade (Usuário, Empresa, BusinessPartner, etc.)
  * <p>
  * Seguindo o padrão DDD, esta entidade é responsável por gerenciar as informações
  * de contact de uma entidade do sistema.

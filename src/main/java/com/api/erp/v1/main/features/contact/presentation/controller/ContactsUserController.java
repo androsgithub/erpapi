@@ -9,7 +9,7 @@ import com.api.erp.v1.main.features.contact.application.mapper.IContactMapper;
 import com.api.erp.v1.main.features.contact.domain.controller.IContactsUserController;
 import com.api.erp.v1.docs.openapi.features.contact.ContactsUserOpenApiDocumentation;
 import com.api.erp.v1.main.features.contact.domain.entity.ContactPermissions;
-import com.api.erp.v1.main.features.contact.domain.service.IGerenciamentoContactService;
+import com.api.erp.v1.main.features.contact.domain.service.IManagementContactService;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
  * - Ativar/desativar contacts de um usuário
  * <p>
  * Para operações básicas de contact (CRUD global), use ContactsController.
- * Para futuras features como "Customer", crie ContactsCustomerController seguindo o mesmo padrão.
+ * Para futuras features como "BusinessPartner", crie ContactsBusinessPartnerController seguindo o mesmo padrão.
  * <p>
  * PADRÃO DE ARQUITETURA:
  * - Controller orquestra chamadas ao service de gerenciamento
@@ -44,13 +44,13 @@ public class ContactsUserController implements IContactsUserController, Contacts
 
     @Autowired
 
-    private IGerenciamentoContactService gerenciamentoContactService;
+    private IManagementContactService gerenciamentoContactService;
     @Autowired
     private IContactMapper contactMapper;
 
     @PostMapping("/associar")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.CRIAR)
+    @RequiresPermission(ContactPermissions.CREATE)
     public ResponseEntity<UserContactsResponse> associarContacts(
             @RequestBody AssociarContactsRequest request) {
 //        var userContact = gerenciamentoContactService.associarContacts(request);
@@ -60,7 +60,7 @@ public class ContactsUserController implements IContactsUserController, Contacts
 
     @PostMapping("/{userId}/contact")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.CRIAR)
+    @RequiresPermission(ContactPermissions.CREATE)
     public ResponseEntity<ContactResponse> adicionarContact(
             @PathVariable @Parameter(description = "ID do usuário") Long userId,
             @RequestBody CreateContactRequest request) {
@@ -70,7 +70,7 @@ public class ContactsUserController implements IContactsUserController, Contacts
 
     @GetMapping("/{userId}")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.VISUALIZAR)
+    @RequiresPermission(ContactPermissions.VIEW)
     public ResponseEntity<UserContactsResponse> buscarContactsUser(
             @PathVariable @Parameter(description = "ID do usuário") Long userId) {
 //        var userContact = gerenciamentoContactService.buscarContactsUser(userId);
@@ -80,7 +80,7 @@ public class ContactsUserController implements IContactsUserController, Contacts
 
     @DeleteMapping("/remover")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.DELETAR)
+    @RequiresPermission(ContactPermissions.DELETE)
     public ResponseEntity<Void> removerContact(
             @RequestBody RemoverContactRequest request) {
         gerenciamentoContactService.removerContact(request);
@@ -89,7 +89,7 @@ public class ContactsUserController implements IContactsUserController, Contacts
 
     @PatchMapping("/{userId}/contact/{contactId}/principal")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.ATUALIZAR)
+    @RequiresPermission(ContactPermissions.UPDATE)
     public ResponseEntity<ContactResponse> marcarComoPrincipal(
             @PathVariable @Parameter(description = "ID do usuário") Long userId,
             @PathVariable @Parameter(description = "ID do contact") Long contactId) {
@@ -99,7 +99,7 @@ public class ContactsUserController implements IContactsUserController, Contacts
 
     @PatchMapping("/{userId}/contact/{contactId}/desativar")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.ATUALIZAR)
+    @RequiresPermission(ContactPermissions.UPDATE)
     public ResponseEntity<ContactResponse> desativarContact(
             @PathVariable @Parameter(description = "ID do usuário") Long userId,
             @PathVariable @Parameter(description = "ID do contact") Long contactId) {
@@ -109,7 +109,7 @@ public class ContactsUserController implements IContactsUserController, Contacts
 
     @PatchMapping("/{userId}/contact/{contactId}/ativar")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.ATUALIZAR)
+    @RequiresPermission(ContactPermissions.UPDATE)
     public ResponseEntity<ContactResponse> ativarContact(
             @PathVariable @Parameter(description = "ID do usuário") Long userId,
             @PathVariable @Parameter(description = "ID do contact") Long contactId) {

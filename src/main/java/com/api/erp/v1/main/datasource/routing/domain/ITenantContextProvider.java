@@ -6,7 +6,7 @@ package com.api.erp.v1.main.datasource.routing.domain;
  * Define contrato para gerenciar o contexto do tenant na request atual.
  * Agnóstica a implementação (ThreadLocal, RequestContext, etc).
  * 
- * Responsabilidade: Abstrair o mecanismo de armazenamento do contexto do tenant
+ * Responsibility: Abstrair o mecanismo de armazenamento do contexto do tenant
  * 
  * @author ERP System
  * @version 1.0
@@ -22,7 +22,7 @@ public interface ITenantContextProvider {
     void setCurrentTenant(String tenantId);
 
     /**
-     * Recupera o tenant atual do contexto
+     * Retrieves o tenant atual do contexto
      * 
      * @return ID do tenant atual, ou null se não houver contexto definido
      */

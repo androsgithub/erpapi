@@ -1,6 +1,7 @@
-DO SLEEP(0.125);
+DO SLEEP (0.125);
+
 create table
-   tb_customer (
+   tb_business_partner (
       id bigint not null auto_increment,
       created_at datetime (6) not null default current_timestamp(6),
       created_by bigint,
@@ -45,14 +46,14 @@ create table
    ) engine = InnoDB;
 
 create table
-   TB_CUSTOMER_CONTACT (
-      customer_id bigint not null,
+   TB_BUSINESS_PARTNER_CONTACT (
+      businesspartner_id bigint not null,
       contact_id bigint not null
    ) engine = InnoDB;
 
 create table
-   TB_CUSTOMER_ADDRESS (
-      customer_id bigint not null,
+   TB_BUSINESS_PARTNER_ADDRESS (
+      businesspartner_id bigint not null,
       address_id bigint not null
    ) engine = InnoDB;
 
@@ -248,11 +249,12 @@ create table
       primary key (id)
    ) engine = InnoDB;
 
-create table tb_role_permission (
-        role_id bigint not null,
-        permission_id bigint not null,
-        primary key (role_id, permission_id)
-    ) engine=InnoDB;
+create table
+   tb_role_permission (
+      role_id bigint not null,
+      permission_id bigint not null,
+      primary key (role_id, permission_id)
+   ) engine = InnoDB;
 
 create table
    tb_measure_unit (
@@ -301,28 +303,30 @@ create table
       primary key (id)
    ) engine = InnoDB;
 
-create table tb_user_contact (
-        user_id bigint not null,
-        contact_id bigint not null,
-        primary key (user_id, contact_id)
-    ) engine=InnoDB;
+create table
+   tb_user_contact (
+      user_id bigint not null,
+      contact_id bigint not null,
+      primary key (user_id, contact_id)
+   ) engine = InnoDB;
 
+create table
+   tb_user_permission (
+      user_id bigint not null,
+      permission_id bigint not null,
+      primary key (user_id, permission_id)
+   ) engine = InnoDB;
 
-create table tb_user_permission (
-        user_id bigint not null,
-        permission_id bigint not null,
-        primary key (user_id, permission_id)
-    ) engine=InnoDB;
+create table
+   tb_user_role (
+      user_id bigint not null,
+      role_id bigint not null,
+      primary key (user_id, role_id)
+   ) engine = InnoDB;
 
-create table tb_user_role (
-        user_id bigint not null,
-        role_id bigint not null,
-        primary key (user_id, role_id)
-    ) engine=InnoDB;
+alter table TB_BUSINESS_PARTNER_CONTACT add constraint UKoyvoyiovpks7mak7a6o9shsjf unique (contact_id);
 
-alter table TB_CUSTOMER_CONTACT add constraint UKoyvoyiovpks7mak7a6o9shsjf unique (contact_id);
-
-alter table TB_CUSTOMER_ADDRESS add constraint UK3g4mi2jwv887g1adobbi2ty7j unique (address_id);
+alter table TB_BUSINESS_PARTNER_ADDRESS add constraint UK3g4mi2jwv887g1adobbi2ty7j unique (address_id);
 
 alter table tb_permission add constraint UK1uq3cg2rbrpk3ykinkkju2gaw unique (codigo);
 
@@ -336,13 +340,13 @@ alter table tb_user add constraint UK594wib8ansybtilla48x7vdld unique (cpf);
 
 alter table tb_user add constraint UKspmnyb4dsul95fjmr5kmdmvub unique (email);
 
-alter table TB_CUSTOMER_CONTACT add constraint FKar3q0fwokcc43i1w07alv1u9t foreign key (contact_id) references tb_contacts (id);
+alter table TB_BUSINESS_PARTNER_CONTACT add constraint FKar3q0fwokcc43i1w07alv1u9t foreign key (contact_id) references tb_contacts (id);
 
-alter table TB_CUSTOMER_CONTACT add constraint FKf44b9l0vsi0mdpwwwla1sfx27 foreign key (customer_id) references tb_customer (id);
+alter table TB_BUSINESS_PARTNER_CONTACT add constraint FKf44b9l0vsi0mdpwwwla1sfx27 foreign key (businesspartner_id) references tb_business_partner (id);
 
-alter table TB_CUSTOMER_ADDRESS add constraint FKh4pilbdgv2i62kt67lignqxat foreign key (address_id) references tb_address (id);
+alter table TB_BUSINESS_PARTNER_ADDRESS add constraint FKh4pilbdgv2i62kt67lignqxat foreign key (address_id) references tb_address (id);
 
-alter table TB_CUSTOMER_ADDRESS add constraint FKe9hd85a57v19b97k79s98yqr8 foreign key (customer_id) references tb_customer (id);
+alter table TB_BUSINESS_PARTNER_ADDRESS add constraint FKe9hd85a57v19b97k79s98yqr8 foreign key (businesspartner_id) references tb_business_partner (id);
 
 alter table TB_CUSTOM_DATA add constraint FKl4dh8wnk2ggj2muhk8ejclagn foreign key (custom_field_id) references TB_custom_field_definition (id);
 

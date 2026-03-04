@@ -1,17 +1,23 @@
 package com.api.erp.v1.main.features.contact.domain.entity;
 
+import com.api.erp.v1.main.features.permission.domain.entity.BasePermissions;
+
 /**
- * Classe com constantes de permissões para a feature Contact
- * Seguindo o padrão de autorização do projeto
+ * Contact-specific permission constants.
+ * <p>
+ * Defines all permissions related to Contact management.
+ * Uses BasePermissions for standard operations.
  */
 public final class ContactPermissions {
 
     private ContactPermissions() {
     }
 
-    public static final String PREFIX = "contacts";
-    public static final String CRIAR = PREFIX + ".criar";
-    public static final String ATUALIZAR = PREFIX + ".atualizar";
-    public static final String VISUALIZAR = PREFIX + ".visualizar";
-    public static final String DELETAR = PREFIX + ".deletar";
+    public static final String PREFIX = "contact";
+    
+    // Standard CRUD operations
+    public static final String CREATE = PREFIX + "." + BasePermissions.OPERATION_CREATE;
+    public static final String UPDATE = PREFIX + "." + BasePermissions.OPERATION_UPDATE;
+    public static final String VIEW = PREFIX + "." + BasePermissions.OPERATION_VIEW;
+    public static final String DELETE = PREFIX + "." + BasePermissions.OPERATION_DELETE;
 }

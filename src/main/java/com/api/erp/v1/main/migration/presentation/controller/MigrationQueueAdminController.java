@@ -1,9 +1,11 @@
 package com.api.erp.v1.main.migration.presentation.controller;
 
 import com.api.erp.v1.docs.openapi.migration.MigrationQueueAdminOpenApiDocumentation;
+import com.api.erp.v1.main.migration.domain.MigrationPermissions;
 import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
 import com.api.erp.v1.main.migration.service.TenantMigrationQueueConsumer;
 import com.api.erp.v1.main.migration.service.TenantMigrationQueue;
+import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -51,10 +53,11 @@ public class MigrationQueueAdminController implements MigrationQueueAdminOpenApi
     private final TenantMigrationQueueConsumer queueConsumer;
     
     /**
-     * GET - Retorna estatísticas da fila
+     * GET - Returns estatísticas da fila
      */
     @Override
     @GetMapping("/stats")
+    @RequiresPermission(MigrationPermissions.VIEW)
     public ResponseEntity<Map<String, Object>> getQueueStats() {
         var stats = migrationQueue.getStats();
         
@@ -78,6 +81,7 @@ public class MigrationQueueAdminController implements MigrationQueueAdminOpenApi
      */
     @Override
     @GetMapping("/events")
+    @RequiresPermission(MigrationPermissions.VIEW)
     public ResponseEntity<Map<String, Object>> getAllEvents() {
         Collection<TenantMigrationEvent> events = migrationQueue.getAllEvents();
         
@@ -93,6 +97,7 @@ public class MigrationQueueAdminController implements MigrationQueueAdminOpenApi
      */
     @Override
     @GetMapping("/events/{eventId}")
+    @RequiresPermission(MigrationPermissions.VIEW)
     public ResponseEntity<?> getEvent(@PathVariable String eventId) {
         return migrationQueue.getEvent(eventId)
                 .map(event -> ResponseEntity.ok(eventToMap(event)))
@@ -104,6 +109,7 @@ public class MigrationQueueAdminController implements MigrationQueueAdminOpenApi
      */
     @Override
     @GetMapping("/events/pending")
+    @RequiresPermission(MigrationPermissions.VIEW)
     public ResponseEntity<Map<String, Object>> getPendingEvents() {
         Collection<TenantMigrationEvent> events = migrationQueue.getPendingEvents();
         
@@ -119,6 +125,7 @@ public class MigrationQueueAdminController implements MigrationQueueAdminOpenApi
      */
     @Override
     @GetMapping("/events/failed")
+    @RequiresPermission(MigrationPermissions.VIEW)
     public ResponseEntity<Map<String, Object>> getFailedEvents() {
         Collection<TenantMigrationEvent> events = migrationQueue.getFailedEvents();
         
@@ -134,6 +141,7 @@ public class MigrationQueueAdminController implements MigrationQueueAdminOpenApi
      */
     @Override
     @GetMapping("/events/completed")
+    @RequiresPermission(MigrationPermissions.VIEW)
     public ResponseEntity<Map<String, Object>> getCompletedEvents() {
         Collection<TenantMigrationEvent> events = migrationQueue.getCompletedEvents();
         
@@ -149,6 +157,7 @@ public class MigrationQueueAdminController implements MigrationQueueAdminOpenApi
      */
     @Override
     @GetMapping("/events/in-progress")
+    @RequiresPermission(MigrationPermissions.VIEW)
     public ResponseEntity<Map<String, Object>> getInProgressEvents() {
         Collection<TenantMigrationEvent> events = migrationQueue.getInProgressEvents();
         
@@ -166,6 +175,7 @@ public class MigrationQueueAdminController implements MigrationQueueAdminOpenApi
      */
     @Override
     @PostMapping("/reprocess/{eventId}")
+    @RequiresPermission(MigrationPermissions.VIEW)
     public ResponseEntity<Map<String, Object>> reprocessEvent(@PathVariable String eventId) {
         try {
             log.info("🔄 Reprocessando evento: {}", eventId);

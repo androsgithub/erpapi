@@ -41,11 +41,11 @@ public class MeasureUnitValidator {
      */
     public void validarDescricao(String descricao) {
         if (descricao == null || descricao.trim().isEmpty()) {
-            throw new ValidationException("descricao", "A descrição é obrigatória");
+            throw new ValidationException("descricao", "Description is required");
         }
         
         if (descricao.length() > 100) {
-            throw new ValidationException("descricao", "A descrição não pode ter mais de 100 caracteres");
+            throw new ValidationException("descricao", "Description cannot have more than 100 characters");
         }
     }
 }

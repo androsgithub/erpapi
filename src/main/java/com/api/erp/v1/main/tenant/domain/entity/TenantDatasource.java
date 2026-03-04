@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * - DATABASE per TENANT: cada tenant pode ter seu próprio banco de dados
  * - ROW-based discrimination: dentro do banco, tenantId discrimina os dados (para matriz e filiais)
  * <p>
- * Exemplo:
+ * Example:
  * - Empresa JAGUAR: banco próprio (jaguar_db) + filiais usam o mesmo banco
  * - Empresa HECE: banco próprio (hece_db)
  * - Filial de JAGUAR em SP: mesmo banco jaguar_db, mas com tenantId diferente
@@ -36,7 +36,7 @@ public class TenantDatasource {
     @JoinColumn(name = "tenant_id", nullable = false, unique = true)
     private Tenant tenant;
 
-    // ===== Configuração de Conexão =====
+    // ===== Configuration de Conexão =====
     @Column(name = "host", nullable = false)
     private String host;
 
@@ -52,7 +52,7 @@ public class TenantDatasource {
     @Column(name = "password", nullable = false)
     private String password;
 
-    // ===== Configuração JDBC =====
+    // ===== Configuration JDBC =====
     @Enumerated(EnumType.STRING)
     @Column(name = "db_type", nullable = false)
     private DBType dbType;
@@ -87,7 +87,7 @@ public class TenantDatasource {
     }
 
     /**
-     * Retorna a URL de conexão JDBC
+     * Returns a URL de conexão JDBC
      */
     public String getJdbcUrl() {
         switch (dbType) {
@@ -124,7 +124,7 @@ public class TenantDatasource {
     }
 
     public enum TestStatus {
-        PENDING,    // Aguardando teste
+        PENDING,    // Waits forndo teste
         SUCCESS,    // Testado com sucesso
         FAILED      // Falha na conexão
     }

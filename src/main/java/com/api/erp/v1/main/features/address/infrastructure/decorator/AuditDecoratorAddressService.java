@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Decorator para adicionar auditoria ao serviço de Address
  * 
- * Registra todas as operações de endereço para fins de rastreabilidade.
+ * Logs todas as operações de endereço para fins de rastreabilidade.
  * Útil para compliance e investigação de problemas.
  * 
  * Exemplo de composição:

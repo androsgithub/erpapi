@@ -29,7 +29,7 @@ public class ObservabilityController implements IObservabilityController {
     }
 
     @GetMapping("/trace/{traceId}")
-    @RequiresPermission(ObservabilityPermissions.VISUALIZAR)
+    @RequiresPermission(ObservabilityPermissions.VIEW)
     @Override
     public ResponseEntity<List<FlowEventDto>> getEventsByTraceId(String traceId) {
         List<FlowEventDto> events = observabilityService.findEventsByTraceId(traceId);
@@ -37,7 +37,7 @@ public class ObservabilityController implements IObservabilityController {
     }
 
     @GetMapping("/health")
-    @RequiresPermission(ObservabilityPermissions.VISUALIZAR)
+    @RequiresPermission(ObservabilityPermissions.VIEW)
     @Override
     public ResponseEntity<Map<String, String>> health() {
         return ResponseEntity.ok(Map.of(
@@ -48,7 +48,7 @@ public class ObservabilityController implements IObservabilityController {
     }
 
     @GetMapping("/trace")
-    @RequiresPermission(ObservabilityPermissions.VISUALIZAR)
+    @RequiresPermission(ObservabilityPermissions.VIEW)
     @Override
     public ResponseEntity<PageableResponse<FlowEventDto>> getAll(
         String status,

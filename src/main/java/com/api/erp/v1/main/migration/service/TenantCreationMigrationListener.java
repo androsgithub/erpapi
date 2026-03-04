@@ -42,7 +42,7 @@ public class TenantCreationMigrationListener {
         
         log.info("");
         log.info("✅ [{}] Novo tenant criado: {}", tenantId, tenantName);
-        log.info("   Enfileirando para migração...");
+        log.info("   Enqueueing for migration...");
         
         try {
             // Busca o datasource do tenant
@@ -50,9 +50,9 @@ public class TenantCreationMigrationListener {
                     .findByTenantIdAndStatus(tenantId, true);
             
             if (datasource == null) {
-                log.warn("⚠️ [{}] Tenant {} não possui datasource configurado ainda", 
+                log.warn("⚠️ [{}] Tenant {} does not have datasource configured yet", 
                         tenantId, tenantName);
-                log.info("   ℹ️ Datasource deve ser criado antes da migração");
+                log.info("   ℹ️ Datasource must be created before migration");
                 return;
             }
             
@@ -64,8 +64,8 @@ public class TenantCreationMigrationListener {
                     TenantMigrationEvent.MigrationEventSource.TENANT_CREATION
             );
             
-            log.info("📥 [{}] Tenant enfileirado para migração", migrationEvent.getEventId());
-            log.info("   Status: {} (será processado em breve)", 
+            log.info("📥 [{}] Tenant enqueued for migration", migrationEvent.getEventId());
+            log.info("   Status: {} (will be processed shortly)", 
                     migrationEvent.getStatus().getLabel());
             log.info("");
             

@@ -37,6 +37,6 @@ public enum TipoContact {
                 return tipo;
             }
         }
-        throw new IllegalArgumentException("Tipo de contact não encontrado: " + descricao);
+        throw new IllegalArgumentException("Contact type not found: " + descricao);
     }
 }

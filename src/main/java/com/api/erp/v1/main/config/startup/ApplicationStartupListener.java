@@ -8,22 +8,22 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
- * INFRASTRUCTURE - Listener de Startup da Aplicação
+ * INFRASTRUCTURE - Application Startup Listener
  * 
- * Responsável pela inicialização da fila unificada de migrações.
+ * Responsible for initializing the unified migration queue.
  * 
  * Fluxo:
- * 1. Master DataSource é criado (FlywayConfig.java)
- * 2. Migrações Master são executadas (síncrono)
- * 3. ApplicationReadyEvent é disparado
+ * 1. Master DataSource is created (FlywayConfig.java)
+ * 2. Master Migrations are executed (synchronously)
+ * 3. ApplicationReadyEvent is fired
  * 4. Este listener inicializa a fila unificada de tenants
  * 5. Enfileira todos os tenants ativos
  * 6. Inicia o consumidor que processa continuamente
  * 
- * Refatoração v2.0:
- * - Substituiu duplicação de código (Job + Fila assíncrona)
+ * Refactoring v2.0:
+ * - Replaced code duplication (Job + Async Queue)
  * - Unificou em um único mecanismo baseado em fila
- * - Centralizado logs e controle de execução
+ * - Centralized logs and execution control
  * 
  * @author ERP System
  * @version 2.0 (Refatorado para Fila Unificada)
@@ -36,9 +36,9 @@ public class ApplicationStartupListener {
     private final TenantMigrationStartupWorker migrationStartupWorker;
 
     /**
-     * Executa na inicialização da aplicação (após Spring Boot estar pronto)
+     * Executes on application initialization (after Spring Boot is ready)
      * 
-     * Inicia a fila unificada de migrações
+     * Starts the unified migration queue
      */
     @EventListener(ApplicationReadyEvent.class)
     public void initializeMigrationQueueOnStartup() {

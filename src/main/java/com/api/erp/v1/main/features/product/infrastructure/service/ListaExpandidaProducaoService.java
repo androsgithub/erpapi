@@ -81,7 +81,7 @@ public class ListaExpandidaProducaoService implements IListaExpandidaProducaoSer
             return;
         }
         
-        // Processar cada componente
+        // Processesr cada componente
         for (ProductComposition composition : componentes) {
             Product componenteProduct = composition.getProductComponente();
             
@@ -104,7 +104,7 @@ public class ListaExpandidaProducaoService implements IListaExpandidaProducaoSer
     }
     
     /**
-     * Obtém apenas os products comprados necessários
+     * Gets apenas os products comprados necessários
      * (útil para gerar lista de compras)
      */
     @Override
@@ -117,7 +117,7 @@ public class ListaExpandidaProducaoService implements IListaExpandidaProducaoSer
     }
     
     /**
-     * Obtém todos os products da composição expandida de forma ordenada
+     * Gets todos os products da composição expandida de forma ordenada
      */
     @Override
     public List<Map.Entry<Product, BigDecimal>> obterListaOrdenada(Product product, BigDecimal quantidadeRequerida) {

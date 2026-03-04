@@ -22,7 +22,7 @@ public class TenantConfig {
 
     @Embedded
     @Builder.Default
-    private CustomerConfig customerConfig = new CustomerConfig();
+    private BusinessPartnerConfig businessPartnerConfig = new BusinessPartnerConfig();
 
     @Embedded
     @Builder.Default

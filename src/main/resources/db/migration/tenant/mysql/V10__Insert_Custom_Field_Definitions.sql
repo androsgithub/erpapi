@@ -1,4 +1,5 @@
-DO SLEEP(0.125);
+DO SLEEP (0.125);
+
 -- Insert Custom Field Definitions
 INSERT INTO
     TB_custom_field_definition (
@@ -22,7 +23,7 @@ INSERT INTO
         target
     )
 VALUES
-    -- Customer Custom Fields
+    -- BusinessPartner Custom Fields
     (
         CURRENT_TIMESTAMP,
         1,
@@ -41,7 +42,7 @@ VALUES
         'Categoria do Cliente',
         'PREMIUM,PADRÃO,BAIXO_VOLUME',
         0,
-        'CUSTOMER'
+        'BUSINESSPARTNER'
     ),
     (
         CURRENT_TIMESTAMP,
@@ -61,7 +62,7 @@ VALUES
         'Data Cadastro Sistema Anterior',
         NULL,
         0,
-        'CUSTOMER'
+        'BUSINESSPARTNER'
     ),
     (
         CURRENT_TIMESTAMP,
@@ -81,7 +82,7 @@ VALUES
         'Observações Internas',
         NULL,
         0,
-        'CUSTOMER'
+        'BUSINESSPARTNER'
     ),
     (
         CURRENT_TIMESTAMP,
@@ -101,7 +102,7 @@ VALUES
         'Ativo em Marketing',
         NULL,
         0,
-        'CUSTOMER'
+        'BUSINESSPARTNER'
     ),
     (
         CURRENT_TIMESTAMP,
@@ -121,7 +122,7 @@ VALUES
         'Data Última Compra',
         NULL,
         0,
-        'CUSTOMER'
+        'BUSINESSPARTNER'
     ),
     -- Product Custom Fields
     (
@@ -283,7 +284,7 @@ VALUES
         'Email de Contato Secundário',
         NULL,
         0,
-        'CUSTOMER'
+        'BUSINESSPARTNER'
     ),
     (
         CURRENT_TIMESTAMP,
@@ -303,5 +304,5 @@ VALUES
         'Volume Anual Estimado (KG)',
         NULL,
         0,
-        'CUSTOMER'
+        'BUSINESSPARTNER'
     );

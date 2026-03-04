@@ -133,7 +133,7 @@
 //        @DisplayName("flags de validação devem estar configuradas")
 //        void shouldHaveValidationFlagsConfigured() {
 //            String query = "SELECT " +
-//                    "customer_validation_enabled, " +
+//                    "businesspartner_validation_enabled, " +
 //                    "contact_validation_enabled, " +
 //                    "address_validation_enabled " +
 //                    "FROM TB_TENANT WHERE id = (SELECT MIN(id) FROM TB_TENANT)";
@@ -142,13 +142,13 @@
 //            assertFalse(results.isEmpty(), "Deve existir tenant para validação");
 //
 //            Map<String, Object> result = results.get(0);
-//            Boolean customerValidation = (Boolean) result.get("customer_validation_enabled");
+//            Boolean businesspartnerValidation = (Boolean) result.get("businesspartner_validation_enabled");
 //            Boolean contactValidation = (Boolean) result.get("contact_validation_enabled");
 //            Boolean addressValidation = (Boolean) result.get("address_validation_enabled");
 //
 //            // Ao menos uma flag deve estar configurada
 //            assertTrue(
-//                    customerValidation != null || contactValidation != null || addressValidation != null,
+//                    businesspartnerValidation != null || contactValidation != null || addressValidation != null,
 //                    "Pelo menos uma flag de validação deve estar configurada"
 //            );
 //        }
@@ -200,7 +200,7 @@
 //        @DisplayName("flags de auditoria devem estar configuradas")
 //        void shouldHaveAuditFlagsConfigured() {
 //            String query = "SELECT " +
-//                    "customer_audit_enabled, " +
+//                    "businesspartner_audit_enabled, " +
 //                    "contact_audit_enabled, " +
 //                    "address_audit_enabled " +
 //                    "FROM TB_TENANT WHERE id = (SELECT MIN(id) FROM TB_TENANT)";
@@ -210,7 +210,7 @@
 //
 //            // Apenas verificar que conseguimos ler os valores
 //            Map<String, Object> result = results.get(0);
-//            assertNotNull(result.get("customer_audit_enabled"));
+//            assertNotNull(result.get("businesspartner_audit_enabled"));
 //            assertNotNull(result.get("contact_audit_enabled"));
 //            assertNotNull(result.get("address_audit_enabled"));
 //        }

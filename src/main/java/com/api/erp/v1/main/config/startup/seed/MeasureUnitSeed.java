@@ -11,15 +11,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * COMPONENT - Seeder de Unidades de Medida Padrão
+ * COMPONENT - Default Measure Units Seeder
  * 
- * Inicializa as unidades de medida padrão do sistema.
- * Cada unidade é criada apenas uma vez (não cria duplicatas).
+ * Initializes default measure units of the system.
+ * Each unit is created only once (does not create duplicates).
  * 
- * Responsabilidades:
- * - Carregar unidades padrão
- * - Verificar se já existem
- * - Criar em lote ou individual
+ * Responsibilities:
+ * - Load default units
+ * - Check if they already exist
+ * - Create em lote ou individual
  * - Logar progresso
  * 
  * @author ERP System
@@ -99,11 +99,11 @@ public class MeasureUnitSeed {
     public void executar() {
         try {
             if (repository.count() > 0) {
-                log.info("⏭️  Unidades de medida já inicializadas, pulando seed.");
+                log.info("⏭️  Measure units already initialized, skipping seed.");
                 return;
             }
 
-            log.info("📏 Inicializando unidades de medida padrão...");
+            log.info("🔏 Initializing default measure units...");
 
             // 1. Busca todas as siglas existentes de uma só vez (1 query)
             Set<String> siglasExistentes = repository.findAll()
@@ -121,19 +121,19 @@ public class MeasureUnitSeed {
                     .toList();
 
             if (paracriar.isEmpty()) {
-                log.info("⏭️  Todas as unidades já existem, nada a criar.");
+                log.info("⏭️  All units already exist, nothing to create.");
                 return;
             }
 
             // 3. Salva tudo em lote (1 query ou poucos batches)
             repository.saveAll(paracriar);
 
-            log.info("✅ {} unidades criadas, {} já existiam.",
+            log.info("✅ {} units created, {} already existed.",
                     paracriar.size(),
                     siglasExistentes.size());
 
         } catch (Exception e) {
-            log.error("❌ Erro ao inicializar unidades de medida:", e);
+            log.error("❌ Error initializing measure units:", e);
             throw new RuntimeException("Falha ao inicializar unidades de medida", e);
         }
     }

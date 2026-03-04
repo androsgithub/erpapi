@@ -26,7 +26,7 @@ public class MeasureUnitController implements IMeasureUnitController, MeasureUni
 
     @PostMapping
     @RequiresXTenantId
-    @RequiresPermission(MeasureUnitPermissions.CRIAR)
+    @RequiresPermission(MeasureUnitPermissions.CREATE)
     public ResponseEntity<MeasureUnitResponseDTO> criar(
             @RequestBody MeasureUnitRequestDTO dto) {
         MeasureUnitResponseDTO resposta = service.criar(dto);
@@ -35,7 +35,7 @@ public class MeasureUnitController implements IMeasureUnitController, MeasureUni
 
     @PutMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(MeasureUnitPermissions.ATUALIZAR)
+    @RequiresPermission(MeasureUnitPermissions.UPDATE)
     public ResponseEntity<MeasureUnitResponseDTO> atualizar(
             @PathVariable Long id,
             @RequestBody MeasureUnitRequestDTO dto) {
@@ -45,14 +45,14 @@ public class MeasureUnitController implements IMeasureUnitController, MeasureUni
 
     @GetMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(MeasureUnitPermissions.VISUALIZAR)
+    @RequiresPermission(MeasureUnitPermissions.VIEW)
     public ResponseEntity<MeasureUnitResponseDTO> obter(@PathVariable Long id) {
         return ResponseEntity.ok(service.obter(id));
     }
 
     @GetMapping
     @RequiresXTenantId
-    @RequiresPermission(MeasureUnitPermissions.VISUALIZAR)
+    @RequiresPermission(MeasureUnitPermissions.VIEW)
     public ResponseEntity<Page<MeasureUnitResponseDTO>> listar(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -63,21 +63,21 @@ public class MeasureUnitController implements IMeasureUnitController, MeasureUni
 
     @PatchMapping("/{id}/ativar")
     @RequiresXTenantId
-    @RequiresPermission(MeasureUnitPermissions.ATIVAR)
+    @RequiresPermission(MeasureUnitPermissions.ACTIVATE)
     public ResponseEntity<MeasureUnitResponseDTO> ativar(@PathVariable Long id) {
         return ResponseEntity.ok(service.ativar(id));
     }
 
     @PatchMapping("/{id}/desativar")
     @RequiresXTenantId
-    @RequiresPermission(MeasureUnitPermissions.DESATIVAR)
+    @RequiresPermission(MeasureUnitPermissions.DEACTIVATE)
     public ResponseEntity<MeasureUnitResponseDTO> desativar(@PathVariable Long id) {
         return ResponseEntity.ok(service.desativar(id));
     }
 
     @DeleteMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(MeasureUnitPermissions.DELETAR)
+    @RequiresPermission(MeasureUnitPermissions.DELETE)
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
         return ResponseEntity.noContent().build();

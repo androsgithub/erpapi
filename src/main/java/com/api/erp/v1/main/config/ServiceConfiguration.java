@@ -1,8 +1,8 @@
 package com.api.erp.v1.main.config;
 
-import com.api.erp.v1.main.features.permission.domain.service.IGerenciamentoPermissionService;
+import com.api.erp.v1.main.features.permission.domain.service.IManagementPermissionService;
 import com.api.erp.v1.main.features.permission.infrastructure.config.PermissionServiceConfiguration;
-import com.api.erp.v1.main.features.permission.infrastructure.factory.GerenciamentoPermissionServiceFactory;
+import com.api.erp.v1.main.features.permission.infrastructure.factory.ManagementPermissionServiceFactory;
 import com.api.erp.v1.main.features.measureunit.domain.service.IMeasureUnitService;
 import com.api.erp.v1.main.features.measureunit.infrastructure.factory.MeasureUnitServiceFactory;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +20,8 @@ public class ServiceConfiguration {
     }
 
     @Bean
-    public IGerenciamentoPermissionService gerenciamentoPermissionService(
-            GerenciamentoPermissionServiceFactory factory) {
+    public IManagementPermissionService gerenciamentoPermissionService(
+            ManagementPermissionServiceFactory factory) {
         return factory.create();
     }
 }

@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * INFRASTRUCTURE - Worker de Inicialização para Fila Unificada de Migrações
+ * INFRASTRUCTURE - Worker de Initialization para Fila Unificada de Migrações
  * 
  * Responsável por:
  * 1. Enfileirar TODOS os tenants ativos ao iniciar a aplicação
@@ -42,7 +42,7 @@ public class TenantMigrationStartupWorker {
     private final TenantDatasourceRepository tenantDatasourceRepository;
     
     /**
-     * Executa a inicialização da fila de migrações
+     * Executes a inicialização da fila de migrações
      * 
      * Fluxo:
      * 1. Busca todos os tenants ativos
@@ -62,15 +62,15 @@ public class TenantMigrationStartupWorker {
         
         try {
             // ────────────────────────────────────────────────────────────
-            // FASE 1: Enfileirar todos os tenants ativos
+            // PHASE 1: Enfileirar todos os tenants ativos
             // ────────────────────────────────────────────────────────────
             log.info("📋 Buscando tenants ativos para enfileiramento...");
             
             var tenants = tenantRepository.findAllByAtivaTrue();
             
             if (tenants.isEmpty()) {
-                log.warn("⚠️ Nenhum tenant ativo encontrado para migração");
-                log.info("✅ Inicialização concluída (sem tenants)");
+                log.warn("⚠️ No active tenant found for migration");
+                log.info("✅ Initialization completed (no tenants)");
                 return;
             }
             
@@ -88,7 +88,7 @@ public class TenantMigrationStartupWorker {
                             .findByTenantIdAndStatus(tenant.getId(), true);
                     
                     if (datasource == null) {
-                        log.warn("⚠️ Tenant {} não possui datasource configurado - pulando", 
+                        log.warn("⚠️ Tenant {} does not have datasource configured - skipping", 
                                 tenant.getNome());
                         skippedCount++;
                         continue;
@@ -119,37 +119,37 @@ public class TenantMigrationStartupWorker {
             log.info("   📈 Total: {}", tenants.size());
             
             if (enqueuedCount == 0) {
-                log.warn("⚠️ Nenhum tenant foi enfileirado para migração");
+                log.warn("⚠️ No tenant was enqueued for migration");
                 return;
             }
             
             // ────────────────────────────────────────────────────────────
-            // FASE 2: Iniciar o consumidor assíncrono
+            // PHASE 2: Iniciar o consumidor assíncrono
             // ────────────────────────────────────────────────────────────
             log.info("");
-            log.info("🚀 Iniciando consumidor assíncrono de fila...");
-            log.info("   A aplicação continuará respondendo durante o processamento");
+            log.info("🚀 Starting asynchronous queue consumer...");
+            log.info("   Application will continue responding during processing");
             log.info("");
             
             // Dispara o consumidor de forma assíncrona
             queueConsumer.startConsumer();
             
-            log.info("✅ Inicialização concluída com sucesso");
-            log.info("   - {} tenants enfileirados para migração", enqueuedCount);
+            log.info("✅ Initialization completed successfully");
+            log.info("   - {} tenants enqueued for migration", enqueuedCount);
             log.info("   - Consumidor iniciado em background");
             log.info("");
             
         } catch (Exception e) {
             log.error("");
             log.error("╔════════════════════════════════════════════════════════════════╗");
-            log.error("║   !!!   ERRO NA INICIALIZAÇÃO DA FILA DE MIGRAÇÕES   !!!       ║");
+            log.error("║   !!!   ERROR INITIALIZING MIGRATION QUEUE   !!!       ║");
             log.error("╚════════════════════════════════════════════════════════════════╝");
             log.error("Erro: {}", e.getMessage(), e);
             
             // Não relança exceção para permitir que a aplicação continue
             // A fila pode ser reprocessada manualmente se necessário
-            log.warn("⚠️ A aplicação continuará rodando apesar do erro na inicialização");
-            log.warn("   Dica: Use endpoints de administração para verificar status e reprocessar");
+            log.warn("⚠️ Application will continue running despite initialization error");
+            log.warn("   Tip: Use admin endpoints to check status and reprocess");
         }
         
         log.info("");

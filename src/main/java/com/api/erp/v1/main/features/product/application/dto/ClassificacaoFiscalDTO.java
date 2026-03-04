@@ -47,7 +47,7 @@ public class ClassificacaoFiscalDTO {
     /**
      * Código de benefício fiscal (opcional)
      * Máximo 10 caracteres
-     * Exemplo: "AP01" para regime de tributação especial
+     * Example: "AP01" para regime de tributação especial
      */
     private String codigoBeneficioFiscal;
     

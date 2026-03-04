@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * INFRASTRUCTURE - Configuração JPA para Tenant DataSource
+ * INFRASTRUCTURE - Configuration JPA para Tenant DataSource
  * <p>
  * Configura EntityManager e TransactionManager para bancos de dados de tenants.
  * Usa RoutingDS para rotear automaticamente para o banco correto baseado no tenant.
@@ -30,7 +30,7 @@ import java.util.Map;
 @EnableJpaRepositories(
         basePackages = {
                 "com.api.erp.v1.main.features.address.domain.repository",
-                "com.api.erp.v1.main.features.customer.domain.repository",
+                "com.api.erp.v1.main.features.businesspartner.domain.repository",
                 "com.api.erp.v1.main.features.contact.domain.repository",
                 "com.api.erp.v1.main.features.user.domain.repository",
                 "com.api.erp.v1.main.features.permission.domain.repository",
@@ -59,7 +59,7 @@ public class TenantJpaConfig {
                 .packages(
                         "com.api.erp.v1.main.tenant.domain.entity",
                         "com.api.erp.v1.main.features.address.domain.entity",
-                        "com.api.erp.v1.main.features.customer.domain.entity",
+                        "com.api.erp.v1.main.features.businesspartner.domain.entity",
                         "com.api.erp.v1.main.features.contact.domain.entity",
                         "com.api.erp.v1.main.features.user.domain.entity",
                         "com.api.erp.v1.main.features.permission.domain.entity",
@@ -88,7 +88,7 @@ public class TenantJpaConfig {
     public CustomRoutingDatasource customRoutingDatasource(
             IDataSourceRouter dataSourceRouter) {
 
-        log.info("Criando CustomRoutingDatasource para roteamento automático");
+        log.info("Creating CustomRoutingDatasource for automatic routing");
         return new CustomRoutingDatasource(dataSourceRouter);
     }
 }

@@ -27,13 +27,13 @@
 // * Esta configuração foi substituída pela arquitetura consolidada e limpa.
 // * Migre para: com.api.erp.v1.main.datasource.routing.config
 // *
-// * Configuração manual de DataSource para o banco master (erpapi).
+// * Configuration manual de DataSource para o banco master (erpapi).
 // *
 // * Esta classe configura:
 // * - defaultDataSource: DataSource para o banco master
 // * - multiTenantRoutingDataSource: Roteia requisições entre bancos de tenants
 // * - entityManagerFactory: EntityManager para o banco master
-// * - transactionManager: Gerenciador de transações
+// * - transactionManager: Managesdor de transações
 // *
 // * IMPORTANTE: @EnableJpaRepositories foi removido e movido para TenantsMasterRepositoriesConfig
 // * para evitar conflitos com outros @EnableJpaRepositories (ex: em LogsRepositoriesConfig).
@@ -86,7 +86,7 @@
 //        entityManagerFactoryBean.setPackagesToScan(
 //                ApplicationContext.class.getPackageName(),
 //                "com.api.erp.v1.main.features.address.domain.entity",
-//                "com.api.erp.v1.main.features.customer.domain.entity",
+//                "com.api.erp.v1.main.features.businesspartner.domain.entity",
 //                "com.api.erp.v1.main.features.contact.domain.entity",
 //                "com.api.erp.v1.main.features.user.domain.entity",
 //                "com.api.erp.v1.main.shared.infrastructure.persistence.converters",

@@ -16,10 +16,10 @@ import java.util.Optional;
 /**
  * INFRASTRUCTURE - Implementação de ITenantConfigProvider usando JDBC
  * <p>
- * Recupera configurações de tenant do banco de dados Master.
+ * Retrieves configurações de tenant do banco de dados Master.
  * Usa JdbcTemplate para abstração de queries.
  * <p>
- * Responsabilidade: Recuperar dados de tenant persistidos
+ * Responsibility: Retrievesr dados de tenant persistidos
  *
  * @author ERP System
  * @version 1.0
@@ -88,7 +88,7 @@ public class JdbcTenantConfigProvider implements ITenantConfigProvider {
                         String dbType = rs.getString("db_type");
 
                         log.debug(
-                            "Tenant {} encontrado: BD {} em {}:{} (tipo: {})",
+                            "Tenant {} found: DB {} at {}:{} (type: {})",
                             tenantId, database, host, port, dbType
                         );
 
@@ -125,7 +125,7 @@ public class JdbcTenantConfigProvider implements ITenantConfigProvider {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            log.error("❌ Erro inesperado ao recuperar configuração de tenant {}: {}", tenantId, e.getMessage(), e);
+            log.error("❌ Unexpected error retrieving tenant configuration {}: {}", tenantId, e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -145,7 +145,7 @@ public class JdbcTenantConfigProvider implements ITenantConfigProvider {
     @Override
     public boolean tenantExists(String tenantId) {
         if (tenantId == null || tenantId.trim().isEmpty()) {
-            log.warn("Tenant ID inválido para verificação: null ou vazio");
+            log.warn("Invalid Tenant ID for verification: null or empty");
             return false;
         }
 
@@ -157,13 +157,13 @@ public class JdbcTenantConfigProvider implements ITenantConfigProvider {
                     (rs, rowNum) -> 1
             );
             boolean exists = !results.isEmpty();
-            log.debug("Verificação de tenant {}: {}", tenantId, exists ? "existe" : "não existe");
+            log.debug("Tenant verification {}: {}", tenantId, exists ? "exists" : "does not exist");
             return exists;
         } catch (NumberFormatException e) {
-            log.warn("Tenant ID não é um número válido: {}", tenantId);
+            log.warn("Tenant ID is not a valid number: {}", tenantId);
             return false;
         } catch (Exception e) {
-            log.error("Erro ao verificar existência de tenant {}: {}", tenantId, e.getMessage());
+            log.error("Error verifying tenant existence {}: {}", tenantId, e.getMessage());
             return false;
         }
     }

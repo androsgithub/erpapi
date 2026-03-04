@@ -1,8 +1,8 @@
 package com.api.erp.v1.main.shared.domain.enums;
 
 public enum TenantType {
-    DEFAULT("default", "Configuração Padrão"),
-    HECE("hece", "Configuração para empresa Hece - máquinas");
+    DEFAULT("default", "Configuration Padrão"),
+    HECE("hece", "Configuration para empresa Hece - máquinas");
 
     private final String code;
     private final String description;

@@ -14,7 +14,7 @@ import javax.sql.DataSource;
  * Encapsula toda a lógica de criação e configuração de DataSources.
  * Aplica validações e configurações padrão para todos os pools.
  * 
- * Responsabilidade: Criar DataSources prontos para uso
+ * Responsibility: Create DataSources prontos para uso
  * 
  * @author ERP System
  * @version 1.0
@@ -35,7 +35,7 @@ public class HikariDataSourceFactory {
      */
     public DataSource createDataSource(TenantDSConfig config) {
         if (config == null) {
-            throw new IllegalArgumentException("TenantDataSourceConfig não pode ser null");
+            throw new IllegalArgumentException("TenantDataSourceConfig cannot be null");
         }
 
         try {
@@ -60,8 +60,8 @@ public class HikariDataSourceFactory {
             log.info("DataSource criado com sucesso para tenant: {}", config.getTenantId());
             return dataSource;
         } catch (Exception e) {
-            log.error("Erro ao criar DataSource para tenant: {}", config.getTenantId(), e);
-            throw new RuntimeException("Falha ao criar DataSource para tenant: " + config.getTenantId(), e);
+            log.error("Error creating DataSource for tenant: {}", config.getTenantId(), e);
+            throw new RuntimeException("Failed to create DataSource for tenant: " + config.getTenantId(), e);
         }
     }
 
@@ -70,7 +70,7 @@ public class HikariDataSourceFactory {
      */
     public DataSource createDataSource(TenantDSConfig config, int maxPoolSize, int minIdle) {
         if (config == null) {
-            throw new IllegalArgumentException("TenantDataSourceConfig não pode ser null");
+            throw new IllegalArgumentException("TenantDataSourceConfig cannot be null");
         }
 
         try {
@@ -91,12 +91,12 @@ public class HikariDataSourceFactory {
 
             HikariDataSource dataSource = new HikariDataSource(hikariConfig);
             
-            log.info("DataSource criado com sucesso para tenant: {} (poolSize: {})", 
+            log.info("DataSource created successfully for tenant: {} (poolSize: {})", 
                     config.getTenantId(), maxPoolSize);
             return dataSource;
         } catch (Exception e) {
-            log.error("Erro ao criar DataSource para tenant: {}", config.getTenantId(), e);
-            throw new RuntimeException("Falha ao criar DataSource para tenant: " + config.getTenantId(), e);
+            log.error("Error creating DataSource for tenant: {}", config.getTenantId(), e);
+            throw new RuntimeException("Failed to create DataSource for tenant: " + config.getTenantId(), e);
         }
     }
 }

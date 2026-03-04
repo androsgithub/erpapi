@@ -134,17 +134,17 @@ public class UserService implements IUserService {
 
 
         Long tenantId = TenantContext.getTenantId();
-        Long tenantGroupId = TenantContext.getGroupId();
+        List<Long> tenantGroupIds = TenantContext.getGroupIds();
 
         for (Long permissionId : request.permissionIds()) {
 
             Permission permission = permissionRepository.findById(permissionId).orElseThrow(() -> new NotFoundException("Permission not found"));
 
-            boolean exists = userRepository.existsByIdAndPermissions_IdAndTenantIdAndTenantGroupId(
+            boolean exists = userRepository.existsByIdAndPermissions_IdAndTenantIdAndTenantGroupIdIn(
                     userId,
                     permissionId,
                     tenantId,
-                    tenantGroupId
+                    tenantGroupIds
             );
 
             if (exists) continue;
@@ -183,13 +183,13 @@ public class UserService implements IUserService {
 
 
         Long tenantId = TenantContext.getTenantId();
-        Long tenantGroupId = TenantContext.getGroupId();
+        List<Long> tenantGroupIds = TenantContext.getGroupIds();
 
         for (Long roleId : request.roleIds()) {
 
             Role role = roleRepository.findById(roleId).orElseThrow(() -> new NotFoundException("Role not found"));
 
-            boolean exists = userRepository.existsByIdAndRoles_IdAndTenantIdAndTenantGroupId(userId, roleId, tenantId, tenantGroupId);
+            boolean exists = userRepository.existsByIdAndRoles_IdAndTenantIdAndTenantGroupIdIn(userId, roleId, tenantId, tenantGroupIds);
 
             if (exists) continue;
 

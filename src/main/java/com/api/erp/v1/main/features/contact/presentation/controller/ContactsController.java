@@ -31,7 +31,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @PostMapping
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.CRIAR)
+    @RequiresPermission(ContactPermissions.CREATE)
     public ResponseEntity<ContactResponse> criar(@RequestBody CreateContactRequest request) {
         var contact = contactService.criar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(contactMapper.toResponse(contact));
@@ -39,7 +39,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @GetMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.VISUALIZAR)
+    @RequiresPermission(ContactPermissions.VIEW)
     public ResponseEntity<ContactResponse> buscar(
             @PathVariable @Parameter(description = "ID do contact") Long id) {
         var contact = contactService.buscarPorId(id);
@@ -48,7 +48,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @GetMapping
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.VISUALIZAR)
+    @RequiresPermission(ContactPermissions.VIEW)
     public ResponseEntity<List<ContactResponse>> listar() {
         var contacts = contactService.buscarTodos();
         return ResponseEntity.ok(contactMapper.toResponseList(contacts));
@@ -56,7 +56,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @GetMapping("/status/ativos")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.VISUALIZAR)
+    @RequiresPermission(ContactPermissions.VIEW)
     public ResponseEntity<List<ContactResponse>> listarAtivos() {
         var contacts = contactService.buscarAtivos();
         return ResponseEntity.ok(contactMapper.toResponseList(contacts));
@@ -65,7 +65,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @GetMapping("/status/inativos")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.VISUALIZAR)
+    @RequiresPermission(ContactPermissions.VIEW)
     public ResponseEntity<List<ContactResponse>> listarInativos() {
         var contacts = contactService.buscarInativos();
         return ResponseEntity.ok(contactMapper.toResponseList(contacts));
@@ -73,7 +73,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @GetMapping("/tipo/{tipo}")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.VISUALIZAR)
+    @RequiresPermission(ContactPermissions.VIEW)
     public ResponseEntity<List<ContactResponse>> listarPorTipo(
             @PathVariable @Parameter(description = "Tipo de contact (TELEFONE, EMAIL, WHATSAPP, etc.)") String tipo) {
         var contacts = contactService.buscarPorTipo(tipo);
@@ -82,7 +82,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @GetMapping("/principal")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.VISUALIZAR)
+    @RequiresPermission(ContactPermissions.VIEW)
     public ResponseEntity<ContactResponse> buscarPrincipal() {
         var contact = contactService.buscarPrincipal();
         return ResponseEntity.ok(contactMapper.toResponse(contact));
@@ -90,7 +90,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @PutMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.ATUALIZAR)
+    @RequiresPermission(ContactPermissions.UPDATE)
     public ResponseEntity<ContactResponse> atualizar(
             @PathVariable @Parameter(description = "ID do contact") Long id,
             @RequestBody CreateContactRequest request) {
@@ -101,7 +101,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @PatchMapping("/{id}/ativar")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.ATUALIZAR)
+    @RequiresPermission(ContactPermissions.UPDATE)
     public ResponseEntity<ContactResponse> ativar(
             @PathVariable @Parameter(description = "ID do contact") Long id) {
         var contact = contactService.ativar(id);
@@ -110,7 +110,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @PatchMapping("/{id}/desativar")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.ATUALIZAR)
+    @RequiresPermission(ContactPermissions.UPDATE)
     public ResponseEntity<ContactResponse> desativar(
             @PathVariable @Parameter(description = "ID do contact") Long id) {
         var contact = contactService.desativar(id);
@@ -119,7 +119,7 @@ public class ContactsController implements IContactsController, ContactsOpenApiD
 
     @DeleteMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(ContactPermissions.DELETAR)
+    @RequiresPermission(ContactPermissions.DELETE)
     public ResponseEntity<Void> deletar(
             @PathVariable @Parameter(description = "ID do contact") Long id) {
         contactService.deletar(id);

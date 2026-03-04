@@ -10,7 +10,7 @@
 //public interface UserPermissionRepository extends JpaRepository<UserPermission, Long> {
 //
 //    // ⚠️ Queries com tenantGroupId null precisam usar IS NULL em SQL
-//    // Suporta tenants com e sem particionamento por grupos
+//    // Suporta tenants com e without group partitioning
 //    @Query("""
 //            SELECT CASE WHEN COUNT(up) > 0 THEN true ELSE false END
 //            FROM UserPermission up

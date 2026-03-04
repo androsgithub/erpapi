@@ -14,7 +14,7 @@ import java.util.List;
  * Envia notificações (via email) quando contacts são criados, atualizados ou deletados.
  * Este decorator pode ser adicionado à factory quando habilitado na configuração.
  * <p>
- * Configuração:
+ * Configuration:
  * contact.decorators.notification.enabled=true
  * contact.decorators.notification.recipient-email=admin@empresa.com
  * <p>

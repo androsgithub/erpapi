@@ -46,7 +46,7 @@ public class ProductServiceProxy implements IProductService {
 
             try {
                 IProductService service = applicationContext.getBean(beanName, IProductService.class);
-                log.debug("[CUSTOMER SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
+                log.debug("[BUSINESSPARTNER SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
                 response = service;
             } catch (Exception e) {
                 log.debug("[PRODUCT SERVICE] Service {} not found, using default", beanName);

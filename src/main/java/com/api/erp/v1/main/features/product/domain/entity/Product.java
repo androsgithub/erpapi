@@ -14,9 +14,9 @@ import java.util.List;
 /**
  * Entidade de domínio que representa um Product.
  * <p>
- * Responsabilidades:
- * - Armazenar dados do product
- * - Validar estado do product através de métodos de comportamento
+ * Responsibilities:
+ * - Storesr dados do product
+ * - Validate estado do product através de métodos de comportamento
  * - Representar as regras de negócio do domínio
  * <p>
  * Atributos principais:
@@ -61,7 +61,7 @@ public class Product extends BaseEntity {
      * Referência à Unidade de Medida - evita valores soltos
      * Toda unidade deve ser uma entidade válida do sistema
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "measure_unit_id", nullable = false)
     private MeasureUnit measureUnit;
 

@@ -9,13 +9,13 @@
 // * Esta configuração foi substituída pela arquitetura consolidada e limpa.
 // * Migre para: com.api.erp.v1.main.datasource.routing.config.TenantRepositoriesConfig
 // *
-// * Configuração de JPA Repositories para os repositories multi-tenant (features).
+// * Configuration de JPA Repositories para os repositories multi-tenant (features).
 // *
 // * Esta classe é separada de TenantsConfiguration para evitar conflitos com outros
 // * @EnableJpaRepositories na aplicação (ex: em LogsRepositoriesConfig e TenantsMasterRepositoriesConfig).
 // *
-// * Configuração:
-// * - basePackages: Todos os repositories de features (address, customer, contact, user, etc)
+// * Configuration:
+// * - basePackages: Todos os repositories de features (address, businesspartner, contact, user, etc)
 // * - entityManagerFactoryRef: entityManagerFactory (criado em TenantsConfiguration)
 // * - transactionManagerRef: transactionManager (criado em TenantsConfiguration)
 // *
@@ -34,7 +34,7 @@
 //@EnableJpaRepositories(
 //        basePackages = {
 //                "com.api.erp.v1.main.features.address.domain.repository",
-//                "com.api.erp.v1.main.features.customer.domain.repository",
+//                "com.api.erp.v1.main.features.businesspartner.domain.repository",
 //                "com.api.erp.v1.main.features.contact.domain.repository",
 //                "com.api.erp.v1.main.features.user.domain.repository",
 //                "com.api.erp.v1.main.features.permission.domain.repository",
@@ -46,5 +46,5 @@
 //        transactionManagerRef = "transactionManager"
 //)
 //public class FeaturesRepositoriesConfig {
-//    // Configuração de Repositories para features multi-tenant
+//    // Configuration de Repositories para features multi-tenant
 //}

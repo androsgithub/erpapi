@@ -1,7 +1,8 @@
-DO SLEEP(0.125);
--- Insert Customer Contacts
+DO SLEEP (0.125);
+
+-- Insert BusinessPartner Contacts
 INSERT INTO
-    TB_CUSTOMER_CONTACT (customer_id, contact_id)
+    TB_BUSINESS_PARTNER_CONTACT (businesspartner_id, contact_id)
 VALUES
     -- Distribuidora Brasil - multiple contacts
     (
@@ -9,7 +10,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'DISTRIBUIDORA BRASIL'
             LIMIT
@@ -32,7 +33,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'DISTRIBUIDORA BRASIL'
             LIMIT
@@ -55,7 +56,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'DISTRIBUIDORA BRASIL'
             LIMIT
@@ -78,7 +79,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'DISTRIBUIDORA BRASIL'
             LIMIT
@@ -101,7 +102,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'LOJA CENTRAL'
             LIMIT
@@ -127,7 +128,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'LOJA CENTRAL'
             LIMIT
@@ -153,7 +154,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'LOJA CENTRAL'
             LIMIT
@@ -176,7 +177,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'FORNECEDOR ABC'
             LIMIT
@@ -202,7 +203,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'FORNECEDOR ABC'
             LIMIT
@@ -229,7 +230,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'João da Silva'
             LIMIT
@@ -255,7 +256,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'João da Silva'
             LIMIT
@@ -282,7 +283,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'Maria dos Santos'
             LIMIT
@@ -308,7 +309,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'Maria dos Santos'
             LIMIT
@@ -335,7 +336,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'SUPRIMENTOS XYZ'
             LIMIT
@@ -361,7 +362,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'SUPRIMENTOS XYZ'
             LIMIT
@@ -384,7 +385,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'Pedro Oliveira'
             LIMIT
@@ -410,7 +411,7 @@ VALUES
             SELECT
                 id
             FROM
-                tb_customer
+                tb_business_partner
             WHERE
                 nome = 'Pedro Oliveira'
             LIMIT

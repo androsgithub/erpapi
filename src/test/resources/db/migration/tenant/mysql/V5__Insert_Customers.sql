@@ -1,6 +1,6 @@
--- Insert Customers
+-- Insert BusinessPartners
 INSERT INTO
-    tb_customer (
+    tb_business_partner (
         created_at,
         created_by,
         deleted,

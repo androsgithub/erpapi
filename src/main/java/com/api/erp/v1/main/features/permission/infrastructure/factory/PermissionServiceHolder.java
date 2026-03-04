@@ -26,7 +26,7 @@ public class PermissionServiceHolder {
         try {
             IPermissionService service = serviceReference.get();
             if (service == null) {
-                throw new IllegalStateException("PermissionService não foi inicializado");
+                throw new IllegalStateException("PermissionService was not initialized");
             }
             return service;
         } finally {

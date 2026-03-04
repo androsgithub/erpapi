@@ -10,7 +10,7 @@ import java.util.List;
  * UNIFIED CONFIG REQUEST - Consolida todas as configurações de tenant
  * 
  * Substitui os 6 PUTs antigos:
- * - PUT /config/customer
+ * - PUT /config/businesspartner
  * - PUT /config/user
  * - PUT /config/permission
  * - PUT /config/tenant
@@ -21,12 +21,12 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UnifiedTenantConfigRequest(
-        // === CUSTOMER CONFIG ===
-        Boolean customerValidationEnabled,
-        Boolean customerAuditEnabled,
-        Boolean customerCacheEnabled,
-        Boolean customerNotificationEnabled,
-        Boolean customerTenantCustomizationEnabled,
+        // === BUSINESSPARTNER CONFIG ===
+        Boolean businesspartnerValidationEnabled,
+        Boolean businesspartnerAuditEnabled,
+        Boolean businesspartnerCacheEnabled,
+        Boolean businesspartnerNotificationEnabled,
+        Boolean businesspartnerTenantCustomizationEnabled,
         
         // === USER CONFIG ===
         Boolean userApprovalRequired,

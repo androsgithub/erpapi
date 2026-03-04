@@ -18,7 +18,7 @@ public class CPF {
         String cpfLimpo = limpar(cpf);
         if (cpfLimpo.length() != 11) return false;
         
-        // Validação de dígitos verificadores
+        // Validation de dígitos verificadores
         int[] pesos1 = {10, 9, 8, 7, 6, 5, 4, 3, 2};
         int[] pesos2 = {11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
         

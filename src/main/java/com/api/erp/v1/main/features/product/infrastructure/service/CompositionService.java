@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 /**
  * Serviço de Aplicação para Composição de Product (BOM)
  * 
- * Responsabilidades:
- * - Gerenciar composições de products fabricáveis
- * - Validar regras de domínio (composição circular, quantidade, etc)
+ * Responsibilities:
+ * - Managesr composições de products fabricáveis
+ * - Validate regras de domínio (composição circular, quantidade, etc)
  * - Transformar DTOs
  * 
  * SRP: Lógica de aplicação para composições
@@ -44,10 +44,10 @@ public class CompositionService implements ICompositionService {
         Product productFabricado = obterProduct(dto.getProductFabricadoId());
         Product productComponente = obterProduct(dto.getProductComponenteId());
         
-        // Validar composição
+        // Validate composição
         validator.validarComposition(productFabricado, productComponente, dto.getQuantidadeNecessaria());
         
-        // Verificar se já existe essa composição
+        // Check se já existe essa composição
         var compositionExistente = compositionRepository.findByProductFabricadoIdAndProductComponenteId(
                 dto.getProductFabricadoId(),
                 dto.getProductComponenteId()
@@ -88,7 +88,7 @@ public class CompositionService implements ICompositionService {
             );
             composition.setProductComponente(novoComponente);
         } else {
-            // Validar apenas a quantidade
+            // Validate apenas a quantidade
             if (dto.getQuantidadeNecessaria() == null || 
                     dto.getQuantidadeNecessaria().compareTo(java.math.BigDecimal.ZERO) <= 0) {
                 throw ProductException.quantidadeInvalida();
@@ -105,7 +105,7 @@ public class CompositionService implements ICompositionService {
     }
     
     /**
-     * Obtém uma composição por ID
+     * Gets uma composição por ID
      */
     @Transactional(readOnly = true)
     public CompositionResponseDTO obter(Long id) {
@@ -117,7 +117,7 @@ public class CompositionService implements ICompositionService {
      */
     @Transactional(readOnly = true)
     public List<CompositionResponseDTO> listarComposicoesPor(Long productFabricadoId) {
-        // Validar que o product existe
+        // Validate que o product existe
         obterProduct(productFabricadoId);
         
         return compositionRepository.findByProductFabricadoId(productFabricadoId).stream()
@@ -143,7 +143,7 @@ public class CompositionService implements ICompositionService {
     }
     
     /**
-     * Obtém composição por ID ou lança exceção
+     * Gets composição por ID ou lança exceção
      */
     private ProductComposition obterPorId(Long id) {
         return compositionRepository.findById(id)
@@ -154,7 +154,7 @@ public class CompositionService implements ICompositionService {
     }
     
     /**
-     * Obtém product por ID ou lança exceção
+     * Gets product por ID ou lança exceção
      */
     private Product obterProduct(Long id) {
         return productRepository.findById(id)

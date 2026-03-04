@@ -1,1087 +1,532 @@
-# ERP Cloud - Documentação Arquitetural
+# 🌐 CLOUD.md - Documentação Arquitetural do ERPAPI
 
-> **Última Atualização**: Fevereiro 14, 2026  
-> Um documento único, agnóstico de tecnologia, que documenta estratégias, padrões e motivos das decisões do sistema.
-> ⚠️ **NOTA**: Este documento descreve a arquitetura ideal. Ver seção [Desvios Identificados](#-desvios-identificados) para divergências com a implementação atual.
+## 📌 Propósito deste Documento
 
----
-
-## 📋 Índice
-1. [Visão Geral](#visão-geral)
-2. [Princípios Arquiteturais](#princípios-arquiteturais)
-3. [Padrões de Design](#padrões-de-design)
-4. [Estratégia de Domínio](#estratégia-de-domínio)
-5. [Observability & Auditoria](#-observability--auditoria)
-6. [Gestão de Acesso](#-gestão-de-acesso)
-7. [Multi-Tenancy](#multi-tenancy)
-8. [Decisões de Projeto](#decisões-de-projeto)
-9. [Desvios Identificados](#-desvios-identificados)
-10. [Componentes Principais](#componentes-principais)
-11. [Fluxos Críticos](#fluxos-críticos)
-12. [Fila Assíncrona de Migrações](#-fila-assíncrona-de-migrações)
-13. [Referências Internas](#-referências-internas)
+Este é um documento de referência arquitetural para agentes de IA. Fornece uma visão completa de como o sistema funciona, sua estrutura, fluxos de dados e padrões utilizados. **Não contém código Java**, focando apenas em conceitos e arquitetura.
 
 ---
 
-## 🎯 Visão Geral
+## 🏢 Visão Geral do ERPAPI
 
-ERP Cloud é um sistema de gestão empresarial projetado para ser:
-- **Multi-tenant**: Múltiplas empresas operando de forma isolada no mesmo sistema
-- **Extensível**: Suporta customizações por tenant
-- **Auditável**: Rastreia todas as operações críticas
-- **Seguro**: Isolamento de dados, controle de acesso granular
+**ERPAPI** é uma aplicação Enterprise Resource Planning (ERP) desenvolvida em **Spring Boot 4.0.1** com **Java 21**, projetada para oferecer uma plataforma escalável de gestão empresarial com suporte completo a **múltiplos tenants** (multi-tenancy).
 
-### Objetivo Principal
-Fornecer uma plataforma centralizada para gerenciamento de processos empresariais (usuários, products, customers, etc) com suporte a múltiplos tenants.
-
----
-
-## 🏗️ Princípios Arquiteturais
-
-### 1. **Clean Architecture**
-A codebase é organizada em camadas independentes:
-
-```
-┌─────────────────────────────────────────┐
-│   Presentation (REST API, Controllers)  │
-│   Input validation, HTTP mapping        │
-├─────────────────────────────────────────┤
-│   Application (Handlers, Commands)      │
-│   Orquestração de domínio, use cases    │
-├─────────────────────────────────────────┤
-│   Domain (Aggregates, Value Objects)    │
-│   Lógica de negócio pura                │
-├─────────────────────────────────────────┤
-│   Infrastructure (Persistence, Events)  │
-│   Detalhe técnico de persistência       │
-└─────────────────────────────────────────┘
-```
-
-**Por que?** Mantém a lógica de negócio isolada de detalhes técnicos, facilitando testes e manutenção.
-
-### 2. **Domain-Driven Design (DDD)**
-O sistema modela conceitos de negócio como primeira classe:
-- **Agregados**: User, Tenant, Product (raízes de coerência transacional)
-- **Value Objects**: UserId, UserEmail, UserRole (imutáveis, sem identidade própria)
-- **Repositórios**: Persistência abstrata para agregados
-- **Domain Events**: Eventos que representam mudanças significativas
-
-**Por que?** Alinha código com linguagem de negócio, tornando mais fácil comunicação entre técnicos e stakeholders.
-
-### 3. **CQRS (Command Query Responsibility Segregation)**
-Separação entre operações de escrita (Commands) e leitura (Queries):
-- **Commands**: Mudam o estado (CreateUser, ActivateUser)
-- **Handlers**: Orquestram a execução de commands
-- **Queries**: Recuperam dados (potencial para otimizações futuras)
-
-**Por que?** Permite otimizações independentes de escrita/leitura e auditoria clara.
-
-### 4. **Event Sourcing**
-Operações críticas geram domain events que documentam o histórico:
-- UserCreatedEvent, UserActivatedEvent, UserRoleAddedEvent
-- Permite reconstruir estado, auditoria, e notificações
-
-**Por que?** Auditoria completa, capacidade de recuperação de falhas, e base para sistemas assíncronos.
+### Características Principais:
+- ✅ Arquitetura multi-tenant com 3 estratégias diferentes
+- ✅ Segregação de dados por tenant, grupo de tenants e escopo global
+- ✅ Suporte a múltiplos bancos de dados e schemas
+- ✅ Sistema de features extensível e modular
+- ✅ Padrões de design avançados (Strategy, Decorator, Proxy)
+- ✅ Observabilidade com integração SonarQube
+- ✅ Spring Batch para processamento assíncrono de migrações
+- ✅ Flyway para controle de versão de banco de dados
 
 ---
 
-## 🎨 Padrões de Design
+## 🏗️ Arquitetura Multi-Tenant
 
-### **Pattern: Mapper (Domain ↔ Infrastructure)** - ⚠️ NÃO IMPLEMENTADO
-```
-Domain Layer      Infrastructure Layer
-   User      <---->   UserEntity
-  (puro)            (com JPA annotations)
-```
+### 1. Estratégias de Multi-Tenancy Suportadas
 
-**Objetivo**: Mantém o domínio livre de acoplamento com detalhes de persistência. A camada domain não conhece JPA, bancos de dados, ou qualquer framework.
+O ERPAPI suporta 3 estratégias principais de isolamento de dados:
 
-**Padrão idealizado**:
-- `User.java` (domínio puro, sem @Entity, sem @Column)
-- `UserEntity.java` (mapping JPA completo)
-- `UserMapper.java` (converte User ↔ UserEntity bidirecionalmente)
+#### 🔹 **Estratégia 1: Segmentação por Coluna (Row-Level Isolation)**
+Todos os tenants compartilham o mesmo banco de dados e tabelas, com segregação via colunas específicas:
 
-**ℹ️ ATUAL**: Ver seção [Desvios Identificados](#-desvios-identificados) - Implementação atual não segue este padrão.
+- **Tenant ID**: Identifica o específico tenant proprietário do registro
+- **Tenant Group IDs**: Agrupa múltiplos tenants para compartilhamento de registros específicos
+- **Scope**: Define se um registro é:
+  - **Tenant**: Pertence a um único tenant
+  - **Global**: Disponível para todos os tenants do banco
 
-### **Pattern: Value Object (Imutável)**
-```
-UserEmail = "joao@example.com"  // Validado no construtor
-userId = 123L                    // Dentro de UserId(123)
-```
+*Benefício*: Sincronização de dados compartilhados em tempo real
+*Limitação*: Requer filtros rigorosos em todas as queries
 
-**Motivo**: Encapsula validação, previne estados inválidos, documenta intent.
+#### 🔹 **Estratégia 2: Segmentação por Schema**
+Cada tenant (ou grupo de tenants) possui um schema separado dentro do mesmo banco de dados.
 
-**Exemplos**: UserId, UserEmail, UserName, UserPassword, UserRole, UserPermission
+*Benefício*: Isolamento lógico completo, schemas independentes
+*Limitação*: Maior complexidade operacional
 
-### **Pattern: Repository (Abstração de Persistência)**
-```
-Domain:     UserRepository (interface, abstraiona dados)
-Infra:      UserRepositoryJpa (implementação concreta)
-```
+#### 🔹 **Estratégia 3: Bancos Separados**
+Cada tenant possui um banco de dados completamente separado.
 
-**Motivo**: Domínio não depende de tecnologia de persistência. Fácil de mockear testes.
+*Benefício*: Isolamento máximo, compliance de dados, escalabilidade horizontal
+*Limitação*: Maior consumo de recursos, sincronização complexa para dados compartilhados
 
-### **Pattern: Aggregate Root (Consistência Transacional)**
-```
-User (Aggregate Root)
-├── UserId (Value Object)
-├── UserEmail (Value Object)
-├── Set<UserRole> (Value Objects)
-├── Set<UserPermission> (Value Objects)
-└── Domain Events (histórico)
-```
-
-**Motivo**: Define limites de transação. Operações afetam o agregado como um todo, garantindo consistência.
-
----
-
-## 🔑 Estratégia de Domínio
-
-### **User Aggregate**
-
-#### **Identidade e Dados Básicos**
-- **Identificador Único**: UserId (por sistema global)
-- **Email**: Único por tenant (valor object validado)
-- **Nome**: String validada (comprimento mínimo/máximo)
-- **Senha**: Hash criptografado (nunca armazenado plano)
-
-#### **Estado do Usuário** (UserStatus)
-```
-INACTIVE → ACTIVE → DELETED
-  ↑                   ↑
-  │   (não pode      (soft delete,
-  └─ voltar)        não pode reverter)
-```
-
-**Regras**:
-- Novo usuário começa INACTIVE
-- Ativação geralmente ocorre após confirmação de email
-- Soft delete mantém dados para auditoria
-
-#### **Papéis (Roles)** - Modelo Multi-Role
-```
-Antes (anti-padrão):
-  user.role = "ADMIN"  // Apenas 1 role
-
-Agora (correto):
-  user.roles = {ADMIN, MANAGER}  // 0..N roles
-```
-
-**Tipos de Role**: ADMIN, MANAGER, USER, GUEST
-
-**Por que múltiplas roles?**
-- Cenários reais: Um usuário pode ser simultaneamente ADMIN de um módulo e MANAGER de outro
-- Mais flexível que lógica de condicional complexa
-- Segue princípio de composição sobre herança
-
-#### **Permissões (Permissions)** - Modelo Independente de Roles
-```
-user.permissions = {
-  "USER_CREATE",      // Pode criar usuários
-  "TENANT_EDIT",      // Pode editar tenant
-  "REPORT_VIEW"       // Pode ver relatórios
-}
-```
-
-**Sistema de Código**: `MODULE_ACTION`
-- Convenção consistente
-- Extraível para filtros (ex: "Todas as permissões do módulo USER")
-- Agnóstico a camadas
-
-**Por que independente de roles?**
-- Roles definem perfis padrão (ADMIN = todos as permissões)
-- Permissões diretas permitem customização (revoke específico, grant exceções)
-- Não preso a estrutura de roles
-
-#### **Invariantes (Regras de Negócio)**
-1. Todo usuário ativo must ter pelo menos 1 role
-2. Email é único por tenant
-3. Senha ativa é sempre hash (nunca texto plano)
-4. Usuário inativo/deletado não pode ter role/permissão atribuída
-5. Não pode remover GUEST se for a única role
-
----
-
-## 📊 Observability & Auditoria
-
-### **Estratégia de Observability**
-
-Observability é a capacidade de entender o estado interno do sistema observando seus outputs (logs, eventos, métricas). No ERP Cloud, implementamos via camada de **rastreamento de fluxos (Flow Tracking)** com a biblioteca `com.dros.observability`.
-
-#### **Arquitetura**
+### 2. Modelo de Dados Multi-Tenant
 
 ```
-┌─────────────────────────────────────────────┐
-│   Method com @TrackFlow                     │
-│   @TrackFlow("CREATE_USER")                 │
-│   public User criar(CreateUserRequest req)  │
-└──────────────────┬──────────────────────────┘
-                   │ Intercepta via AOP
-                   ↓
-┌─────────────────────────────────────────────┐
-│   Aspect (Automatic)                        │
-│   Captura: entrada, saída, exceção          │
-│   Mede: tempo de execução                   │
-│   Rastreia: tenantId, userId, traceId       │
-└──────────────────┬──────────────────────────┘
-                   │ Publica para múltiplos destinos
-         ┌─────────┼──────────┬────────────┐
-         ↓         ↓          ↓            ↓
-    Database   WebSocket    Kafka       Logs
-  (auditoria) (real-time) (analytics) (debug)
-```
+┌────────────────────────────────────────────────────┐
+│                    BANCO DE DADOS                  │
+├────────────────────────────────────────────────────┤
+│                                                    │
+│  ┌──────────────────────────────────────────────┐  │
+│  │          TABELA COMPARTILHADA                │  │
+│  ├──────────────────────────────────────────────┤  │
+│  │ ID  │ TenantId │ TenantGroupIds │ Scope │... │  │
+│  ├─────┼──────────┼────────────────┼───────┼────┤  │
+│  │ 1   │ Tenant-A │ NULL           │ TENANT│... │  │
+│  │ 2   │ Tenant-B │ NULL           │ TENANT│... │  │
+│  │ 3   │ NULL     │ Group-1,2,3    │ GROUP │... │  │
+│  │ 4   │ NULL     │ NULL           │GLOBAL │... │  │
+│  └──────────────────────────────────────────────┘  │
+│                                                    │
+└────────────────────────────────────────────────────┘
 
-#### **Componentes**
-
-1. **@TrackFlow Annotation** (com.dros.observability)
-   - Marca métodos para rastreamento
-   - Parâmetro: código único (ex: "CREATE_USER", "SRVC_CREATE_USER")
-   - Aplicado em controllers, services, handlers
-   - Automático: sem código adicional necessário
-
-2. **Aspect/Interceptor** (automático via pacote dros)
-   - Intercepts método anotado antes e depois
-   - Cria FlowEvent com detalhes da execução
-   - Captura exceções automaticamente
-   - Publica para todos os trackers configurados
-
-3. **Trackers** (destinos de eventos)
-   - **FlowEventRepository (Database)**: Persistência permanente em `tb_flow_events`
-   - **KafkaTracker**: Publicação para sistemas de analytics em tempo real
-   - **WebSocketTracker**: Push para UI receber eventos conforme ocorrem
-   - **Logs**: Saída em arquivos (backup, debug)
-
-#### **Dados Rastreados por FlowEvent**
-
-```java
-FlowEvent {
-    id: Long,                     // PK
-    traceId: String,              // UUID único da requisição (trace completo)
-    stepName: String,              // "CREATE_USER", "SRVC_ACTIVATE_USER"
-    status: FlowStatus,             // SUCCESS, FAILURE, PENDING
-    executionTimeMs: int,           // Tempo em milissegundos
-    tenantId: Long,                 // Isolamento multi-tenant
-    userId: Long,                   // Quem executou (opcional, do auth)
-    requestPayload: String,         // Request JSON (opcional, configurable)
-    responsePayload: String,        // Response JSON (opcional, configurable)
-    errorMessage: String,           // Stack trace se falhou
-    errorType: String,              // Classe da exceção
-    timestamp: Instant,             // Quando ocorreu
-}
-```
-
-#### **Convenção de Nomenclatura de Flows**
-
-Padrão consistente para rastreabilidade:
-
-```
-REST Controller:    [AÇÃO]_[RECURSO]
-                    CREATE_USER
-                    READ_USER_ME
-                    UPDATE_USER_EMAIL
-                    DELETE_USER
-                    ADD_USER_ROLES
-                    LIST_USER_PERMISSIONS
-                    APPROVE_USER
-                    REJECT_USER
-
-Service/Handler:    SRVC_[AÇÃO]_[RECURSO]
-                    SRVC_CREATE_USER
-                    SRVC_ACTIVATE_USER
-                    SRVC_SEARCH_BY_ID_USER
-                    SRVC_ADD_PERMISSION
-                    SRVC_REMOVE_ROLE
-```
-
-#### **Implementação no User Handler**
-
-```java
-@Service
-public class CreateUserHandler implements CommandHandler<CreateUserCommand, CreateUserResponse> {
-    
-    private final UserRepository userRepository;
-    private final DomainEventPublisher eventPublisher;
-
-    @Override
-    @TrackFlow("SRVC_CREATE_USER")  // ← Adiciona rastreamento automático
-    public CreateUserResponse handle(CreateUserCommand command) {
-        // Validar email único
-        UserEmail email = new UserEmail(command.email());
-        if (userRepository.existsByEmailInTenant(command.tenantId(), email)) {
-            throw new UserEmailAlreadyExistsException(command.email());
-        }
-
-        // Criar usuário
-        User user = User.create(
-            command.tenantId(),
-            new UserName(command.name()),
-            email,
-            new UserPassword(command.plainPassword())
-        );
-
-        // Persistir
-        userRepository.save(user);
-
-        // Publicar eventos
-        user.pullDomainEvents().forEach(eventPublisher::publish);
-
-        return new CreateUserResponse(
-            user.getId().getValue(),
-            user.getEmail().getValue(),
-            user.getName().getValue(),
-            user.getStatus().toString()
-        );
-        // ← Após retorno, Aspect captura sucesso e publica FlowEvent automaticamente
-    }
-}
-```
-
-#### **Fluxo Completo de uma Requisição**
-
-```
-1. POST /api/users → UserController.criar()
-   │
-2. @TrackFlow("CREATE_USER") intercepta
-   ├─ Cria FlowEvent inicial
-   ├─ Inicia timer de execução
-   │
-3. Controlador valida entrada
-   │
-4. Chama CreateUserHandler
-   │
-5. @TrackFlow("SRVC_CREATE_USER") intercepta
-   ├─ Cria FlowEvent child (rastreio hierárquico)
-   │
-6. CreateUserHandler.handle()
-   ├─ User.create() (domínio puro)
-   ├─ userRepository.save() (persistência)
-   ├─ eventPublisher.publish() (domínio events)
-   │
-7. Retorna CreateUserResponse
-   │
-8. Aspect do handler captura resultado
-   ├─ Execução: 125ms
-   ├─ Status: SUCCESS
-   ├─ Preserva payloads
-   │
-9. FlowEvent publicado para:
-   ├─ FlowEventRepository (banco)
-   ├─ KafkaTracker (analytics em tempo real)
-   ├─ WebSocketTracker (UI sabe imediatamente)
-   └─ Logs (arquivo de debug)
-
-Resultado: Auditoria completa e rastreável. Possível reconstruir exação requisição.
-```
-
-#### **Casos de Uso Práticos**
-
-1. **Auditoria Regulatória (LGPD, GDPR)**
-   - Quem criou/modificou cada usuário e quando
-   - Rastreio completo para compliance
-   - Retenção configurável por tenant
-
-2. **Debug de Bugs em Produção**
-   - `GET /api/observability/events/{traceId}` recupera toda a cadeia
-   - Ver exatamente qual step falhou
-   - Stack trace capturado automaticamente
-
-3. **Performance Monitoring**
-   - Medir tempo por endpoint: `GET /api/observability/stats`
-   - Identificar gargalos: qual step demorou?
-   - Alertar se tempo > SLA configurado
-
-4. **Real-time Dashboards**
-   - WebSocket envia eventos conforme ocorrem
-   - UI mostra requisições in-flight
-   - Notificar admins de operações críticas (DELETE_USER, etc)
-
-5. **Analytics & Business Intelligence**
-   - Kafka publica para Elasticsearch/Datadog
-   - Entender padrões de uso (quem, o quê, quando)
-   - Gerar relatórios de atividade por tenant
-
-#### **Por que Observability vs apenas Logs?**
-
-| Aspecto | Logs | Observability |
-|---------|------|---------------|
-| **Estrutura** | String free-form | Estruturado (stepName, status, etc) |
-| **Query** | grep/regex (lento) | SQL estruturado, índices rápidos |
-| **Real-time** | Delay (tail -f) | WebSocket push imediato |
-| **Correlação** | TraceId manual | Automático via biblioteca |
-| **Analytics** | Manual, ad-hoc | Integrado com Kafka/BI |
-| **Retention** | Expires | Banco dedicado com política |
-| **Rastreamento** | Linear | Hierárquico (parent-child flows) |
-
----
-
-## 🔐 Gestão de Acesso
-
-### **Modelo de Autorização**
-```
-┌──────────────────────┐
-│   Usuário (User)     │
-│   ├─ Roles           │  ← Perfis padrão (ADMIN, MANAGER, etc)
-│   └─ Permissions     │  ← Permissões específicas (diretas)
-└──────────────────────┘
-         │
-         ↓
-┌──────────────────────┐
-│  hasPermission()     │  ← Verifica se tem permissão
-│  hasRole()           │  ← Verifica se tem role
-│  hasPermissionByCode()│  ← Verifica por código string
-└──────────────────────┘
-```
-
-### **Resolução de Autorização**
-
-1. **Por Role**: `user.hasRole(RoleType.ADMIN)`
-   - Rápido, verificação simples
-   - Útil para lógicas amplas (ex: "Só admins podem deletar")
-
-2. **Por Permissão**: `user.hasPermission(permission)`
-   - Granular, controle fino
-   - Útil para lógicas específicas
-
-3. **Por Código**: `user.hasPermissionByCode("USER_CREATE")`
-   - String-based, agnóstico a implementação
-   - Útil para decoradores/filtros REST
-
-### **Decisão: Por que não usar Roles vinculadas a Permissões?**
-```
-❌ Anti-padrão:
-   Role ADMIN {
-     permissions: [USER_CREATE, USER_EDIT, USER_DELETE, ...]
-   }
-   // Problema: Não pode conceder apenas USER_CREATE a alguém sem conceder ADMIN inteiro
-
-✅ Abordagem correta:
-   user.roles = {ADMIN, MANAGER}          // Perfis amplos
-   user.permissions = {USER_EDIT_OTHER}   // Exceções/customizações
-   // Resolve por: roles baseado ou permissions diretas
+  Tenant-A vê: Registros 1 (TENANT-A) + 3 (GROUP) + 4 (GLOBAL)
+  Tenant-B vê: Registros 2 (TENANT-B) + 3 (GROUP) + 4 (GLOBAL)
+  Tenant-C vê: Registros 3 (GROUP) + 4 (GLOBAL)
 ```
 
 ---
 
-## 🏢 Multi-Tenancy
+## 🔄 Fluxos e Serviços
 
-### **Estratégia de Isolamento**
+### 1. Padrão de Fluxos Genéricos vs Especializados
 
-#### **Isolamento em Banco de Dados**
-```
-Tabela: tb_user
-├─ id: 1
-├─ tenant_id: 100  ← Sempre presente
-├─ email: "joao@empresa.com"
-└─ ...
+O sistema utiliza um padrão em camadas onde cada tenant pode utilizar um fluxo padrão ou um fluxo personalizado:
 
-Tabela: tb_tenant
-├─ id: 100
-├─ nome: "Empresa A"
-└─ ...
-```
+#### 🟢 **Fluxo Genérico (Padrão)**
+Implementação base que funciona para qualquer tenant:
+- Segue as regras e processos padrão do sistema
+- Facilita manutenção centralizada
+- Exemplo: `UserService` para gerenciamento padrão de usuários
 
-**Implementação**:
-- Todo aggregado carrega `tenantId`
-- Queries sempre filtram por `tenantId` (segurança em camada)
-- Repository valida tenant ante de operar
+#### 🔵 **Fluxo com Gerenciamento**
+Versão estendida com processos adicionais:
+- Adiciona workflows como aprovações, notificações
+- Mantém compatibilidade com a versão genérica
+- Exemplo: `UserServiceWithManagement` para usuários com fluxos de aprovação
 
-#### **Isolamento Lógico**
-- Usuários de tenant A não podem ver/modificar dados de tenant B
-- Validação em múltiplas camadas (repository, handler, domain)
+#### 🟣 **Fluxo Especializado por Tenant**
+Implementação customizada para um tenant específico:
+- Lógica única e proprietária
+- Uso de Custom Fields e Custom Data para personalizações
+- Exemplo: `UserServiceEmpresa` para fluxos específicos da empresa
 
-#### **Por que Multi-Tenant?**
-1. **Custo-benefício**: Uma única instância serve múltiplos customers
-2. **Escalabilidade**: Fácil onboarding de novos customers
-3. **Manutenção**: Uma codebase para múltiplos customers
-4. **Isolamento**: Dados completamente separados logicamente
+### 2. Resolução de Serviços via Proxy
 
----
+O sistema utiliza **proxies de roteamento** que:
 
-## 💡 Decisões de Projeto
-
-### **Decisão 1: Mapper Pattern vs BaseEntity**
-
-| Aspecto | Mapper | BaseEntity |
-|---------|--------|-----------|
-| **Acoplamento** | Domain desacoplado | Domain acoplado a JPA |
-| **Testabilidade** | Domain testado puro | Precisa de contexto JPA |
-| **Manutenção** | Claro, separação visível | Implícito, menos óbvio |
-| **Duplic. Código** | Mais linhas (mapper) | Menos linhas |
-
-**Escolha**: Mapper Pattern
-
-**Motivo**: Mantém domínio puro e agnóstico. Complexidade de mapper é aceitável.
-
-### **Decisão 2: Múltiplas Roles vs Hierarquia**
+1. Identificam qual tenant iniciou a requisição
+2. Consultam um registro de mapeamento tenant → uma implementação de serviço
+3. Roteia a chamada para o serviço correto
+4. Aplicam decorators (logs, métricas) de forma transparente
 
 ```
-❌ Hierarquia:
-   GUEST → USER → MANAGER → ADMIN
-   // Usuário herda todas permissões de níveis inferiores
-
-✅ Múltiplas Roles:
-   user = {ADMIN, MANAGER}
-   // Composição explícita
+Requisição (Tenant-A)
+    ↓
+┌─────────────────────────┐
+│  Proxy Interceptor      │
+│  (Tenant Resolver)      │
+└────────────┬────────────┘
+             ↓
+    Thread Local: Tenant-A
+             ↓
+┌─────────────────────────┐
+│  Service Registry       │
+│  Tenant-A → Service X   │
+│  Tenant-B → Service X   │
+│  Tenant-C → Service Y   │
+└────────────┬────────────┘
+             ↓
+    Resolve → Service Y
+             ↓
+    Apply Decorators (Logs, Metrics)
+             ↓
+    Execute Service Y.execute()
+             ↓
+    Response
 ```
 
-**Motivo**: Mais flexível, suporta cross-cutting roles (ADMIN de um módulo, MANAGER de outro)
+### 3. Decorators e Cross-Cutting Concerns
 
-### **Decisão 3: Permission Codes vs Enums**
+Decorators são adicionados aos serviços para implementar preocupações transversais:
 
+- **Logging Decorator**: Registra entrada/saída de operações
+- **Metrics Decorator**: Coleta métricas de desempenho (latência, throughput)
+- **Audit Decorator**: Rastreia alterações para compliance
+- **Cache Decorator**: Melhora desempengo com cache
+
+Exemplo de composição:
 ```
-❌ Enums (pode ficar desincronizado):
-   enum Permission {
-     USER_CREATE, USER_READ, ...
-   }
-
-✅ Strings validadas (extensível):
-   permission = "USER_CREATE"
-   // Validação: uppercase + underscore, max 50 chars
-```
-
-**Motivo**: Permite adicionar permissões sem recompile. Agnóstico a código.
-
-### **Decisão 4: Event Sourcing**
-
-```
-Evento:  UserCreatedEvent(userId, email, tenantId, occurredOn)
-         UserActivatedEvent(userId, occurredOn)
-         UserRoleAddedEvent(userId, roleType, occurredOn)
-```
-
-**Por que?**
-1. Auditoria nativa (quem fez quê, quando)
-2. Reconstruir estado em qualquer ponto
-3. Base para notificações/integrações assíncronas
-4. Debugging facilitado (replay eventos)
-
----
-
-## ⚠️ Desvios Identificados
-
-### **1. Acoplamento à Camada de Persistência**
-
-**Documentado**: 
-- Domain layer puro (sem @Entity, sem @Column)
-- Mapper Pattern para separação User.java ↔ UserEntity.java
-
-**Real**:
-- Aggregados com @Entity direto (ex: `User.java` em v1/features/user/domain/entity/)
-- Sem camada Domain separada; domain e persistência acoplados
-- Model em domain/entity/ com anotações JPA
-
-**Impacto**: 
-- Domínio não é testável sem contexto JPA
-- Difícil migrar entre tecnologias de persistência
-- Violação de Clean Architecture
-
-**Recomendação**: 
-- Refatorar User.java para remover @Entity, @Column, @OneToMany, etc
-- Criar User.java (puro) e UserEntity.java (JPA)
-- Implementar UserMapper.java para conversão
-
----
-
-### **2. Estrutura de Pacotes Diferente**
-
-**Documentado**:
-```
-/src/main/java/com/api/erp/core/
-├── domain/
-│   ├── aggregates/user/
-│   ├── valueobjects/user/
-│   ├── repositories/
-│   └── events/
-├── application/
-│   └── user/handlers/
-└── infrastructure/
-```
-
-**Real**:
-```
-/src/main/java/com/api/erp/v1/
-├── features/user/
-│   ├── domain/
-│   │   ├── entity/     (com @Entity - acoplado ⚠️)
-│   │   ├── controller/ (em domain? deveria estar em presentation ⚠️)
-│   │   ├── service/
-│   │   ├── repository/
-│   │   └── validator/
-│   ├── application/
-│   ├── infrastructure/
-│   └── presentation/
-├── tenant/
-├── shared/
-└── observability/
-```
-
-**Problemas**:
-- `/core/` não existe; refatoração para `/v1/features/` não foi documentada
-- Controladores em `domain/controller/` (deveria estar em `presentation/`)
-- Nomenclatura em português (User) vs English (User) em CLOUD.md
-- Pasta `/core/` documentada está vazia no projeto real
-
----
-
-### **3. Value Objects**
-
-**Documentado**:
-- `UserId`, `UserEmail`, `UserPassword`, `UserRole`, `UserPermission` como Value Objects imutáveis
-- Validação encapsulada no construtor
-
-**Real**:
-- `UserRole` e `UserPermission` são @Entity (não são Value Objects)
-- `Email` e `CPF` corretamente implementados como Value Objects
-- `UserPassword` / senha armazenada como String em `senha_hash` (sem Value Object)
-- UserName não existe; apenas `nome_completo` como String
-
-**Impacto**: Lógica de validação espalhada, menos type-safety
-
----
-
-### **4. Domain Events**
-
-**Documentado**:
-- `UserCreatedEvent`, `UserActivatedEvent`, `UserRoleAddedEvent`
-- Event Sourcing implementado
-- Eventos publicados via DomainEventPublisher
-
-**Real**:
-- Não há implementação visível de Domain Events
-- Domínio não publica eventos de negócio
-- Event Sourcing não foi implementado
-- FlowEvent em observability (rastreamento técnico, não de domínio)
-
-**Impacto**: Sem base para notificações assíncronas, auditoria limitada
-
----
-
-### **5. Handlers CQRS**
-
-**Documentado**:
-- `CreateUserHandler`, `ActivateUserHandler`, `ChangeUserEmailHandler`
-- CommandHandler<Command, Response> pattern
-- @TrackFlow para rastreamento automático
-
-**Real**:
-- Lógica em Services (v1/features/user/domain/service/)
-- Não há Handlers/Commands explícitos
-- @TrackFlow pode estar implementado em observability
-- Controladores chamam services diretamente
-
-
-
----
-
-## 🧩 Componentes Principais
-
-### **User Module (Núcleo de Autenticação/Identidade)**
-
-#### **Camadas**
-1. **Domain** (User aggregate, Value Objects, Events)
-   - UserStatus, UserRole, UserPermission
-   - Métodos: activate(), changeEmail(), addRole(), grantPermission()
-
-2. **Application** (Handlers, Commands)
-   - CreateUserHandler: Cria novo usuário
-   - ActivateUserHandler: Ativa usuário
-   - ChangeUserEmailHandler: Muda email
-   - ChangeUserPasswordHandler: Muda senha
-
-3. **Infrastructure** (Persistence)
-   - UserEntity (JPA mapping)
-   - UserMapper (conversão Domain ↔ Entity)
-   - UserRepository (acesso a dados)
-
-4. **REST** (Controllers, DTOs - a implementar conforme necessário)
-
-#### **Fluxo de Criação de Usuário**
-```
-REST Controller
-  ↓
-CreateUserCommand (CQRS command)
-  ↓
-CreateUserHandler (orquestração)
-  ↓
-User.create() (factory, domínio puro)
-  ↓
-UserRepository.save() (persistência)
-  ↓
-eventPublisher.publish() (eventos de domínio)
-```
-
-### **Tenant Module (Multi-Tenancy)**
-
-#### **Responsabilidades**
-- Isolamento de dados por tenant
-- Validação de tenant ativo
-- Associação de usuários a tenants
-
-#### **Padrão de Integração**
-Todos os agregados implementam `TenantAware`:
-```
-interface TenantAware {
-    Long getTenantId();
-    void setTenantId(Long tenantId);
-}
+UserService
+    ↓ (decorado com)
+├─ LoggingDecorator
+├─ MetricsDecorator
+├─ AuditDecorator
+└─ CacheDecorator
 ```
 
 ---
 
-## 🔄 Fluxos Críticos
+## 📦 Arquitetura de Features
 
-### **Fluxo 1: Registrar Novo Usuário**
-```
-1. Customer chama POST /users
-   ├─ Validação: email formato, senha força
-   
-2. CreateUserCommand criado
-   
-3. CreateUserHandler.handle()
-   ├─ Verifica email único no tenant
-   ├─ Chama User.create()
-   │  └─ Gera UserCreatedEvent
-   ├─ Salva no repository
-   └─ Publica eventos (possibilita envio de email, etc)
-   
-4. Usuário vira INACTIVE (aguardando confirmação email)
+O sistema é organizado em **features modularizadas**, cada uma responsável por um domínio específico:
 
-5. Após confirmação: ActivateUserHandler
-   ├─ Altera status para ACTIVE
-   └─ Gera UserActivatedEvent
-```
+### 1. Features Principais (Core)
 
-### **Fluxo 2: Atribuir Múltiplas Roles**
+#### 🏷️ **Feature: Produtos**
+Gerenciamento completo do catálogo de produtos:
+- Cadastro de produtos com informações detalhadas
+- Informações fiscais (NCM, ICMS, IPI, ISS)
+- Classificação e categorização
+- Composição de produtos
+- Integração com TaxEngine para cálculos de impostos
+- Essencial para: Estoque, Vendas, Compras, Contabilidade
 
-```
-Comando: "Faça João ser ADMIN e MANAGER ao mesmo tempo"
+#### 👥 **Feature: BusinessPartner**
+Cadastro centralizado de entidades de negócio (clientes, fornecedores, parceiros comerciais e outros):
+- Informações básicas e fiscais (CPF/CNPJ, Razão Social)
+- Atividades econômicas (CNAEs)
+- Tipos de parceria (cliente, fornecedor, outro)
+- Vinculação com endereços e contatos
+- Suporte a atributos customizados via Custom Fields
+- Essencial para: Vendas, Compras, Contabilidade, Gestão de Relacionamento
 
-1. Handler carrega usuário
-2. user.addRole(new UserRole(ADMIN))
-   ├─ Valida: usuário ativo?
-   ├─ Role já existe?
-   ├─ Adiciona à set
-   └─ Gera UserRoleAddedEvent
-3. user.addRole(new UserRole(MANAGER))
-   └─ Repete processo
-4. Salva agregado
-5. Publica ambos eventos
-```
+#### 💰 **Feature: TaxEngine**
+Sistema especializado para cálculos de impostos e alíquotas:
+- Tabelas de alíquotas por produto e operação
+- Cálculos de ICMS, IPI, ISS
+- Integração com dados de NCM
+- Aplicação automática de impostos em transações
+- Essencial para: Vendas, Compras, Nota Fiscal
 
-### **Fluxo 3: Verificar Autorização**
+### 2. Features Compartilhadas (Shared)
 
-```
-Controlador: "Pode João executar USER_CREATE?"
+Estas features servem como "sudomínios" auxiliares, reutilizadas por outras features:
 
-1. Carrega usuário João
-2. Chama: user.hasPermissionByCode("USER_CREATE")
-3. Verifica em user.permissions
-4. Se não encontrar, poderia estender para:
-   └─ Verificar se role ADMIN confere permissão
-5. Retorna boolean
-```
+#### 📍 **Feature: Endereço**
+Gerenciamento centralizado de endereços:
+- Entidade separada e reutilizável
+- Suporta múltiplos tipos: residencial, comercial, entrega
+- Integração com geografias (UF, Município)
+- Utilizada por: BusinessPartner, Filiais, Pontos de Entrega
 
----
+#### 📞 **Feature: Contato**
+Gerenciamento centralizado de contatos:
+- Telefone, E-mail, Redes Sociais
+- Tipos de contato (pessoal, comercial, emergência)
+- Associação com BusinessPartner e outras entidades
+- Utilizada por: BusinessPartner e demais features
 
-## 📝 Notas Importantes
+#### 🎯 **Feature: Custom Field / Custom Data**
+Sistema de personalizações:
+- **Custom Field**: Define novos campos dinamicamente
+- **Custom Data**: Armazena valores desses campos
+- Permite cada tenant adicionar campos específicos sem modificar o schema
+- Exemplo: Um tenant pode querer "Matrícula Interna" em BusinessPartner ou campos específicos por tipo de negócio
 
-### **Padrão de Nomeação Ideal (Documentado)**
-- **Commands**: `CreateUserCommand`, `ActivateUserCommand`
-- **Handlers**: `CreateUserHandler`, `ActivateUserHandler`
-- **Value Objects**: `UserId`, `UserEmail`, `UserName`
-- **Aggregates**: `User`, `Tenant`, `Product`
-- **Events**: `UserCreatedEvent`, `UserRoleAddedEvent`
+### 3. Features Obrigatórias (Não-Opcionais)
 
-### **Padrão de Nomeação Real (Implementado)**
-- **Commands**: Não explícitos; lógica em services
-- **Handlers**: Não existem; Services fazem orquestração
-- **Value Objects**: `Email`, `CPF` (parcial)
-- **Aggregates**: `User`, `Tenant`, `Product` (em português)
-- **Events**: FlowEvent (técnico) vs Domain Events (não implementados)
+Funcionalidades essenciais que todo sistema ERP necessita:
 
-### **Validação em Camadas**
-```
-REST (formato, range) → Handler (regras app) → Domain (invariantes)
-```
+- **Movimento de Estoque**: Entrada, saída, ajustes
+- **Financeiro**: Contas a Pagar, Contas a Receber, Caixa
+- **Nota Fiscal**: Geração e validação de documentos fiscais
 
-Cada camada valida seu escopo sem duplicar.
+### 4. Features Planejadas (Roadmap)
 
-### **Soft Delete**
-Usuários deletados mantêm todos os dados para:
-- Auditoria (rastrear quem foi deletado)
-- Relacionamentos (referência histórica)
-- Recuperação futura
+Funcionalidades futuras a serem implementadas:
 
-### **Criptografia de Senha**
-Nunca done de forma reversível. Apenas hash para verificação.
+- 📦 **Compras**: Pedidos, recebimento, nota fiscal de entrada
+- 🛒 **Vendas**: Pedidos, faturamento, nota fiscal de saída
+- 🔧 **Serviços**: Ordens de serviço, cronogramas
+- 📥 **Entradas**: Movimentação de entrada de mercadorias
+- 💳 **Contas a Pagar**: Gestão de passivos
+- 💸 **Contas a Receber**: Gestão de recebíveis
+- 📊 **Contábil**: Integração com sistemas contábeis externos
 
 ---
 
-## 🚀 Roadmap Arquitetural
+## 🔌 Padrões de Design Implementados
 
-### **Fase 1 (Em Progresso)**: Core User Module
-- [x] User aggregate (implementado como User.java com @Entity acoplado ⚠️)
-- [x] Multi-role support (UserRole como @Entity)
-- [x] Independent permissions (UserPermission como @Entity)
-- [ ] Domain events (não implementado)
-- [x] REST endpoints (implementado em v1/features/user/presentation/)
-- ⚠️ [x] Value Objects (parcial: Email, CPF implementados; UserPassword não)
+### 1. Strategy Pattern
+Define uma família de algoritmos e permite que um seja selecionado em tempo de execução.
 
-**Status**: ~70% - Funcionalidade básica implementada, mas sem padrões DDD/Clean Architecture rigorosos
+**Uso no ERPAPI:**
+- Diferentes estratégias de cálculo de impostos (ICMS vs IPI vs ISS)
+- Diferentes estratégias de precificação por tenant
+- Diferentes validações por tipo de entidade
 
----
+### 2. Decorator Pattern
+Adiciona responsabilidades a objetos dinamicamente sem alterar suas estruturas.
 
-### **Fase 2 (80% Concluída)**: Extensões
-- [x] Product module (v1/features/product/ - ✅ implementado)
-- [x] Customer module (v1/features/customer/ - ✅ implementado)
-- [x] Custom fields (v1/features/customfield/ - ✅ parcialmente implementado)
-- [x] Audit logging / Observability (v1/observability/ - ✅ implementado)
+**Uso no ERPAPI:**
+- Logging em torno de operações de serviço
+- Métricas de desempenho
+- Auditoria de alterações
+- Caching de resultados
 
-**Status**: ~80% - Módulos existem, mas sem integração completa com observability
+Permite composição de múltiplos comportamentos sem criar subclasses explodidas.
 
----
+### 3. Proxy Pattern
+Fornece um substituto ou espaço reservado para outro objeto para controlar o acesso.
 
-### **Fase 3 (20% Concluída)**: Escalabilidade
-- [ ] Event bus assíncrono (RabbitMQ, Kafka) - ❌ não implementado
-- [ ] CQRS read model (views otimizadas) - ❌ não implementado
-- [ ] Cache distribuído - ❌ não implementado
-- [ ] Replicação de dados - ❌ não implementado
-- [x] Multi-tenancy support (v1/tenant/ - ✅ implementado)
-
-**Status**: ~20% - Apenas multi-tenancy implementado
+**Uso no ERPAPI:**
+- Roteamento baseado em tenant antes de executar um serviço
+- Interceptação de requisições para resolução de contexto
+- Aplicação automática de decorators
+- Controle de acesso por permissões
 
 ---
 
-## � Fila Assíncrona de Migrações
+## 🔄 Fluxo de Ciclo de Vida do Tenant
 
-### **Problema Original**
-- ⏳ Startup bloqueava até migrar TODOS os tenants
-- 🐢 Tempo de inicialização proporcional ao número de tenants
-- 🔴 Falha em um tenant bloqueava inicialização da app
-
-### **Solução Implementada**
-Sistema de fila assíncrona que otimiza o tempo de startup em **95%**.
-
-#### **Arquitetura em Duas Fases**
-
-```
-FASE 1: Startup Síncrono (Fast Path)
-┌─────────────────────────────────────────┐
-│ 1. Master DataSource criado (HikariCP)  │
-│ 2. Migrações Master executadas (Flyway) │
-│ 3. Aplicação PRONTA para requisições ✅ │
-│    (tudo em ~5-10 segundos)             │
-└─────────────────────────────────────────┘
-           ⏬ ApplicationReadyEvent
-FASE 2: Processamento Assíncrono (Background)
-┌─────────────────────────────────────────┐
-│ 1. Migrações de tenants ENFILEIRADAS     │
-│ 2. Processadas em ThreadPool (2-5 threads) │
-│ 3. Não bloqueiam a API da aplicação      │
-│ 4. Status monitorável via REST API       │
-└─────────────────────────────────────────┘
-```
-
-#### **Componentes Principais**
-
-**Localização**: `/src/main/java/com/api/erp/v1/main/migration/async/`
-
-```
-migration/async/
-├── config/
-│   └── AsyncMigrationConfig.java              # ThreadPoolTaskExecutor (2-5 threads)
-├── domain/
-│   └── MigrationQueueTask.java                # Modelo: tarefa com estados (PENDING, IN_PROGRESS, COMPLETED, FAILED)
-├── service/
-│   └── MigrationQueueService.java             # Orquestração: fila, processamento, stats
-└── presentation/
-    ├── controller/
-    │   └── MigrationQueueController.java      # 6 endpoints REST
-    └── dto/
-        ├── MigrationQueueStatsDTO.java        # DTO: estatísticas
-        └── MigrationQueueTaskDTO.java         # DTO: detalhes da tarefa
-```
-
-#### **Estados de uma Migração**
-
-```
-PENDING (enfileirada)
-   ↓ [quando thread disponível]
-IN_PROGRESS (processando)
-   ↓ [sucesso ou falha]
-COMPLETED (✅ sucesso)   ou   FAILED (❌ erro + mensagem)
-```
-
-#### **Endpoints REST**
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/api/v1/migrations/queue/stats` | Estatísticas: total, pending, in-progress, completed, failed, % progress |
-| GET | `/api/v1/migrations/queue/tasks` | Todas as tasks com detalhes |
-| GET | `/api/v1/migrations/queue/tasks/in-progress` | Tasks sendo processadas |
-| GET | `/api/v1/migrations/queue/tasks/failed` | Tasks com erro (contém errorMessage) |
-| GET | `/api/v1/migrations/queue/tasks/{taskId}` | Detalhes de uma task específica |
-| GET | `/api/v1/migrations/queue/tasks/tenant/{tenantId}` | Todas as tasks de um tenant |
-
-**Exemplo de Response**:
-```json
-{
-  "isRunning": true,
-  "totalTasks": 5,
-  "pendingTasks": 1,
-  "inProgressTasks": 1,
-  "completedTasks": 3,
-  "failedTasks": 0,
-  "progressPercentage": "60.00%"
-}
-```
-
-#### **Benefícios**
-
-✅ **Inicialização Rápida** - Aplicação pronta em segundos, não minutos
-
-✅ **Sem Bloqueios** - API disponível enquanto migrações rodam em background
-
-✅ **Monitoramento** - Endpoints REST para acompanhar progresso em tempo real
-
-✅ **Resiliência** - Se um tenant falha, não afeta outros; erros rastreados
-
-✅ **Escalabilidade** - ThreadPool configurável (2-5 por padrão, escalável para 8-16)
-
-#### **Fluxo de Inicialização**
-
-```
+### Fase 1: Inicialização da Aplicação
 1. Spring Boot inicia
-   ↓
-2. FlywayConfig.flywayMaster() executa (sincronamente)
-   ├─ Cria Master DataSource
-   ├─ Executa migrações master via Flyway
-   └─ App está PRONTA ✅
-   ↓
-3. ApplicationReadyEvent disparado
-   ↓
-4. ApplicationStartupListener.runMigrationsOnStartup()
-   ├─ Enfileira migrações de todos os tenants ativos
-   └─ Inicia MigrationQueueService.processMigrationQueue() (@Async)
-   ↓
-5. Listener retorna → App responde requisições
-   ↓
-6. Em background, threads processam fila:
-   ├─ Thread 1: Tenant A (migração)
-   ├─ Thread 2: Tenant B (migração)
-   └─ ... continua até terminar
-```
+2. Master DataSource é criado (banco central)
+3. Migrações Flyway do Master são executadas sincronamente
+4. Spring Boot fica pronto (ApplicationReadyEvent)
 
-#### **Rastreamento de Task**
+### Fase 2: Carregamento de Tenants Existentes
+1. `ApplicationStartupListener` intercepta o evento de ApplicationReady
+2. `TenantMigrationStartupWorker` inicia
+3. Todos os tenants ativos são carregados do banco master
+4. Para cada tenant: um evento é criado e enfileirado
+5. Um registro de rastreamento é criado para cada tenant
 
-Cada migração tem:
-- **taskId**: UUID único
-- **tenantId, tenantName**: Identificação
-- **status**: PENDING → IN_PROGRESS → COMPLETED/FAILED
-- **enqueuedAt, startedAt, completedAt**: Timestamps
-- **waitTimeSeconds**: Tempo em fila
-- **executionTimeSeconds**: Tempo de migração
-- **migrationsExecuted**: Número de migrações aplicadas
-- **errorMessage**: Se FAILED (contém detalhes do erro)
+### Fase 3: Processamento de Fila de Migrações
+1. `TenantMigrationQueueConsumer` inicia em thread background
+2. Aguarda eventos na fila (BlockingQueue)
+3. Para cada evento:
+   - Resolve o DataSource do tenant
+   - Executa migrações Flyway
+   - Executa scripts de seed (dados iniciais)
+   - Atualiza o status para COMPLETED
+4. Se houver erro: tenta 3 vezes (retry)
+5. Se falhar definitivamente: marca como FAILED
 
-#### **Monitoramento em Tempo Real**
-
-**Shell:**
-```bash
-# Verificar progresso contínuo
-watch -n 1 'curl -s http://localhost:8080/api/v1/migrations/queue/stats | jq ".progressPercentage"'
-
-# Ver tasks em progresso
-curl -s http://localhost:8080/api/v1/migrations/queue/tasks/in-progress | jq '.tasks[] | {tenant: .tenantName, elapsed: .executionTimeSeconds}'
-```
-
-#### **Performance Esperado**
-
-| Cenário | Antes (Sync) | Depois (Async) | Ganho |
-|---------|-------------|----------------|-------|
-| 3 tenants | 30-40s bloqueado | 5-10s pronto | **4-8x rápido** |
-| 10 tenants | 100-150s bloqueado | 5-10s pronto | **10-30x rápido** |
-| 50 tenants | 500+s bloqueado | 5-10s pronto | **50-100x rápido** |
-
-#### **Configuração**
-
-**Padrão em `AsyncMigrationConfig.java`**:
-```java
-CorePoolSize: 2      // Threads sempre ativas
-MaxPoolSize: 5       // Máximo simultâneo
-QueueCapacity: 100   // Fila de espera
-```
-
-**Ajustar para seu cenário**:
-- **Poucos tenants (<10)**: CorePoolSize=2, MaxPoolSize=3
-- **Muitos tenants (10-100)**: CorePoolSize=4, MaxPoolSize=8
-- **Very large (>100)**: CorePoolSize=8, MaxPoolSize=16
-
-#### **Tratamento de Erros**
-
-- **Se um tenant falha**: Task marca FAILED com errorMessage, fila continua
-- **Se Master falha**: Logs de erro, aplicação tenta continuar (graceful degradation)
-- **Se task fica PENDING infinito**: Verifica `isRunning: false` (pode estar parada)
-
-#### **Próximos Passos (Futuro)**
-
-1. **Persistência**: Salvar histórico de migrações em banco
-2. **Webhooks**: Notificar quando migrações completam
-3. **Dashboard**: UI em tempo real visualizando fila
-4. **Retry Automático**: Com exponential backoff
-5. **Message Queue**: Para clusters distribuídos (RabbitMQ/Kafka)
-6. **Métricas**: Prometheus/Grafana integration
+### Fase 4: Novo Tenant (Runtime)
+1. Requisição POST para criar novo tenant
+2. `TenantService` valida e cria o registro
+3. Publica `TenantCreatedEvent`
+4. `TenantCreationMigrationListener` intercepta o evento
+5. Novo evento é enfileirado automaticamente
+6. Consumer processa de forma assíncrona
+7. Resposta retorna imediatamente (sem bloquear)
 
 ---
 
-## 📚 Referências Internas
+## 🗄️ Gerenciamento de Banco de Dados e Migrações
 
+### 1. Estratégia de Versionamento com Flyway
 
-### **Estrutura Documentada (Ideal - /core/)**
-- **User Aggregate**: `/src/main/java/com/api/erp/core/domain/aggregates/user/` ❌ VAZIO
-- **Value Objects**: `/src/main/java/com/api/erp/core/domain/valueobjects/user/` ❌ VAZIO
-- **Handlers**: `/src/main/java/com/api/erp/core/application/user/handlers/` ❌ VAZIO
-- **Repository**: `/src/main/java/com/api/erp/core/domain/repositories/user/` ❌ VAZIO
-- **Tests**: `/src/test/java/com/api/erp/core/domain/user/` ❌ VAZIO
+**Flyway** é utilizado para controlar versões de schema:
 
-### **Estrutura Real (Implementada - /v1/features/)**
-- **User Aggregate**: `/src/main/java/com/api/erp/v1/features/user/domain/entity/User.java` ⚠️ com @Entity acoplado
-- **Value Objects**: `/src/main/java/com/api/erp/v1/shared/domain/valueobject/` (Email.java, CPF.java, NCM.java, etc)
-- **Services**: `/src/main/java/com/api/erp/v1/features/user/domain/service/`
-- **Repository**: `/src/main/java/com/api/erp/v1/features/user/domain/repository/`
-- **Presentation**: `/src/main/java/com/api/erp/v1/features/user/presentation/controller/`
-- **Tests**: `/src/test/java/com/api/erp/v1/features/user/`
+- **Migrações Versionadas** (`V1__*, V2__*, V3__*`): Executadas em ordem, nunca são revertidas
+- **Migrações Repetíveis** (`R__*`): Executadas sempre que mudam, úteis para views e procedures
 
-### **Outros Módulos Implementados em /v1/features/**
-- **Tenant (Multi-tenancy)**: `/src/main/java/com/api/erp/v1/tenant/` ✅
-- **Observability**: `/src/main/java/com/api/erp/v1/observability/` ✅
-- **Product**: `/src/main/java/com/api/erp/v1/features/product/` ✅
-- **Customer**: `/src/main/java/com/api/erp/v1/features/customer/` ✅
-- **Address**: `/src/main/java/com/api/erp/v1/features/address/` ✅
-- **Permissão**: `/src/main/java/com/api/erp/v1/features/permission/` ✅
-- **Unidade de Medida**: `/src/main/java/com/api/erp/v1/features/measureunit/` ✅
+**Estrutura de Migrações:**
+```
+src/main/resources/db/migration/
+├── master/              # Banco central (Master)
+│   └── mysql/
+│       ├── V1__CREATE_DB_TABLES.sql
+│       ├── V2__Insert_Initial_Tenants.sql
+│       └── V3__Insert_Tenant_Datasources.sql
+├── tenant/              # Para cada tenant
+│   └── mysql/
+│       ├── V1__CREATE_DB_TABLES.sql
+│       ├── V2__Insert_Measure_Units.sql
+│       ├── V3__Insert_Addresses.sql
+│       └── ... mais V4, V5, etc
+├── taxengine/           # Módulo de impostos
+│   └── mysql/
+│       ├── V1__create_aliquota_tables.sql
+│       └── V2__seed_aliquotas_icms.sql
+└── observability/       # Logs e eventos
+    └── mysql/
+        └── V1__Create_Flow_Events_Table.sql
+```
+
+### 2. Suporte a Múltiplos Bancos de Dados
+
+O sistema suporta múltiplos SGBDs através de schemas separados por banco:
+
+- ✅ MySQL
+- ✅ PostgreSQL
+- ✅ SQL Server
+- ✅ Oracle
+- ✅ H2 (testes)
+- ✅ SQLite
+- ✅ Firebird
+- ✅ MariaDB
+- ✅ DB2
+- ✅ Derby
+- ✅ HSQLDB
+- ✅ Informix
+- ✅ Sybase
+- ✅ Vertica
+- ✅ CockroachDB
+- ✅ ClickHouse
+
+Cada banco tem seus próprios scripts SQL otimizados para suas características.
+
+### 3. Seed de Dados
+
+Após as migrações Flyway, scripts de seed populam dados iniciais:
+
+- Unidades de Medida padrão
+- Endereços iniciais
+- Contatos padrão
+- Composições de produtos
+- Alíquotas de impostos
 
 ---
 
-## 🔧 Ações Recomendadas para Alinhar com Arquitetura
+## 📊 Observabilidade e Monitoramento
 
-Para alinhar a implementação com a arquitetura documentada:
+### 1. Integração com SonarQube
 
-### **Prioridade 1 (Alta)**: 
-- ✅ Separar Domain puro de persistência (remover @Entity de User.java)
-- ✅ Implementar Mapper Pattern corretamente (User.java puro + UserEntity.java + UserMapper.java)
-- ✅ Criar handlers CQRS explícitos (CreateUserHandler, ActivateUserHandler, etc)
+- **Análise estática de código**: Detecção de bugs, vulnerabilidades e code smells
+- **Métricas de qualidade**: Cobertura de testes, duplicação de código
+- **Histórico de evolução**: Acompanhamento de melhoria contínua
 
-### **Prioridade 2 (Média)**:
-- ✅ Implementar Domain Events (UserCreatedEvent, UserActivatedEvent, UserRoleAddedEvent)
-- ✅ Adicionar @TrackFlow em handlers críticos
-- ✅ Documentar Value Objects como imutáveis e testáveis
+**Configuração:**
+```
+URL: http://localhost:9000
+Project Key: ERPAPI
+```
 
-### **Prioridade 3 (Baixa)**:
-- Event Sourcing completo
-- Event bus assíncrono (RabbitMQ, Kafka)
-- CQRS read model otimizado
+### 2. Logging Estruturado
+
+- Logs detalhados com contexto de tenant
+- Rastreamento de fluxos de migração
+- Eventos de sucesso e falha registrados
+- Métricas de duração e items processados
+
+### 3. Auditoria e Eventos de Flow
+
+- Tabela dedicada para eventos de fluxo
+- Rastreamento completo de execuções
+- Suporte para extração de relatórios futuros
+- Histórico de reprocessamentos
 
 ---
 
-**Esta documentação é um documento vivo. Atualize à medida que novas decisões são tomadas e padrões evoluem.**
+## 🔐 Segurança e Controle de Acesso
+
+### 1. Spring Security Integration
+
+- Autenticação via credenciais (username/password)
+- Suporte a JWT para APIs stateless
+- Controle de acesso baseado em Roles
+
+### 2. Sistema de Permissões
+
+- Permissões granulares atribuíveis a roles
+- Validação por endpoint
+- Suporte a permissões customizadas
+
+### 3. Isolamento de Dados por Tenant
+
+- Contexto de tenant propagado em ThreadLocal
+- Filtros automáticos em queries (row-level security)
+- Segregação garantida mesmo com bugs no código
+
+---
+
+## 🚀 Tecnologias Principais
+
+| Componente | Tecnologia | Versão |
+|-----------|-----------|--------|
+| Framework | Spring Boot | 4.0.1 |
+| Linguagem | Java | 21 |
+| Build | Maven | 3.6+ |
+| ORM | Hibernate/JPA | - |
+| Segurança | Spring Security | - |
+| Processamento Batch | Spring Batch | - |
+| Migrações DB | Flyway | - |
+| Documentação API | SpringDoc OpenAPI | 2.3.0 |
+| JWT | JJWT | 0.11.5 |
+| Lombok | Lombok | - |
+| Análise Código | SonarQube | - |
+
+---
+
+## 📋 Checklist de Recursos Implementados
+
+### ✅ Núcleo Multi-Tenant
+- [x] Suporte para segregação por coluna (tenantId, tenantGroupIds, scope)
+- [x] Roteamento dinâmico de serviços por tenant
+- [x] Carregamento automático de DataSources
+- [x] Fila unificada de processamento
+
+### ✅ Features Implementadas
+- [x] Gestão de Usuários
+- [x] Gestão de Produtos
+- [x] Gestão de BusinessPartner (Clientes, Fornecedores e outros)
+- [x] Gestão de Endereços
+- [x] Gestão de Contatos
+- [x] TaxEngine (Cálculos de Impostos)
+- [x] Custom Fields e Custom Data
+- [x] Sistema de Permissões
+
+### ⏳ Features em Desenvolvimento / Planejadas
+- [ ] Compras
+- [ ] Vendas
+- [ ] Serviços
+- [ ] Movimento de Estoque (Entradas/Saídas)
+- [ ] Contas a Pagar
+- [ ] Contas a Receber
+- [ ] Integração Contábil
+
+### 🔄 Infraestrutura e Operacional
+- [x] Spring Batch para migrações batch
+- [x] Flyway para versionamento de schema
+- [x] Fila de processamento com retry automático
+- [x] Logging estruturado e rastreável
+- [x] Suporte a múltiplos bancos de dados
+- [ ] Melhorias em observability (em progresso)
+
+---
+
+## 🛣️ Roadmap Futuro
+
+### Curto Prazo (1-2 sprints)
+- [ ] Completar features de Compras e Vendas
+- [ ] Implementar movimento de estoque com rastreabilidade
+- [ ] Melhorar relatórios de observability
+
+### Médio Prazo (2-4 sprints)
+- [ ] Integração com sistemas contábeis
+- [ ] Dashboard de analytics
+- [ ] Melhorias na performance com caching distribuído
+
+### Longo Prazo (4+ sprints)
+- [ ] Machine Learning para previsões de demanda
+- [ ] Integração EDI com parceiros
+- [ ] Conformidade com padrões internacionais (ISO, Sarbanes-Oxley)
+
+---
+
+## 💡 Notas Técnicas para Agentes de IA
+
+### Ao Implementar Novas Features:
+1. Seguir a estrutura de pacotes: `v1/main/features/{feature}`
+2. Implementar interface padrão de serviço
+3. Adicionar suporte a multi-tenant desde o início
+4. Criar decorators para logging/métricas
+5. Registrar novos serviços no proxy resolver
+
+### Ao Modificar Migrações:
+1. Criar nova versão `V{N}__description.sql`
+2. Nunca modificar migrations já executadas
+3. Testar contra múltiplos bancos de dados
+4. Incluir scripts seed quando necessário
+
+### Ao Trabalhar com Dados Compartilhados:
+1. Sempre considerar TenantGroupIds
+2. Implementar filtros row-level corretos
+3. Documentar comportamento esperado por Scope
+4. Testar isolamento entre tenants
+
+---
+
+## 📚 Dependências e Versões
+
+Veja `pom.xml` para lista completa de dependências. Principais:
+- Spring Boot 4.0.1 com Spring Framework 6.x
+- Java 21+ (compilação e runtime)
+- Jakarta EE (Java 21+)
+- PostgreSQL, MySQL e outros drivers de banco

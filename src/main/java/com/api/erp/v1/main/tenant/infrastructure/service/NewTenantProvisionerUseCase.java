@@ -4,7 +4,7 @@ import com.api.erp.v1.main.datasource.routing.TenantContext;
 import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
 import com.api.erp.v1.main.migration.service.TenantMigrationQueue;
 import com.api.erp.v1.main.tenant.application.dto.CreateNewTenantWithDatasourceRequest;
-import com.api.erp.v1.main.tenant.application.dto.CriarTenantRequest;
+import com.api.erp.v1.main.tenant.application.dto.CreateTenantRequest;
 import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceRequest;
 import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceResponse;
 import com.api.erp.v1.main.tenant.domain.entity.Tenant;
@@ -18,14 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * INFRASTRUCTURE - Serviço de Provisionamento de Novo Tenant
+ * INFRASTRUCTURE - New Tenant Provisioning Service
  * 
- * Orquestra todo o processo de criar um novo tenant completo com datasource,
- * migrações e seeders, escondendo a complexidade do controller.
+ * Orchestrates the entire process of creating a new complete tenant with datasource,
+ * migrations and seeders, hiding controller complexity.
  * 
- * Responsabilidades:
- * - Criar tenant no master database
- * - Configurar datasource
+ * Responsibilities:
+ * - Create tenant no master database
+ * - Configure datasource
  * - Testar conexão
  * - Enfileirar migrações + seeders
  * - Iniciar processamento
@@ -72,11 +72,11 @@ public class NewTenantProvisionerUseCase {
         
         try {
             // ═══════════════════════════════════════════════════════════════════
-            // FASE 1: CRIAR TENANT NO MASTER DATABASE
+            // PHASE 1: CRIAR TENANT NO MASTER DATABASE
             // ═══════════════════════════════════════════════════════════════════
             log.info("1️⃣  Criando tenant no master database...");
             
-            CriarTenantRequest criarRequest = new CriarTenantRequest(
+            CreateTenantRequest criarRequest = new CreateTenantRequest(
                     request.nome(),
                     request.cnpj(),
                     request.razaoSocial(),
@@ -92,7 +92,7 @@ public class NewTenantProvisionerUseCase {
             log.info("✅ Tenant criado: {} (ID: {})", tenantCriado.getNome(), tenantCriado.getId());
             
             // ═══════════════════════════════════════════════════════════════════
-            // FASE 2: CONFIGURAR DATASOURCE DO TENANT
+            // PHASE 2: CONFIGURAR DATASOURCE DO TENANT
             // ═══════════════════════════════════════════════════════════════════
             log.info("2️⃣  Configurando datasource para tenant {} ...", tenantCriado.getId());
             
@@ -118,9 +118,9 @@ public class NewTenantProvisionerUseCase {
             }
             
             // ═══════════════════════════════════════════════════════════════════
-            // FASE 3: ENFILEIRAR MIGRAÇÃO + SEED (NOVO SISTEMA)
+            // PHASE 3: ENFILEIRAR MIGRAÇÃO + SEED (NOVO SISTEMA)
             // ═══════════════════════════════════════════════════════════════════
-            log.info("3️⃣  Enfileirando migração Flyway + MainSeed...");
+            log.info("3️⃣  Enqueueing Flyway migration + MainSeed...");
             
             TenantMigrationEvent migrationEvent = migrationQueue.enqueueEvent(
                     tenantCriado.getId(),
@@ -131,14 +131,14 @@ public class NewTenantProvisionerUseCase {
             );
             
             log.info("✅ Evento enfileirado (EventID: {})", migrationEvent.getEventId());
-            log.info("⏳ Status: {} (será processado automaticamente)", migrationEvent.getStatus().getLabel());
+            log.info("⏳ Status: {} (will be processed automatically)", migrationEvent.getStatus().getLabel());
             
             log.info("");
             log.info("╔════════════════════════════════════════════════════════════════╗");
             log.info("║  ✅ NOVO TENANT PROVISIONADO COM SUCESSO                      ║");
             log.info("╚════════════════════════════════════════════════════════════════╝");
             
-            // Retorna resultado completo
+            // Returns resultado completo
             return new NewTenantProvisionResult(
                     tenantCriado,
                     datasourceResponse,

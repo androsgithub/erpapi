@@ -36,7 +36,7 @@ public interface CustomFieldDefinitionOpenApiDocumentation extends ICustomFieldD
     @Override
     @Operation(
             summary = "Criar campo customizado",
-            description = "Cria um novo campo customizado para uma entidade específica do sistema (ex: customer, product), vinculado à empresa/tenant."
+            description = "Cria um novo campo customizado para uma entidade específica do sistema (ex: businesspartner, product), vinculado à empresa/tenant."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Campo customizado criado com sucesso"),

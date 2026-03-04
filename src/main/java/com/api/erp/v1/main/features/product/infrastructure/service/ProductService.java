@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Serviço de Aplicação para Product
  * <p>
- * Responsabilidades:
+ * Responsibilities:
  * - Orquestrar operações de domínio
  * - Coordenar transações
  * - Transformar DTOs
@@ -95,7 +95,7 @@ public class ProductService implements IProductService {
     }
 
     /**
-     * Obtém um product por ID
+     * Gets um product por ID
      */
     @Transactional(readOnly = true)
     public Product obter(Long id) {
@@ -168,7 +168,7 @@ public class ProductService implements IProductService {
     }
 
     /**
-     * Obtém um product por ID ou lança exceção
+     * Gets um product por ID ou lança exceção
      */
     private Product obterPorId(Long id) {
         return repository.findById(id)
@@ -176,7 +176,7 @@ public class ProductService implements IProductService {
     }
 
     /**
-     * Obtém unidade de medida ou lança exceção
+     * Gets unidade de medida ou lança exceção
      */
     private MeasureUnit obterMeasureUnit(Long id) {
         return measureUnitRepository.findById(id)

@@ -64,8 +64,8 @@ public class TenantService implements ITenantService {
     }
 
     /**
-     * Obtém o usuário atual do contexto de segurança.
-     * Retorna "SYSTEM" se não houver usuário autenticado.
+     * Gets current user from security context.
+     * Returns "SYSTEM" if no authenticated user.
      */
     private String obterUserAtual() {
         try {
@@ -95,13 +95,13 @@ public class TenantService implements ITenantService {
 
     @Override
     @Transactional(transactionManager = "masterTransactionManager")
-    public Tenant criarTenant(CriarTenantRequest request) {
+    public Tenant criarTenant(CreateTenantRequest request) {
         log.info("[EMPRESA SERVICE] Criando nova empresa: {}", request.nome());
 
         // Check if company with this CNPJ already exists
         // Here you can add a validation if necessary
 
-        // Criar nova empresa
+        // Create nova empresa
         Tenant empresa = new Tenant();
         empresa.setNome(request.nome());
         empresa.setEmail(new Email(request.email()));
@@ -119,7 +119,7 @@ public class TenantService implements ITenantService {
         // Create default company configuration
         TenantConfig empresaConfig = new TenantConfig();
 
-        // Configurar TenantConfig com o tipo de tenant
+        // Configure TenantConfig com o tipo de tenant
         InternalTenantConfig tenantConfig = new InternalTenantConfig();
         tenantConfig.setTenantType(request.tenantType());
         tenantConfig.setTenantSubdomain(request.tenantSubdomain() != null ? request.tenantSubdomain() : request.tenantType().getCode());
@@ -127,7 +127,7 @@ public class TenantService implements ITenantService {
         empresaConfig.setInternalTenantConfig(tenantConfig);
 
         // Add other default configurations
-        empresaConfig.setCustomerConfig(new CustomerConfig());
+        empresaConfig.setBusinessPartnerConfig(new BusinessPartnerConfig());
         empresaConfig.setContactConfig(new ContactConfig());
         empresaConfig.setAddressConfig(new AddressConfig());
         empresaConfig.setPermissionConfig(new PermissionConfig());
@@ -148,7 +148,7 @@ public class TenantService implements ITenantService {
             eventPublisher.publishEvent(tenantCreatedEvent);
             log.debug("[EMPRESA SERVICE] Evento TenantCreatedEvent publicado para tenant: {}", empresaSalva.getId());
         } catch (Exception e) {
-            log.warn("[EMPRESA SERVICE] Erro ao publicar evento de criação de tenant: {}", e.getMessage());
+            log.warn("[EMPRESA SERVICE] Error publishing tenant creation event: {}", e.getMessage());
             // Continua mesmo se o evento não for publicado
         }
 
@@ -176,21 +176,21 @@ public class TenantService implements ITenantService {
         
         TenantConfig tenantConfig = tenant.getConfig();
         
-        // CUSTOMER CONFIG
-        if (hasCustomerConfig(request)) {
-            log.info("[TENANT SERVICE] Updating Customer Config");
-            CustomerConfig customerConfig = new CustomerConfig();
-            if (request.customerValidationEnabled() != null) 
-                customerConfig.setCustomerValidationEnabled(request.customerValidationEnabled());
-            if (request.customerAuditEnabled() != null) 
-                customerConfig.setCustomerAuditEnabled(request.customerAuditEnabled());
-            if (request.customerCacheEnabled() != null) 
-                customerConfig.setCustomerCacheEnabled(request.customerCacheEnabled());
-            if (request.customerNotificationEnabled() != null) 
-                customerConfig.setCustomerNotificationEnabled(request.customerNotificationEnabled());
-            if (request.customerTenantCustomizationEnabled() != null) 
-                customerConfig.setCustomerTenantCustomizationEnabled(request.customerTenantCustomizationEnabled());
-            tenantConfig.setCustomerConfig(customerConfig);
+        // BUSINESSPARTNER CONFIG
+        if (hasBusinessPartnerConfig(request)) {
+            log.info("[TENANT SERVICE] Updating BusinessPartner Config");
+            BusinessPartnerConfig businesspartnerConfig = new BusinessPartnerConfig();
+            if (request.businesspartnerValidationEnabled() != null) 
+                businesspartnerConfig.setBusinessPartnerValidationEnabled(request.businesspartnerValidationEnabled());
+            if (request.businesspartnerAuditEnabled() != null) 
+                businesspartnerConfig.setBusinessPartnerAuditEnabled(request.businesspartnerAuditEnabled());
+            if (request.businesspartnerCacheEnabled() != null) 
+                businesspartnerConfig.setBusinessPartnerCacheEnabled(request.businesspartnerCacheEnabled());
+            if (request.businesspartnerNotificationEnabled() != null) 
+                businesspartnerConfig.setBusinessPartnerNotificationEnabled(request.businesspartnerNotificationEnabled());
+            if (request.businesspartnerTenantCustomizationEnabled() != null) 
+                businesspartnerConfig.setBusinessPartnerTenantCustomizationEnabled(request.businesspartnerTenantCustomizationEnabled());
+            tenantConfig.setBusinessPartnerConfig(businesspartnerConfig);
         }
         
         // USER CONFIG
@@ -278,12 +278,12 @@ public class TenantService implements ITenantService {
     }
     
     // HELPER METHODS para detectar quais configs foram preenchidas
-    private boolean hasCustomerConfig(UnifiedTenantConfigRequest request) {
-        return request.customerValidationEnabled() != null ||
-               request.customerAuditEnabled() != null ||
-               request.customerCacheEnabled() != null ||
-               request.customerNotificationEnabled() != null ||
-               request.customerTenantCustomizationEnabled() != null;
+    private boolean hasBusinessPartnerConfig(UnifiedTenantConfigRequest request) {
+        return request.businesspartnerValidationEnabled() != null ||
+               request.businesspartnerAuditEnabled() != null ||
+               request.businesspartnerCacheEnabled() != null ||
+               request.businesspartnerNotificationEnabled() != null ||
+               request.businesspartnerTenantCustomizationEnabled() != null;
     }
     
     private boolean hasUserConfig(UnifiedTenantConfigRequest request) {

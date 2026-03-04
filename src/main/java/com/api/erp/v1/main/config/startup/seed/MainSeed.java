@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * COMPONENT - Coordenador de Seeders de Inicialização
+ * COMPONENT - Initialization Seeders Coordinator
  * <p>
- * Orquestra a execução de todos os seeders em ordem correta.
- * Cada seeder é responsável por inicializar dados específicos de um módulo.
+ * Orchestrates execution of all seeders in correct order.
+ * Each seeder is responsible for initializing specific module data.
  * <p>
- * Responsabilidades:
- * - Executar permissões antes de usuários
- * - Executar usuários antes de unidades
+ * Responsibilities:
+ * - Execute permissions before users
+ * - Execute users before units
  * - Tratamento centralizado de erros
  * - Logging de progresso
  *
@@ -37,39 +37,39 @@ public class MainSeed {
     public void executar() {
         if (!(bootstrapUserAdmin || bootstrapPermission)) return;
 
-        log.info("📋 Iniciando execução de seeders de inicialização...");
+        log.info("📋 Starting initialization seeders execution...");
         int sucessos = 0;
         int erros = 0;
 
         if (bootstrapPermission) {
             try {
-                log.debug("1️⃣  Executando seeder de permissões...");
+                log.debug("1️⃣  Running permissions seeder...");
                 permissionSeed.executar();
-                log.info("✅ Permissões inicializadas com sucesso");
+                log.info("✅ Permissions initialized successfully");
                 sucessos++;
             } catch (Exception e) {
-                log.error("❌ Erro ao executar seeder de permissões:", e);
+                log.error("❌ Error executing permissions seeder:", e);
                 erros++;
             }
         }
 
         if (bootstrapUserAdmin) {
             try {
-                log.debug("2️⃣  Executando seeder de usuário admin...");
+                log.debug("2️⃣  Running admin user seeder...");
                 userAdminSeed.executar();
-                log.info("✅ Usuário admin inicializado com sucesso");
+                log.info("✅ Admin user initialized successfully");
                 sucessos++;
             } catch (Exception e) {
-                log.error("❌ Erro ao executar seeder de usuário admin:", e);
+                log.error("❌ Error executing admin user seeder:", e);
                 erros++;
             }
         }
 
-        // ❌ COMENTADO: Unidades de medida agora são migração FlywayDB
-        // - Usar migration: V2__Insert_Measure_Units.sql para dados padrão
-        // - Seed apenas para unidades específicas do tenant se necessário
+        // ❌ COMMENTED: Measure units are now FlywayDB migration
+        // - Use migration: V2__Insert_Measure_Units.sql for default data
+        // - Seed only for tenant-specific units if necessary
         // try {
-        //     log.debug("3️⃣  Executando seeder de unidades de medida...");
+        //     log.debug("3️⃣  Executesndo seeder de unidades de medida...");
         //     measureUnitSeed.executar();
         //     log.info("✅ Unidades de medida inicializadas com sucesso");
         //     sucessos++;
@@ -79,9 +79,9 @@ public class MainSeed {
         // }
 
         if (erros == 0) {
-            log.info("✅ Todos os {} seeders foram executados com sucesso", sucessos);
+            log.info("✅ All {} seeders were executed successfully", sucessos);
         } else {
-            log.warn("⚠️  Execução de seeders concluída: {} sucesso(s), {} erro(s)", sucessos, erros);
+            log.warn("⚠️  Seeder execution completed: {} success(es), {} error(s)", sucessos, erros);
         }
     }
 }

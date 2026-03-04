@@ -1,11 +1,11 @@
--- Insert Customer Addresses
+-- Insert BusinessPartner Addresses
 INSERT INTO
-    TB_CUSTOMER_ADDRESS (customer_id, address_id)
+    TB_BUSINESSPARTNER_ADDRESS (businesspartner_id, address_id)
 SELECT
-    c.id as customer_id,
+    c.id as businesspartner_id,
     a.id as address_id
 FROM
-    tb_customer c
+    tb_business_partner c
     CROSS JOIN tb_address a
 WHERE
     c.deleted = 0

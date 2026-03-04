@@ -1,15 +1,27 @@
 package com.api.erp.v1.main.features.measureunit.domain.entity;
 
+import com.api.erp.v1.main.features.permission.domain.entity.BasePermissions;
+
+/**
+ * Measure Unit-specific permission constants.
+ * <p>
+ * Defines all permissions related to Measure Unit management.
+ * Uses BasePermissions for standard operations.
+ */
 public final class MeasureUnitPermissions {
 
     private MeasureUnitPermissions() {
     }
 
-    public static final String PREFIX = "unidade-medida";
-    public static final String CRIAR = PREFIX + ".criar";
-    public static final String ATUALIZAR = PREFIX + ".atualizar";
-    public static final String VISUALIZAR = PREFIX + ".visualizar";
-    public static final String DELETAR = PREFIX + ".deletar";
-    public static final String ATIVAR = PREFIX + ".ativar";
-    public static final String DESATIVAR = PREFIX + ".desativar";
+    public static final String PREFIX = "measure-unit";
+    
+    // Standard CRUD operations
+    public static final String CREATE = PREFIX + "." + BasePermissions.OPERATION_CREATE;
+    public static final String UPDATE = PREFIX + "." + BasePermissions.OPERATION_UPDATE;
+    public static final String VIEW = PREFIX + "." + BasePermissions.OPERATION_VIEW;
+    public static final String DELETE = PREFIX + "." + BasePermissions.OPERATION_DELETE;
+    
+    // Activation operations
+    public static final String ACTIVATE = PREFIX + "." + BasePermissions.OPERATION_ACTIVATE;
+    public static final String DEACTIVATE = PREFIX + "." + BasePermissions.OPERATION_DEACTIVATE;
 }

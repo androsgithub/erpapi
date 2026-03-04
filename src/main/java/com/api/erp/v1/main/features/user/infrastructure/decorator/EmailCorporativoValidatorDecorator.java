@@ -19,7 +19,7 @@ public class EmailCorporativoValidatorDecorator implements IUserValidator {
 
     @Override
     public void validar(CreateUserRequest request) {
-        // Executa validação base
+        // Executes validação base
         wrapped.validar(request);
 
         // Adiciona validação de domínio corporativo

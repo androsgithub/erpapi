@@ -3,7 +3,7 @@ package com.api.erp.v1.main.features.product.presentation.controller;
 import com.api.erp.v1.main.features.product.application.dto.ListaExpandidaResponseDTO;
 import com.api.erp.v1.main.features.product.domain.controller.IListaExpandidaController;
 import com.api.erp.v1.docs.openapi.features.product.ListaExpandidaOpenApiDocumentation;
-import com.api.erp.v1.main.features.product.domain.entity.ListaExpandidaPermissions;
+import com.api.erp.v1.main.features.product.domain.entity.ExpandedListPermissions;
 import com.api.erp.v1.main.features.product.domain.service.IListaExpandidaService;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
@@ -24,7 +24,7 @@ public class ListaExpandidaController implements IListaExpandidaController, List
 
     @GetMapping("/product/{productId}")
     @RequiresXTenantId
-    @RequiresPermission(ListaExpandidaPermissions.GERAR)
+    @RequiresPermission(ExpandedListPermissions.GENERATE)
     public ResponseEntity<ListaExpandidaResponseDTO> gerarListaExpandida(
             @PathVariable Long productId,
             @RequestParam(defaultValue = "1") BigDecimal quantidade) {
@@ -34,7 +34,7 @@ public class ListaExpandidaController implements IListaExpandidaController, List
 
     @GetMapping("/compras/product/{productId}")
     @RequiresXTenantId
-    @RequiresPermission(ListaExpandidaPermissions.GERAR_COMPRA)
+    @RequiresPermission(ExpandedListPermissions.GENERATE_PURCHASE)
     public ResponseEntity<ListaExpandidaResponseDTO> gerarListaCompras(
             @PathVariable Long productId,
             @RequestParam(defaultValue = "1") BigDecimal quantidade) {

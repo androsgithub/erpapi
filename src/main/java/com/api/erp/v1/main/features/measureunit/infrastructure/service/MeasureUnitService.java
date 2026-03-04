@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Serviço de aplicação para MeasureUnit
  * <p>
- * Responsabilidades:
+ * Responsibilities:
  * - Orquestrar operações de domínio
  * - Coordenar transações
  * - Transformar DTOs
@@ -38,7 +38,7 @@ public class MeasureUnitService implements IMeasureUnitService {
         validator.validarCriacao(dto.getSigla(), dto.getDescricao());
 
         if (repository.existsBySigla(dto.getSigla())) {
-            throw new BusinessException(HttpStatus.CONFLICT, "Já existe uma unidade de medida com a sigla: " + dto.getSigla());
+            throw new BusinessException(HttpStatus.CONFLICT, "A unit of measurement with code already exists: " + dto.getSigla());
         }
 
         MeasureUnit unidade = MeasureUnit.builder().sigla(dto.getSigla().trim().toUpperCase()).descricao(dto.getDescricao().trim()).build();
@@ -55,7 +55,7 @@ public class MeasureUnitService implements IMeasureUnitService {
 
         if (!unidade.getSigla().equals(dto.getSigla())) {
             if (repository.existsBySigla(dto.getSigla())) {
-                throw new BusinessException(HttpStatus.CONFLICT, "Já existe uma unidade de medida com a sigla: " + dto.getSigla());
+                throw new BusinessException(HttpStatus.CONFLICT, "A unit of measurement with code already exists: " + dto.getSigla());
             }
         }
 
@@ -69,7 +69,7 @@ public class MeasureUnitService implements IMeasureUnitService {
     }
 
     /**
-     * Obtém uma unidade de medida por ID
+     * Gets uma unidade de medida por ID
      */
     @Transactional(readOnly = true)
     public MeasureUnitResponseDTO obter(Long id) {
@@ -111,10 +111,10 @@ public class MeasureUnitService implements IMeasureUnitService {
     }
 
     /**
-     * Obtém uma unidade por ID ou lança exceção
+     * Gets uma unidade por ID ou lança exceção
      */
     private MeasureUnit obterPorId(Long id) {
-        return repository.findById(id).orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Unidade de medida não encontrada com ID: " + id));
+        return repository.findById(id).orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Unit of measurement not found with ID: " + id));
     }
 
     /**

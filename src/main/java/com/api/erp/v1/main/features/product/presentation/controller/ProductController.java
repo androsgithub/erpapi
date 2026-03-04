@@ -35,39 +35,39 @@ public class ProductController implements IProductController, ProductOpenApiDocu
     private IProductMapper productMapper;
 
     @PostMapping
-    @Operation(summary = "Criar novo product", description = "Cria um novo product com validações de domínio")
+    @Operation(summary = "Create novo product", description = "Cria um novo product com validações de domínio")
     @ApiResponses({@ApiResponse(responseCode = "201", description = "Product criado com sucesso"), @ApiResponse(responseCode = "400", description = "Dados inválidos"), @ApiResponse(responseCode = "404", description = "Unidade de medida não encontrada"), @ApiResponse(responseCode = "409", description = "Código do product já existe")})
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.CRIAR)
+    @RequiresPermission(ProductPermissions.CREATE)
     public ResponseEntity<ProductResponseDTO> criar(@RequestBody ProductRequestDTO dto) {
         Product resposta = service.criar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(productMapper.toResponse(resposta));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizar product", description = "Atualiza os dados de um product existente")
+    @Operation(summary = "Update product", description = "Atualiza os dados de um product existente")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Product atualizado com sucesso"), @ApiResponse(responseCode = "400", description = "Dados inválidos"), @ApiResponse(responseCode = "404", description = "Product não encontrado"), @ApiResponse(responseCode = "409", description = "Código já existe")})
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.ATUALIZAR)
+    @RequiresPermission(ProductPermissions.UPDATE)
     public ResponseEntity<ProductResponseDTO> atualizar(@PathVariable Long id, @RequestBody ProductRequestDTO dto) {
         Product product = service.atualizar(id, dto);
         return ResponseEntity.ok(productMapper.toResponse(product));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Obter product", description = "Retorna os dados de um product pelo ID")
+    @Operation(summary = "Obter product", description = "Returns os dados de um product pelo ID")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Product encontrado"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.VISUALIZAR)
+    @RequiresPermission(ProductPermissions.VIEW)
     public ResponseEntity<ProductResponseDTO> obter(@PathVariable Long id) {
         return ResponseEntity.ok(productMapper.toResponse(service.obter(id)));
     }
 
     @GetMapping
-    @Operation(summary = "Listar products", description = "Retorna todos os products com paginação")
+    @Operation(summary = "Listar products", description = "Returns todos os products com paginação")
     @ApiResponse(responseCode = "200", description = "Lista de products")
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.VISUALIZAR)
+    @RequiresPermission(ProductPermissions.VIEW)
     public ResponseEntity<Page<ProductResponseDTO>> listar(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "descricao") String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
         Page<ProductResponseDTO> response = productMapper.toResponsePage(service.listar(pageable));
@@ -76,10 +76,10 @@ public class ProductController implements IProductController, ProductOpenApiDocu
     }
 
     @GetMapping("/tipo/{tipo}")
-    @Operation(summary = "Listar products por tipo", description = "Retorna products filtrados por tipo (COMPRADO ou FABRICAVEL)")
+    @Operation(summary = "Listar products por tipo", description = "Returns products filtrados por tipo (COMPRADO ou FABRICAVEL)")
     @ApiResponse(responseCode = "200", description = "Lista de products filtrados")
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.VISUALIZAR)
+    @RequiresPermission(ProductPermissions.VIEW)
     public ResponseEntity<Page<ProductResponseDTO>> listarPorTipo(@PathVariable ProductType type, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductResponseDTO> response = productMapper.toResponsePage(service.listarPorTipo(type, pageable));
@@ -90,7 +90,7 @@ public class ProductController implements IProductController, ProductOpenApiDocu
     @Operation(summary = "Ativar product", description = "Muda o status do product para ATIVO")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Product ativado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.ATIVAR)
+    @RequiresPermission(ProductPermissions.ACTIVATE)
     public ResponseEntity<ProductResponseDTO> ativar(@PathVariable Long id) {
         return ResponseEntity.ok(productMapper.toResponse(service.ativar(id)));
     }
@@ -99,7 +99,7 @@ public class ProductController implements IProductController, ProductOpenApiDocu
     @Operation(summary = "Desativar product", description = "Muda o status do product para INATIVO")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Product desativado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.DESATIVAR)
+    @RequiresPermission(ProductPermissions.DEACTIVATE)
     public ResponseEntity<ProductResponseDTO> desativar(@PathVariable Long id) {
         return ResponseEntity.ok(productMapper.toResponse(service.desativar(id)));
     }
@@ -108,7 +108,7 @@ public class ProductController implements IProductController, ProductOpenApiDocu
     @Operation(summary = "Bloquear product", description = "Muda o status do product para BLOQUEADO")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Product bloqueado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.BLOQUEAR)
+    @RequiresPermission(ProductPermissions.LOCK)
     public ResponseEntity<ProductResponseDTO> bloquear(@PathVariable Long id) {
         return ResponseEntity.ok(productMapper.toResponse(service.bloquear(id)));
     }
@@ -117,16 +117,16 @@ public class ProductController implements IProductController, ProductOpenApiDocu
     @Operation(summary = "Descontinuar product", description = "Muda o status do product para DESCONTINUADO")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Product descontinuado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.DESCONTINUAR)
+    @RequiresPermission(ProductPermissions.DISCONTINUE)
     public ResponseEntity<ProductResponseDTO> descontinuar(@PathVariable Long id) {
         return ResponseEntity.ok(productMapper.toResponse(service.descontinuar(id)));
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Deletar product", description = "Remove um product do sistema")
+    @Operation(summary = "Delete product", description = "Remove um product do sistema")
     @ApiResponses({@ApiResponse(responseCode = "204", description = "Product deletado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
     @RequiresXTenantId
-    @RequiresPermission(ProductPermissions.DELETAR)
+    @RequiresPermission(ProductPermissions.DELETE)
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
         return ResponseEntity.noContent().build();

@@ -7,7 +7,7 @@ import java.time.Instant;
 /**
  * DTO para representação de evento de fluxo.
  * 
- * Transfere dados de FlowEventEntity para customer
+ * Transfere dados de FlowEventEntity para businesspartner
  * sem expor detalhes da entidade JPA.
  */
 public record FlowEventDto(

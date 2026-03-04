@@ -21,7 +21,7 @@ public class ContactService implements IContactService {
 
     @Transactional
     public Contact criar(CreateContactRequest request) {
-        // Validar dados
+        // Validate dados
         ContactValidator.validar(request.tipo(), request.valor());
         ContactValidator.validarDescricao(request.descricao());
 
@@ -30,7 +30,7 @@ public class ContactService implements IContactService {
             removerPrincipalExistente();
         }
 
-        // Criar novo contact
+        // Create novo contact
         TipoContact tipo = TipoContact.valueOf(request.tipo().toUpperCase());
         Contact contact = new Contact(tipo, request.valor());
 
@@ -85,7 +85,7 @@ public class ContactService implements IContactService {
         Contact contact = contactRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Contact não encontrado com id: " + id));
 
-        // Validar dados
+        // Validate dados
         ContactValidator.validar(request.tipo(), request.valor());
         ContactValidator.validarDescricao(request.descricao());
 
@@ -94,7 +94,7 @@ public class ContactService implements IContactService {
             removerPrincipalExistente();
         }
 
-        // Atualizar campos
+        // Update campos
         TipoContact tipo = TipoContact.valueOf(request.tipo().toUpperCase());
         contact.setTipo(tipo);
         contact.setValor(request.valor());

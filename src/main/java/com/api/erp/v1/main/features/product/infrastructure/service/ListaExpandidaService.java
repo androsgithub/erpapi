@@ -96,7 +96,7 @@ public class ListaExpandidaService implements IListaExpandidaService {
     }
     
     /**
-     * Obtém product por ID ou lança exceção
+     * Gets product por ID ou lança exceção
      */
     private Product obterProduct(Long id) {
         return productRepository.findById(id)

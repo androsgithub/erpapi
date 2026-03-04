@@ -38,7 +38,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
 
     @GetMapping()
     @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.BUSCAR)
+    @RequiresPermission(TenantPermissions.SEARCH)
     public ResponseEntity<TenantResponse> obter() {
         Long tenantId = TenantContext.getTenantId();
         Tenant tenant = tenantService.getDadosTenant(tenantId);
@@ -47,7 +47,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
 
     /**
      * ═════════════════════════════════════════════════════════════════════════
-     * CRIAR NOVO TENANT COM DATASOURCE E ENFILEIRAR MIGRAÇÕES
+     * CREATE NEW TENANT WITH DATASOURCE AND QUEUE MIGRATIONS
      * 
      * Lógica complexa delegada para NewTenantProvisionerService
      * 
@@ -63,15 +63,15 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
             NewTenantProvisionerUseCase.NewTenantProvisionResult result =
                     newTenantProvisionerService.execute(request);
             
-            // Retorna resposta estruturada
+            // Returns resposta estruturada
             return ResponseEntity.status(HttpStatus.CREATED).body(
                     buildSuccessResponse(result)
             );
             
         } catch (IllegalArgumentException e) {
-            log.error("❌ Erro de validação: {}", e.getMessage());
+            log.error("❌ Validation error: {}", e.getMessage());
             return ResponseEntity.badRequest().body(
-                    buildErrorResponse("Validação falhou", e.getMessage())
+                    buildErrorResponse("Validation falhou", e.getMessage())
             );
             
         } catch (Exception e) {
@@ -126,7 +126,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
 
     @GetMapping("/listar")    
     @RequiresXTenantId    
-    @RequiresPermission(TenantPermissions.BUSCAR)
+    @RequiresPermission(TenantPermissions.SEARCH)
     public ResponseEntity<List<TenantResponse>> listar() {
         log.info("[EMPRESA CONTROLLER] Listando todas as tenants");
         List<Tenant> tenants = tenantService.listarTenants();
@@ -138,7 +138,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
 
     @PutMapping("")
     @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.ATUALIZAR)
+    @RequiresPermission(TenantPermissions.UPDATE)
     public ResponseEntity<TenantResponse> atualizar(
 
             @RequestBody TenantRequest request) {
@@ -152,7 +152,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
      * UNIFIED CONFIG PATCH - Consolidação dos 6 PUTs antigos em 1 PATCH
      * 
      * Substitui:
-     * - PUT /config/customer
+     * - PUT /config/businesspartner
      * - PUT /config/user
      * - PUT /config/permission
      * - PUT /config/tenant
@@ -163,7 +163,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
      * 
      * Envie apenas os campos que deseja atualizar:
      * {
-     *   "customerValidationEnabled": true,
+     *   "businesspartnerValidationEnabled": true,
      *   "userApprovalRequired": false,
      *   "permissionCacheEnabled": true,
      *   ...outros campos opcionais
@@ -174,7 +174,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
      */
     @PatchMapping("/config")
     @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.ATUALIZAR)
+    @RequiresPermission(TenantPermissions.UPDATE)
     public ResponseEntity<TenantResponse> atualizarConfigUnificada(
             @RequestBody UnifiedTenantConfigRequest request) {
         Long tenantId = TenantContext.getTenantId();

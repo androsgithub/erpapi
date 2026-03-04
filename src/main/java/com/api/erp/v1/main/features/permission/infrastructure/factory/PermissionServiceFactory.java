@@ -33,7 +33,7 @@ public class PermissionServiceFactory {
     }
 
     private IPermissionService aplicarDecorators(IPermissionService service, PermissionConfig config) {
-        // Validação é aplicada primeiro
+        // Validation é aplicada primeiro
         if (config != null && config.isPermissionValidationEnabled()) {
             service = new ValidationDecoratorPermissionService(service);
             log.debug("[PERMISSION FACTORY] ValidationDecorator aplicado");

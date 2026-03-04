@@ -30,7 +30,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        logger.info("Registrando endpoints STOMP...");
+        logger.info("Logsndo endpoints STOMP...");
 
         // Endpoint com SockJS fallback
         registry.addEndpoint("/ws")

@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
  * 
  * Thread-safe e suporta execução concorrente controlada.
  * 
- * Responsabilidades:
+ * Responsibilities:
  * - Manter fila centralizada (BlockingQueue)
- * - Registrar eventos para rastreamento
+ * - Logsr eventos para rastreamento
  * - Fornecer estatísticas e monitoramento
- * - Gerenciar retry de eventos com falha
+ * - Managesr retry de eventos com falha
  * - Fornecer histórico de execução
  * 
  * @author ERP System
@@ -44,7 +44,7 @@ public class TenantMigrationQueue {
     // Histórico de eventos processados
     private final Queue<TenantMigrationEvent> eventHistory = new ConcurrentLinkedQueue<>();
     
-    // Configuração de Retry
+    // Configuration de Retry
     @Getter
     private final int maxRetries = 3;
     
@@ -67,7 +67,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Obtém uma migração pendente ou em progresso para um tenant
+     * Gets uma migração pendente ou em progresso para um tenant
      * 
      * @param tenantId ID do tenant
      * @return Evento existente ou Optional.empty() se não houver
@@ -88,15 +88,15 @@ public class TenantMigrationQueue {
             eventQueue.offer(event);
             eventRegistry.put(event.getEventId(), event);
             
-            log.info("📥 [{}] Evento enfileirado: Tenant {} (Origem: {})",
+            log.info("📥 [{}] Event queued: Tenant {} (Source: {})",
                     event.getEventId(),
                     event.getTenantName(),
                     event.getSource().getLabel());
                     
         } catch (Exception e) {
-            log.error("❌ [{}] Erro ao enfileirar evento: {}", 
+            log.error("❌ [{}] Error queuing event: {}", 
                     event.getEventId(), e.getMessage(), e);
-            throw new RuntimeException("Erro ao enfileirar evento de migração", e);
+            throw new RuntimeException("Error queuing migration event", e);
         }
     }
     
@@ -109,12 +109,12 @@ public class TenantMigrationQueue {
     public TenantMigrationEvent enqueueEvent(Long tenantId, String tenantName, 
                                              TenantDatasource datasource,
                                              TenantMigrationEvent.MigrationEventSource source) {
-        // Verifica se já há migração pendente/em progresso
+        // Check if there is already a pending/in-progress migration
         Optional<TenantMigrationEvent> existingMigration = getPendingMigrationForTenant(tenantId);
         if (existingMigration.isPresent()) {
             TenantMigrationEvent existing = existingMigration.get();
-            log.warn("⚠️ Já existe migração pendente para tenant {} (EventID: {}). " +
-                    "Retornando evento existente sem duplicar.",
+            log.warn("⚠️ There is already a pending migration for tenant {} (EventID: {}). " +
+                    "Returning existing event without duplicating.",
                     tenantId, existing.getEventId());
             return existing;
         }
@@ -125,7 +125,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Obtém o próximo evento da fila (bloqueante)
+     * Gets o próximo evento da fila (bloqueante)
      * Usado pelo consumidor de fila para processar eventos
      * 
      * @param timeout Timeout em ms
@@ -143,11 +143,11 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Registra um evento como processado no histórico
+     * Logs um evento como processado no histórico
      */
     public void recordEventCompletion(TenantMigrationEvent event) {
         eventHistory.offer(event);
-        log.info("📊 [{}] Evento registrado no histórico: Tenant {} (Status: {})",
+        log.info("📊 [{}] Event recorded in history: Tenant {} (Status: {})",
                 event.getEventId(),
                 event.getTenantName(),
                 event.getStatus().getLabel());
@@ -158,15 +158,15 @@ public class TenantMigrationQueue {
      */
     public void enqueueForRetry(TenantMigrationEvent event) {
         if (event.getRetryCount() != null && event.getRetryCount() >= maxRetries) {
-            log.error("❌ [{}] Máximo de retries atingido para tenant {}", 
+            log.error("❌ [{}] Maximum retries reached for tenant {}", 
                     event.getEventId(), event.getTenantName());
-            event.markFailed("Máximo de tentativas atingido: " + event.getErrorMessage());
+            event.markFailed("Maximum attempts reached: " + event.getErrorMessage());
             recordEventCompletion(event);
             return;
         }
         
         event.markForRetry();
-        log.warn("🔄 [{}] Evento enfileiado para retry: Tenant {} (Tentativa: {})",
+        log.warn("🔄 [{}] Event queued for retry: Tenant {} (Attempt: {})",
                 event.getEventId(),
                 event.getTenantName(),
                 event.getRetryCount());
@@ -175,7 +175,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Obtém um evento pelo ID
+     * Gets um evento pelo ID
      */
     public Optional<TenantMigrationEvent> getEvent(String eventId) {
         return Optional.ofNullable(eventRegistry.get(eventId));
@@ -191,7 +191,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Obtém todos os eventos registrados (incluindo histórico)
+     * Gets todos os eventos registrados (incluindo histórico)
      */
     public Collection<TenantMigrationEvent> getAllEvents() {
         Set<TenantMigrationEvent> allEvents = new HashSet<>(eventRegistry.values());
@@ -200,7 +200,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Obtém eventos pendentes
+     * Gets eventos pendentes
      */
     public Collection<TenantMigrationEvent> getPendingEvents() {
         return eventRegistry.values().stream()
@@ -209,7 +209,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Obtém eventos com falha
+     * Gets eventos com falha
      */
     public Collection<TenantMigrationEvent> getFailedEvents() {
         return getAllEvents().stream()
@@ -218,7 +218,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Obtém eventos concluídos
+     * Gets eventos concluídos
      */
     public Collection<TenantMigrationEvent> getCompletedEvents() {
         return getAllEvents().stream()
@@ -227,7 +227,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Obtém eventos em progresso
+     * Gets eventos em progresso
      */
     public Collection<TenantMigrationEvent> getInProgressEvents() {
         return eventRegistry.values().stream()
@@ -236,7 +236,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Retorna o tamanho da fila
+     * Returns o tamanho da fila
      */
     public int getQueueSize() {
         return eventQueue.size();
@@ -250,7 +250,7 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Retorna estatísticas da fila
+     * Returns estatísticas da fila
      */
     public MigrationQueueStats getStats() {
         Collection<TenantMigrationEvent> allEvents = getAllEvents();
@@ -286,12 +286,12 @@ public class TenantMigrationQueue {
     }
     
     /**
-     * Limpa a fila (apenas para testes!)
+     * Clears the queue (for testing only!)
      */
     public void clear() {
         eventQueue.clear();
         eventRegistry.clear();
-        log.warn("⚠️ Fila de migrações foi limpa completamente!");
+        log.warn("⚠️ Migration queue was completely cleared!");
     }
     
     /**

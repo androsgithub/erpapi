@@ -5,13 +5,13 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * EVENT - Evento de Criação de Novo Tenant
+ * EVENT - Evento de Creation de Novo Tenant
  * 
  * Publicado quando um novo tenant é criado na aplicação.
  * Dispara automaticamente a enfileiramento do tenant na fila de migrações.
  * 
  * Este evento une os fluxos:
- * - Criação de tenant (TenantService.criarTenant)
+ * - Creation de tenant (TenantService.criarTenant)
  * - Migração do tenant (TenantMigrationQueue)
  * 
  * @author ERP System

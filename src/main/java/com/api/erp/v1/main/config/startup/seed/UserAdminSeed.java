@@ -22,9 +22,9 @@ import java.util.Set;
  * Cria o usuário administrador padrão durante inicialização se não existir.
  * Este usuário tem permissões completas no sistema.
  * 
- * Responsabilidades:
- * - Verificar se admin já existe
- * - Criar usuário admin com credenciais padrão
+ * Responsibilities:
+ * - Check se admin já existe
+ * - Create usuário admin com credenciais padrão
  * - Codificar senha com segurança
  * - Associar usuário à role ADMIN
  * - Logar operação
@@ -50,11 +50,11 @@ public class UserAdminSeed {
     public void executar() {
         try {
             if (userRepository.findByEmail(new Email(ADMIN_EMAIL)).isPresent()) {
-                log.info("⏭️  Usuário Admin '{}' já existe, pulando criação", ADMIN_EMAIL);
+                log.info("⏭️  Admin user '{}' already exists, skipping creation", ADMIN_EMAIL);
                 return;
             }
 
-            log.debug("Criando Usuário Admin padrão...");
+            log.debug("Creating default Admin user...");
 
             Role adminRole = roleRepository.findByNome("ADMIN").orElse(null);
 
@@ -69,13 +69,13 @@ public class UserAdminSeed {
             if (adminRole != null) admin.setRoles(Set.of(adminRole));
 
             userRepository.save(admin);
-            log.info("✅ Usuário Admin criado com sucesso");
+            log.info("✅ Admin user created successfully");
 
-            log.info("📧 Email: {} | 🔐 Senha padrão: {} (ALTERE NA PRIMEIRA EXECUÇÃO)", ADMIN_EMAIL, ADMIN_PASSWORD);
+            log.info("📧 Email: {} | 🔐 Default password: {} (CHANGE ON FIRST RUN)", ADMIN_EMAIL, ADMIN_PASSWORD);
 
         } catch (Exception e) {
-            log.error("❌ Erro ao criar usuário admin:", e);
-            throw new RuntimeException("Falha ao criar usuário admin", e);
+            log.error("❌ Error creating admin user:", e);
+            throw new RuntimeException("Failed to create admin user", e);
         }
     }
 }

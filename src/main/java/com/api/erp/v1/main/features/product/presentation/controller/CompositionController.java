@@ -25,7 +25,7 @@ public class CompositionController implements ICompositionController, Compositio
 
     @PostMapping
     @RequiresXTenantId
-    @RequiresPermission(CompositionPermissions.CRIAR)
+    @RequiresPermission(CompositionPermissions.CREATE)
     public ResponseEntity<CompositionResponseDTO> criar(
             @RequestBody CompositionRequestDTO dto) {
         CompositionResponseDTO resposta = service.criar(dto);
@@ -34,7 +34,7 @@ public class CompositionController implements ICompositionController, Compositio
 
     @PutMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(CompositionPermissions.ATUALIZAR)
+    @RequiresPermission(CompositionPermissions.UPDATE)
     public ResponseEntity<CompositionResponseDTO> atualizar(
             @PathVariable Long id,
             @RequestBody CompositionRequestDTO dto) {
@@ -44,14 +44,14 @@ public class CompositionController implements ICompositionController, Compositio
 
     @GetMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(CompositionPermissions.VISUALIZAR)
+    @RequiresPermission(CompositionPermissions.VIEW)
     public ResponseEntity<CompositionResponseDTO> obter(@PathVariable Long id) {
         return ResponseEntity.ok(service.obter(id));
     }
 
     @GetMapping("/product/{productFabricadoId}")
     @RequiresXTenantId
-    @RequiresPermission(CompositionPermissions.VISUALIZAR)
+    @RequiresPermission(CompositionPermissions.VIEW)
     public ResponseEntity<List<CompositionResponseDTO>> listarComposicoesPor(
             @PathVariable Long productFabricadoId) {
         return ResponseEntity.ok(service.listarComposicoesPor(productFabricadoId));
@@ -59,7 +59,7 @@ public class CompositionController implements ICompositionController, Compositio
 
     @DeleteMapping("/{id}")
     @RequiresXTenantId
-    @RequiresPermission(CompositionPermissions.DELETAR)
+    @RequiresPermission(CompositionPermissions.DELETE)
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
         return ResponseEntity.noContent().build();
@@ -67,7 +67,7 @@ public class CompositionController implements ICompositionController, Compositio
 
     @DeleteMapping("/product/{productFabricadoId}/limpar")
     @RequiresXTenantId
-    @RequiresPermission(CompositionPermissions.DELETAR)
+    @RequiresPermission(CompositionPermissions.DELETE)
     public ResponseEntity<Void> deletarComposicoesDeProduct(
             @PathVariable Long productFabricadoId) {
         service.deletarComposicoesDeProduct(productFabricadoId);

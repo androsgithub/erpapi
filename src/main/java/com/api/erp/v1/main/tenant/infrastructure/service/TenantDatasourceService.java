@@ -28,13 +28,13 @@ import java.util.Optional;
 /**
  * TenantSchemaService
  * <p>
- * Implementação de serviço para gerenciar configurações de datasources dos tenants.
+ * Service implementation for managing tenant datasource configurations.
  * <p>
- * Responsabilidades:
- * - Configurar novo datasource para um tenant
- * - Atualizar configuração de datasource
+ * Responsibilities:
+ * - Configure novo datasource para um tenant
+ * - Update datasource configuration
  * - Test database connection
- * - Registrar datasource no DataSourceRouter
+ * - Logsr datasource no DataSourceRouter
  */
 @Slf4j
 @Service

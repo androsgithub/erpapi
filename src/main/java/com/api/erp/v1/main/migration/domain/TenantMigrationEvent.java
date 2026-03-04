@@ -18,7 +18,7 @@ import java.util.UUID;
  * - MigrationJobLauncher + TenantMigrationProcessor (inicialização)
  * - MigrationQueueService + MigrationQueueTask (criação de novo tenant)
  * 
- * Responsabilidades:
+ * Responsibilities:
  * - Encapsular dados do tenant a ser migrado
  * - Rastrear estado da migração
  * - Manter logs de execução
@@ -130,7 +130,7 @@ public class TenantMigrationEvent {
     }
     
     /**
-     * Retorna tempo de espera (desde enfileiramento até início)
+     * Returns tempo de espera (desde enfileiramento até início)
      */
     public long getWaitTimeMs() {
         if (enqueuedAt != null && startedAt != null) {
@@ -143,7 +143,7 @@ public class TenantMigrationEvent {
      * Enum de Status do Evento
      */
     public enum MigrationEventStatus {
-        PENDING("Aguardando"),
+        PENDING("Waits forndo"),
         IN_PROGRESS("Em Progresso"),
         COMPLETED("Concluído"),
         FAILED("Falha"),
@@ -186,8 +186,8 @@ public class TenantMigrationEvent {
      * Enum de Origem do Evento
      */
     public enum MigrationEventSource {
-        APPLICATION_STARTUP("Inicialização da Aplicação"),
-        TENANT_CREATION("Criação de Novo Tenant"),
+        APPLICATION_STARTUP("Initialization da Aplicação"),
+        TENANT_CREATION("Creation de Novo Tenant"),
         MANUAL_REQUEST("Requisição Manual de Suporte");
         
         private final String label;

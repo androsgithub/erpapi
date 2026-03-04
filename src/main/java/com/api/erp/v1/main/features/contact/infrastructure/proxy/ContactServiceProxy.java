@@ -42,13 +42,13 @@ public class ContactServiceProxy implements IContactService {
 
             try {
                 IContactService service = applicationContext.getBean(beanName, IContactService.class);
-                log.debug("[CUSTOMER SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
+                log.debug("[BUSINESSPARTNER SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
                 response = service;
             } catch (Exception e) {
-                log.debug("[CUSTOMER SERVICE] Service {} not found, using default", beanName);
+                log.debug("[BUSINESSPARTNER SERVICE] Service {} not found, using default", beanName);
             }
         } catch (Exception e) {
-            log.debug("[CUSTOMER SERVICE] Error resolving tenant, using default: {}", e.getMessage());
+            log.debug("[BUSINESSPARTNER SERVICE] Error resolving tenant, using default: {}", e.getMessage());
         }
         return ContactServiceApplyDecorate.aplicarDecorators(response, contactConfig);
     }

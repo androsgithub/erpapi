@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.features.address.application.dto.response;
 
-import com.api.erp.v1.main.features.address.domain.entity.AddressTipo;
+import com.api.erp.v1.main.features.address.domain.entity.AddressType;
 import com.api.erp.v1.main.shared.domain.valueobject.CEP;
 
 import java.time.OffsetDateTime;
@@ -15,7 +15,7 @@ public record AddressResponse(
         String cidade,
         String estado,
         CEP cep,
-        AddressTipo tipo,
+        AddressType tipo,
         Boolean principal,
         Map<String, Object> custom_data,
         OffsetDateTime created_at,

@@ -45,13 +45,13 @@ public class AddressServiceProxy implements IAddressService {
 
             try {
                 IAddressService service = applicationContext.getBean(beanName, IAddressService.class);
-                log.debug("[CUSTOMER SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
+                log.debug("[BUSINESSPARTNER SERVICE] Service resolvido para tenant {}: {}", tenantId, beanName);
                 response = service;
             } catch (Exception e) {
-                log.debug("[CUSTOMER SERVICE] Service {} não encontrado, usando padrão", beanName);
+                log.debug("[BUSINESSPARTNER SERVICE] Service {} not found, using default", beanName);
             }
         } catch (Exception e) {
-            log.debug("[CUSTOMER SERVICE] Erro ao resolver tenant, usando padrão: {}", e.getMessage());
+            log.debug("[BUSINESSPARTNER SERVICE] Error resolving tenant, using default: {}", e.getMessage());
         }
         return AddressServiceApplyDecorate.aplicarDecorators(response, addressConfig);
     }

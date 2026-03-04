@@ -8,7 +8,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 
 /**
- * INFRASTRUCTURE - Configuração de Async para Sistema de Fila Unificada
+ * INFRASTRUCTURE - Configuration de Async para Sistema de Fila Unificada
  * 
  * Define o executor de threads para processamento assíncrono de migrações.
  * 
@@ -28,7 +28,7 @@ public class AsyncMigrationConfig {
     /**
      * Define o executor para tarefas de migração de tenants
      * 
-     * Configuração:
+     * Configuration:
      * - Core threads: 2 (threads sempre ativas)
      * - Max threads: 5 (máximo em picos de carga)
      * - Queue capacity: 100 eventos
@@ -40,12 +40,12 @@ public class AsyncMigrationConfig {
     public Executor migrationTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         
-        // Configuração de threads
+        // Configuration de threads
         executor.setCorePoolSize(2);           // 2 threads por padrão
         executor.setMaxPoolSize(5);            // Máximo 5 em picos
         executor.setQueueCapacity(100);        // Até 100 eventos aguardando
         
-        // Configuração de nomes e shutdown
+        // Configuration de nomes e shutdown
         executor.setThreadNamePrefix("tenant-migration-");
         executor.setAwaitTerminationSeconds(300);  // 5 minutos para finalizar
         executor.setWaitForTasksToCompleteOnShutdown(true);

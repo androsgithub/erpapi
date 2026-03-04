@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Primary;
 import javax.sql.DataSource;
 
 /**
- * INFRASTRUCTURE - Configuração de DataSource Master
+ * INFRASTRUCTURE - Configuration de DataSource Master
  * 
- * Configuração centralizada para o banco de dados Master.
+ * Configuration centralizada para o banco de dados Master.
  * O Master armazena:
  * - Configurações de todos os tenants
  * - Usuários administrativos
@@ -67,23 +67,23 @@ public class MasterDataSourceConfiguration {
             config.setAutoCommit(true);
 
             HikariDataSource dataSource = new HikariDataSource(config);
-            log.info("Master DataSource criado com sucesso");
+            log.info("Master DataSource created successfully");
             return dataSource;
         } catch (Exception e) {
-            log.error("Erro ao criar Master DataSource", e);
-            throw new RuntimeException("Falha ao criar Master DataSource", e);
+            log.error("Error creating Master DataSource", e);
+            throw new RuntimeException("Failed to create Master DataSource", e);
         }
     }
 
     private void validateConfiguration() {
         if (masterUrl == null || masterUrl.trim().isEmpty()) {
-            throw new IllegalArgumentException("spring.datasource.master.url não pode estar vazia");
+            throw new IllegalArgumentException("spring.datasource.master.url cannot be empty");
         }
         if (masterUsername == null || masterUsername.trim().isEmpty()) {
-            throw new IllegalArgumentException("spring.datasource.master.username não pode estar vazia");
+            throw new IllegalArgumentException("spring.datasource.master.username cannot be empty");
         }
         if (masterPassword == null || masterPassword.trim().isEmpty()) {
-            log.warn("spring.datasource.master.password não foi configurada");
+            log.warn("spring.datasource.master.password was not configured");
         }
     }
 }

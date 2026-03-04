@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * INFRASTRUCTURE - Configuração JPA para Master DataSource
+ * INFRASTRUCTURE - Configuration JPA para Master DataSource
  * 
  * Configura EntityManager e TransactionManager para o banco Master centralizado.
  * Banco Master armazena configurações globais como tenants e usuários administrativos.

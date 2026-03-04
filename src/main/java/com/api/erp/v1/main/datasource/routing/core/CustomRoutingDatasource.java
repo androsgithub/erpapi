@@ -18,10 +18,10 @@ import java.sql.SQLException;
  * Estende AbstractDataSource do Spring Framework.
  * 
  * Fluxo:
- * 1. Obtém o tenant do contexto atual (ITenantContextProvider)
+ * 1. Gets o tenant do contexto atual (ITenantContextProvider)
  * 2. Se tenant == "master", usa masterDataSource diretamente
  * 3. Caso contrário, roteia para o DataSource correto (IDataSourceRouter)
- * 4. Retorna uma Connection para o banco do tenant
+ * 4. Returns uma Connection para o banco do tenant
  * 
  * Durante startup/Hibernate initialization, quando não há tenant definido,
  * o TenantContextProvider retorna "master" (default), permitindo que Hibernate

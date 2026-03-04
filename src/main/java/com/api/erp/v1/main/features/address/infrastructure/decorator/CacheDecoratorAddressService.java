@@ -39,28 +39,28 @@ public class CacheDecoratorAddressService implements IAddressService {
     @Override
     @Cacheable(value = "addressPorId", key = "#id")
     public Address buscarPorId(Long id) {
-        log.debug("[CACHE] Buscando endereço do banco de dados (sem cache): id={}", id);
+        log.debug("[CACHE] Fetching address from database (no cache): id={}", id);
         return service.buscarPorId(id);
     }
 
     @Override
     @Cacheable(value = "addresss")
     public List<Address> buscarTodos() {
-        log.debug("[CACHE] Buscando todos endereços do banco de dados (sem cache)");
+        log.debug("[CACHE] Fetching all addresses from database (no cache)");
         return service.buscarTodos();
     }
 
     @Override
     @CacheEvict(value = "addresss", allEntries = true)
     public Address atualizar(Long id, CreateAddressRequest request) {
-        log.debug("[CACHE] Cache invalidado - endereço atualizado: id={}", id);
+        log.debug("[CACHE] Cache invalidated - address updated: id={}", id);
         return service.atualizar(id, request);
     }
 
     @Override
     @CacheEvict(value = "addresss", allEntries = true)
     public void deletar(Long id) {
-        log.debug("[CACHE] Cache invalidado - endereço deletado: id={}", id);
+        log.debug("[CACHE] Cache invalidated - address deleted: id={}", id);
         service.deletar(id);
     }
 }

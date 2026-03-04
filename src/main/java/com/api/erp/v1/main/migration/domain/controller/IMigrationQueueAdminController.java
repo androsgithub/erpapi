@@ -10,7 +10,7 @@ import java.util.Map;
  * Define os contratos e operações disponíveis para administração
  * da fila de processamento de migrações de tenants.
  * 
- * Responsabilidades:
+ * Responsibilities:
  * - Fornecer visibilidade sobre eventos da fila
  * - Permitir reprocessamento de eventos falhados
  * - Monitorar progresso de migrações
@@ -22,7 +22,7 @@ import java.util.Map;
 public interface IMigrationQueueAdminController {
     
     /**
-     * Retorna estatísticas gerais da fila
+     * Returns estatísticas gerais da fila
      * 
      * Inclui:
      * - Total de eventos processados
@@ -42,7 +42,7 @@ public interface IMigrationQueueAdminController {
     ResponseEntity<Map<String, Object>> getAllEvents();
     
     /**
-     * Obtém detalhes de um evento específico
+     * Gets detalhes de um evento específico
      * 
      * @param eventId ID único do evento
      * @return Mapa com detalhes do evento ou 404 se não encontrado

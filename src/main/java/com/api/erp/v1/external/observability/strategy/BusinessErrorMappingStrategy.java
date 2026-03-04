@@ -30,7 +30,7 @@ public class BusinessErrorMappingStrategy implements ErrorMappingStrategy {
         String className = exception.getClass().getName();
         return className.contains("BusinessException") ||
                className.contains("ProductException") ||
-               className.contains("CustomerException") ||
+               className.contains("BusinessPartnerException") ||
                className.contains("DomainException");
     }
 

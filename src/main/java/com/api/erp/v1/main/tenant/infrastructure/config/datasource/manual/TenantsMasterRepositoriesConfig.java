@@ -9,13 +9,13 @@
 // * Esta configuração foi substituída pela arquitetura consolidada e limpa.
 // * Migre para: com.api.erp.v1.main.datasource.routing.config.MasterRepositoriesConfig
 // *
-// * Configuração isolada de JPA Repositories para o banco master (erpapi - TB_TENANT).
+// * Configuration isolada de JPA Repositories para o banco master (erpapi - TB_TENANT).
 // * <p>
 // * Esta classe é separada de TenantsConfiguration para evitar conflitos com outros
 // *
 // * @EnableJpaRepositories na aplicação (ex: em LogsRepositoriesConfig).
 // * <p>
-// * Configuração:
+// * Configuration:
 // * - basePackages: com.api.erp.v1.tenant.domain.repository (contém TenantRepository)
 // * - entityManagerFactoryRef: masterEntityManagerFactory (criado em TenantsMasterDatabaseConfig)
 // * - transactionManagerRef: masterTransactionManager (criado em TenantsMasterDatabaseConfig)

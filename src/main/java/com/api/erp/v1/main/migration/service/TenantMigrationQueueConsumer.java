@@ -12,21 +12,21 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 /**
- * INFRASTRUCTURE - Consumidor de Fila de Migrações de Tenants
+ * INFRASTRUCTURE - Tenant Migration Queue Consumer
  * 
- * Worker assíncrono que consome eventos da fila unificada e processa
- * migrações de tenants. Executa de forma idempotente e thread-safe.
+ * Asynchronous worker that consumes events from the unified queue and processes
+ * tenant migrations. Executes idempotently and thread-safe.
  * 
- * Este serviço substitui a duplicação de lógica entre:
+ * This service replaces logic duplication between:
  * - TenantMigrationProcessor (Job do Spring Batch)
  * - MigrationQueueService.processMigrationTask (Fila de novo tenant)
  * 
- * Responsabilidades:
+ * Responsibilities:
  * - Consumir eventos da fila unificada
- * - Executar migrações Flyway
- * - Executar seeders (dados iniciais)
+ * - Executesr migrações Flyway
+ * - Executesr seeders (dados iniciais)
  * - Rastrear sucesso/falha
- * - Gerenciar retry em caso de falha
+ * - Managesr retry em caso de falha
  * - Manter logs centralizados por tenant
  * 
  * @author ERP System
@@ -41,7 +41,7 @@ public class TenantMigrationQueueConsumer {
     private final TenantMigrationService tenantMigrationService;
     private final MainSeed mainSeed;
     
-    // Configuração
+    // Configuration
     private static final long POLL_TIMEOUT_MS = 30_000; // 30 segundos
     private static final long RETRY_DELAY_MS = 5_000;   // 5 segundos
     
@@ -49,9 +49,9 @@ public class TenantMigrationQueueConsumer {
      * Inicia o consumidor de fila de forma assíncrona
      * 
      * Este método:
-     * 1. Aguarda eventos na fila indefinidamente
-     * 2. Processa cada evento completo (migração + seed)
-     * 3. Registra resultado no histórico
+     * 1. Waits for eventos na fila indefinidamente
+     * 2. Processes cada evento completo (migração + seed)
+     * 3. Logs resultado no histórico
      * 4. Implementa retry automático em caso de falha
      * 5. Mantém logs centralizados
      * 
@@ -61,10 +61,10 @@ public class TenantMigrationQueueConsumer {
     public void startConsumer() {
         log.info("");
         log.info("╔════════════════════════════════════════════════════════════════╗");
-        log.info("║    INICIANDO CONSUMIDOR DE FILA DE MIGRAÇÕES DE TENANTS        ║");
+        log.info("║    STARTING MIGRATION QUEUE CONSUMER                           ║");
         log.info("╚════════════════════════════════════════════════════════════════╝");
         log.info("");
-        log.info("⏳ Aguardando eventos na fila de migrações...");
+        log.info("⏳ Waiting for migration queue events...");
         log.info("");
         
         try {
@@ -80,24 +80,24 @@ public class TenantMigrationQueueConsumer {
                         continue;
                     }
                     
-                    // Processa o evento
+                    // Processes o evento
                     processEvent(event);
                     
-                    // Registra no histórico
+                    // Logs no histórico
                     migrationQueue.recordEventCompletion(event);
                     
                 } catch (InterruptedException e) {
-                    log.warn("⚠️ Consumidor de fila foi interrompido");
+                    log.warn("⚠️ Queue consumer was interrupted");
                     Thread.currentThread().interrupt();
                     break;
                     
                 } catch (Exception e) {
                     if (event != null) {
-                        log.error("❌ [{}] Erro ao processar evento de migração: {}", 
+                        log.error("❌ [{}] Error processing migration event: {}", 
                                 event.getEventId(), e.getMessage(), e);
                         markEventAsFailed(event, e);
                     } else {
-                        log.error("❌ Erro ao processar evento: {}", e.getMessage(), e);
+                        log.error("❌ Error processing event: {}", e.getMessage(), e);
                     }
                 }
             }
@@ -105,18 +105,18 @@ public class TenantMigrationQueueConsumer {
         } finally {
             log.warn("");
             log.warn("╔════════════════════════════════════════════════════════════════╗");
-            log.warn("║  CONSUMIDOR DE FILA FOI INTERROMPIDO - MONITORAR FILA         ║");
+            log.warn("║  QUEUE CONSUMER WAS INTERRUPTED - MONITOR QUEUE              ║");
             log.warn("╚════════════════════════════════════════════════════════════════╝");
         }
     }
     
     /**
-     * Processa um evento de migração individual
+     * Processes um evento de migração individual
      * 
      * Fluxo completo:
      * 1. Marca como iniciado
-     * 2. Executa migrações Flyway
-     * 3. Executa seeders (dados iniciais)
+     * 2. Executes migrações Flyway
+     * 3. Executes seeders (dados iniciais)
      * 4. Marca como sucesso
      */
     private void processEvent(TenantMigrationEvent event) throws Exception {
@@ -124,10 +124,10 @@ public class TenantMigrationQueueConsumer {
         String tenantName = event.getTenantName();
         String eventId = event.getEventId();
         
-        // Log de início
+        // Log of start
         log.info("");
-        log.info("▶ [{}:{}] Iniciando migração do tenant: {}", eventId, tenantId, tenantName);
-        log.info("  🔗 Origem: {} | Retry: {}", 
+        log.info("▶ [{}:{}] Starting tenant migration: {}", eventId, tenantId, tenantName);
+        log.info("  🔗 Source: {} | Retry: {}", 
                 event.getSource().getLabel(), event.getRetryCount() != null ? event.getRetryCount() : 0);
         
         // Marca como iniciado
@@ -135,39 +135,39 @@ public class TenantMigrationQueueConsumer {
         
         try {
             // ════════════════════════════════════════════════════════════════
-            // FASE 1: EXECUTAR MIGRAÇÕES FLYWAY
+            // PHASE 1: RUN FLYWAY MIGRATIONS
             // ════════════════════════════════════════════════════════════════
-            log.info("  📋 [{}] Executando migrações Flyway...", tenantId);
+            log.info("  📋 [{}] Running Flyway migrations...", tenantId);
             
             try {
                 tenantMigrationService.migrateTenantById(tenantId);
-                log.info("  ✅ [{}] Migrações Flyway concluídas com sucesso", tenantId);
+                log.info("  ✅ [{}] Flyway migrations completed successfully", tenantId);
                 
             } catch (Exception e) {
-                log.error("  ❌ [{}] Erro durante migrações Flyway: {}", tenantId, e.getMessage(), e);
-                throw new Exception("Falha na migração Flyway: " + e.getMessage(), e);
+                log.error("  ❌ [{}] Error during Flyway migrations: {}", tenantId, e.getMessage(), e);
+                throw new Exception("Flyway migration failure: " + e.getMessage(), e);
             }
             
             // ════════════════════════════════════════════════════════════════
-            // FASE 2: EXECUTAR SEEDERS (DADOS INICIAIS)
+            // PHASE 2: RUN SEEDERS (INITIAL DATA)
             // ════════════════════════════════════════════════════════════════
-            log.info("  🌱 [{}] Executando seeders (dados iniciais)...", tenantId);
+            log.info("  🌱 [{}] Running seeders (initial data)...", tenantId);
             
             int seedersExecuted = 0;
             try {
                 // Define contexto do tenant para os seeders executarem no banco correto
                 TenantContext.setTenantId(tenantId);
                 
-                // Executa seeders
+                // Executes seeders
                 mainSeed.executar();
                 
-                seedersExecuted = 2; // Contagem padrão (ajustar se necessário)
-                log.info("  ✅ [{}] Seeders executados com sucesso", tenantId);
+                seedersExecuted = 2; // Default count (adjust if necessary)
+                log.info("✅ [{}] Seeders executed successfully", tenantId);
                 
             } catch (Exception e) {
-                log.error("  ⚠️ [{}] Erro ao executar seeders: {}", tenantId, e.getMessage());
-                // Marca como falha no seeder
-                throw new Exception("Falha na execução de seeders: " + e.getMessage(), e);
+                log.error("  ⚠️ [{}] Error executing seeders: {}", tenantId, e.getMessage());
+                // Mark as seed failure
+                throw new Exception("Seed execution failure: " + e.getMessage(), e);
                 
             } finally {
                 // Limpa contexto do tenant
@@ -175,17 +175,17 @@ public class TenantMigrationQueueConsumer {
             }
             
             // ════════════════════════════════════════════════════════════════
-            // SUCESSO TOTAL
+            // COMPLETE SUCCESS
             // ════════════════════════════════════════════════════════════════
-            event.markSuccess(1, seedersExecuted); // 1 migração = Flyway aplicado
+            event.markSuccess(1, seedersExecuted); // 1 migration = Flyway applied
             
-            log.info("✅ [{}] Migração COMPLETA: {} (Flyway + Seed)", tenantId, tenantName);
-            log.info("⏱️  Tempo de espera: {}ms | Tempo de execução: {}ms", 
+            log.info("✅ [{}] COMPLETE Migration: {} (Flyway + Seed)", tenantId, tenantName);
+            log.info("⏱️  Wait time: {}ms | Execution time: {}ms", 
                     event.getWaitTimeMs(), event.getExecutionTimeMs());
             log.info("");
             
         } catch (Exception e) {
-            log.error("❌ [{}] FALHA NA MIGRAÇÃO de {}: {}", eventId, tenantName, e.getMessage());
+            log.error("❌ [{}] MIGRATION FAILURE for {}: {}", eventId, tenantName, e.getMessage());
             markEventAsFailed(event, e);
             throw e;
         }
@@ -195,41 +195,41 @@ public class TenantMigrationQueueConsumer {
      * Marca um evento como falha e implementa retry automático
      */
     private void markEventAsFailed(TenantMigrationEvent event, Exception exception) {
-        log.error("❌ [{}:{}] Falha na migração: {}", 
+        log.error("❌ [{}:{}] Migration failure: {}", 
                 event.getEventId(), event.getTenantId(), exception.getMessage());
         
-        // Verifica se pode fazer retry
+        // Check if you can retry
         if (event.getRetryCount() == null || event.getRetryCount() < migrationQueue.getMaxRetries()) {
-            log.warn("🔄 Agendando retry automático para tenant: {}", event.getTenantName());
+            log.warn("🔄 Scheduling automatic retry for tenant: {}", event.getTenantName());
             
-            // Aguarda antes de fazer retry (backoff simples)
+            // Wait before retry (simple backoff)
             try {
                 Thread.sleep(RETRY_DELAY_MS);
             } catch (InterruptedException e) {
-                log.warn("⚠️ Thread interrompida durante espera de retry");
+                log.warn("⚠️ Thread interrupted during retry wait");
                 Thread.currentThread().interrupt();
             }
             
-            // Enfileira para retry
+            // Queue for retry
             migrationQueue.enqueueForRetry(event);
         } else {
-            // Máximo de retries atingido
+            // Maximum retries reached
             event.markFailed(exception.getMessage());
             migrationQueue.recordEventCompletion(event);
         }
     }
     
     /**
-     * Processa um evento específico (útil para retrigger manual)
+     * Processes a specific event (useful for manual retrigger)
      * 
-     * @param eventId ID do evento a processar
-     * @throws IllegalArgumentException se evento não encontrado
+     * @param eventId ID of the event to process
+     * @throws IllegalArgumentException if event not found
      */
     public void processEventById(String eventId) throws Exception {
         TenantMigrationEvent event = migrationQueue.getEvent(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Evento não encontrado: " + eventId));
+                .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
         
-        log.info("📥 Reprocessando evento manual: {} (Tenant: {})", eventId, event.getTenantName());
+        log.info("📥 Reprocessing manual event: {} (Tenant: {})", eventId, event.getTenantName());
         processEvent(event);
         migrationQueue.recordEventCompletion(event);
     }

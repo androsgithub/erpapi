@@ -10,7 +10,7 @@ import java.util.Optional;
  * Repositório da entidade MeasureUnit.
  * 
  * DIP: Depende de abstrações (JpaRepository)
- * Responsabilidade única: Persistência da MeasureUnit
+ * Responsibility única: Persistência da MeasureUnit
  */
 @Repository
 public interface MeasureUnitRepository extends JpaRepository<MeasureUnit, Long> {

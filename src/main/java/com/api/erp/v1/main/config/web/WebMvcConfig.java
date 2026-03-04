@@ -16,7 +16,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // ✅ Validação de Tenant PRIMEIRO (valida e seta contexto)
+        // ✅ Validation de Tenant PRIMEIRO (valida e seta contexto)
         // Deve ser antes de PermissionInterceptor para garantir contexto
         registry.addInterceptor(tenantValidationInterceptor)
                 .addPathPatterns("/**");

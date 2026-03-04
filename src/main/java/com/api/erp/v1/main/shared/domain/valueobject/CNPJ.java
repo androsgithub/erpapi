@@ -28,7 +28,7 @@ public class CNPJ {
             return false;
         }
         
-        // Validação de dígitos verificadores
+        // Validation de dígitos verificadores
         int[] pesos1 = {5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
         int[] pesos2 = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
         
