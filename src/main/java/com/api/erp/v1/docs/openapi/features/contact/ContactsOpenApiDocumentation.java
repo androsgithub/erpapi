@@ -6,7 +6,6 @@ import com.api.erp.v1.main.features.contact.domain.controller.IContactsControlle
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,20 +20,16 @@ public interface ContactsOpenApiDocumentation extends IContactsController {
 
     @Override
     @Operation(summary = "Criar novo contact", description = "Cria um novo contact no sistema (requer autenticação)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Contact criado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado")
-    })
+    @ApiResponse(responseCode = "201", description = "Contact criado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     ResponseEntity<ContactResponse> criar(@RequestBody CreateContactRequest request);
 
     @Override
     @Operation(summary = "Buscar contact por ID", description = "Busca um contact específico (requer autenticação)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact encontrado"),
-            @ApiResponse(responseCode = "404", description = "Contact não encontrado"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado")
-    })
+    @ApiResponse(responseCode = "200", description = "Contact encontrado")
+    @ApiResponse(responseCode = "404", description = "Contact não encontrado")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     ResponseEntity<ContactResponse> buscar(
             @Parameter(description = "ID do contact") Long id);
 
@@ -55,60 +50,48 @@ public interface ContactsOpenApiDocumentation extends IContactsController {
 
     @Override
     @Operation(summary = "Listar contacts por tipo", description = "Lista contacts de um tipo específico (requer autenticação)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de contacts"),
-            @ApiResponse(responseCode = "400", description = "Tipo de contact inválido")
-    })
+    @ApiResponse(responseCode = "200", description = "Lista de contacts")
+    @ApiResponse(responseCode = "400", description = "Tipo de contact inválido")
     ResponseEntity<List<ContactResponse>> listarPorTipo(
             @Parameter(description = "Tipo de contact (TELEFONE, EMAIL, WHATSAPP, etc.)") String tipo);
 
     @Override
     @Operation(summary = "Buscar contact principal", description = "Busca o contact marcado como principal (requer autenticação)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact principal encontrado"),
-            @ApiResponse(responseCode = "404", description = "Nenhum contact principal encontrado")
-    })
+    @ApiResponse(responseCode = "200", description = "Contact principal encontrado")
+    @ApiResponse(responseCode = "404", description = "Nenhum contact principal encontrado")
     ResponseEntity<ContactResponse> buscarPrincipal();
 
     @Override
     @Operation(summary = "Atualizar contact", description = "Atualiza dados de um contact (requer autenticação)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact atualizado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Contact não encontrado"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado")
-    })
+    @ApiResponse(responseCode = "200", description = "Contact atualizado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Contact não encontrado")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     ResponseEntity<ContactResponse> atualizar(
             @Parameter(description = "ID do contact") Long id,
             @RequestBody CreateContactRequest request);
 
     @Override
     @Operation(summary = "Ativar contact", description = "Ativa um contact desativado (requer autenticação)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact ativado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Contact não encontrado"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado")
-    })
+    @ApiResponse(responseCode = "200", description = "Contact ativado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Contact não encontrado")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     ResponseEntity<ContactResponse> ativar(
             @Parameter(description = "ID do contact") Long id);
 
     @Override
     @Operation(summary = "Desativar contact", description = "Desativa um contact (soft delete) (requer autenticação)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact desativado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Contact não encontrado"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado")
-    })
+    @ApiResponse(responseCode = "200", description = "Contact desativado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Contact não encontrado")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     ResponseEntity<ContactResponse> desativar(
             @Parameter(description = "ID do contact") Long id);
 
     @Override
     @Operation(summary = "Deletar contact", description = "Remove um contact do sistema permanentemente (requer autenticação)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Contact deletado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Contact não encontrado"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado")
-    })
+    @ApiResponse(responseCode = "204", description = "Contact deletado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Contact não encontrado")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     ResponseEntity<Void> deletar(
             @Parameter(description = "ID do contact") Long id);
 }

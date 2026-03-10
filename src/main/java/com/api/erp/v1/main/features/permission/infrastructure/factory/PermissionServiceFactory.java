@@ -4,7 +4,6 @@ import com.api.erp.v1.main.features.permission.domain.repository.PermissionRepos
 import com.api.erp.v1.main.features.permission.domain.service.IPermissionService;
 import com.api.erp.v1.main.features.permission.infrastructure.cache.PermissionCacheManager;
 import com.api.erp.v1.main.features.permission.infrastructure.decorator.PermissionAuditServiceDecorator;
-import com.api.erp.v1.main.features.permission.infrastructure.decorator.PermissionCacheServiceDecorator;
 import com.api.erp.v1.main.features.permission.infrastructure.decorator.ValidationDecoratorPermissionService;
 import com.api.erp.v1.main.features.permission.infrastructure.service.PermissionService;
 import com.api.erp.v1.main.tenant.domain.entity.configs.PermissionConfig;
@@ -37,12 +36,6 @@ public class PermissionServiceFactory {
         if (config != null && config.isPermissionValidationEnabled()) {
             service = new ValidationDecoratorPermissionService(service);
             log.debug("[PERMISSION FACTORY] ValidationDecorator aplicado");
-        }
-
-        // Cache é aplicado antes de auditoria
-        if (config != null && config.isPermissionCacheEnabled()) {
-            service = new PermissionCacheServiceDecorator(service, cacheManager);
-            log.debug("[PERMISSION FACTORY] CacheDecorator aplicado");
         }
 
         // Auditoria é a última

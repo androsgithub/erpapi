@@ -16,12 +16,8 @@ public class PermissionEvaluator {
     private final IPermissionService permissionService;
 
     public boolean hasPermission(String permissionCodigo) {
-        return hasPermission(permissionCodigo, Collections.emptyMap());
-    }
-
-    public boolean hasPermission(String permissionCodigo, Map<String, String> contexto) {
         Long userId = getUserIdFromContext();
-        return permissionService.hasPermission(userId, permissionCodigo, contexto);
+        return permissionService.hasPermission(userId, permissionCodigo);
     }
 
     private Long getUserIdFromContext() {

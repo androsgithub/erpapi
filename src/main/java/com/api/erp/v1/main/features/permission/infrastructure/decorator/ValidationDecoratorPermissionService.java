@@ -17,14 +17,14 @@ public class ValidationDecoratorPermissionService implements IPermissionService 
     private final IPermissionService delegate;
 
     @Override
-    public boolean hasPermission(Long userId, String permissionCodigo, Map<String, String> contexto) {
+    public boolean hasPermission(Long userId, String permissionCodigo) {
         log.debug("[PERMISSION VALIDATION] Validating parameters - userId: {}, permissionCodigo: {}", 
                 userId, permissionCodigo);
 
         validarParametros(userId, permissionCodigo);
 
         log.debug("[PERMISSION VALIDATION] Parameters validated successfully");
-        return delegate.hasPermission(userId, permissionCodigo, contexto);
+        return delegate.hasPermission(userId, permissionCodigo);
     }
 
     private void validarParametros(Long userId, String permissionCodigo) {

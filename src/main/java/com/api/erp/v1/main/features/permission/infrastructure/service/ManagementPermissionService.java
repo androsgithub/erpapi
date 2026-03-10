@@ -10,6 +10,7 @@ import com.api.erp.v1.main.features.permission.domain.repository.RoleRepository;
 import com.api.erp.v1.main.features.permission.domain.service.IManagementPermissionService;
 import com.api.erp.v1.main.features.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -44,12 +45,19 @@ public class ManagementPermissionService implements IManagementPermissionService
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "permissions",
+            keyGenerator = "principalKeyGenerator",
+            condition = "@tenantService.getTenantConfig().getPermissionConfig().isPermissionCacheEnabled()",
+            unless = "#result == null"
+    )
     public List<Permission> getAllPermissions() {
         return permissionRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "roles", keyGenerator = "principalKeyGenerator")
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }

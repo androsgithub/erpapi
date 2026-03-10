@@ -8,15 +8,18 @@ import com.api.erp.v1.main.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.main.shared.domain.valueobject.Email;
 import com.api.erp.v1.main.shared.domain.valueobject.Telefone;
 import com.api.erp.v1.main.shared.infrastructure.service.SecurityService;
-import com.api.erp.v1.main.tenant.application.dto.*;
-import com.api.erp.v1.main.tenant.domain.entity.configs.*;
+import com.api.erp.v1.main.tenant.application.dto.CreateTenantRequest;
+import com.api.erp.v1.main.tenant.application.dto.TenantRequest;
+import com.api.erp.v1.main.tenant.application.dto.UnifiedTenantConfigRequest;
 import com.api.erp.v1.main.tenant.domain.entity.Tenant;
 import com.api.erp.v1.main.tenant.domain.entity.TenantDadosFiscais;
+import com.api.erp.v1.main.tenant.domain.entity.configs.*;
 import com.api.erp.v1.main.tenant.domain.repository.TenantDatasourceRepository;
 import com.api.erp.v1.main.tenant.domain.repository.TenantRepository;
 import com.api.erp.v1.main.tenant.domain.service.ITenantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,7 +50,7 @@ public class TenantService implements ITenantService {
     @Override
     public Tenant getDadosTenant(Long tenantId) {
         return tenantRepository.findById(tenantId)
-            .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND));
+                .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND));
     }
 
     @Override
@@ -80,6 +83,10 @@ public class TenantService implements ITenantService {
     }
 
     @Override
+    @Cacheable(
+            value = "tenant-config",
+            unless = "#result == null"
+    )
     public TenantConfig getTenantConfig(Long tenantId) {
         Tenant empresa = tenantRepository.findById(tenantId).orElse(null);
         if (empresa == null) {
@@ -140,10 +147,10 @@ public class TenantService implements ITenantService {
 
         log.info("[EMPRESA SERVICE] Tenant criada com sucesso: {} (ID: {})",
                 request.nome(), empresaSalva.getId());
-        
+
         // Publicar evento de criação para disparar migração automática
         try {
-            com.api.erp.v1.main.migration.domain.TenantCreatedEvent tenantCreatedEvent = 
+            com.api.erp.v1.main.migration.domain.TenantCreatedEvent tenantCreatedEvent =
                     new com.api.erp.v1.main.migration.domain.TenantCreatedEvent(this, empresaSalva);
             eventPublisher.publishEvent(tenantCreatedEvent);
             log.debug("[EMPRESA SERVICE] Evento TenantCreatedEvent publicado para tenant: {}", empresaSalva.getId());
@@ -170,54 +177,54 @@ public class TenantService implements ITenantService {
         log.info("[TENANT SERVICE] Updating Unified Tenant Configuration");
         log.info("[TENANT SERVICE] Tenant ID: {}", tenantId);
         log.info("[TENANT SERVICE] ═══════════════════════════════════════════════════");
-        
+
         Tenant tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND));
-        
+
         TenantConfig tenantConfig = tenant.getConfig();
-        
+
         // BUSINESSPARTNER CONFIG
         if (hasBusinessPartnerConfig(request)) {
             log.info("[TENANT SERVICE] Updating BusinessPartner Config");
             BusinessPartnerConfig businesspartnerConfig = new BusinessPartnerConfig();
-            if (request.businesspartnerValidationEnabled() != null) 
+            if (request.businesspartnerValidationEnabled() != null)
                 businesspartnerConfig.setBusinessPartnerValidationEnabled(request.businesspartnerValidationEnabled());
-            if (request.businesspartnerAuditEnabled() != null) 
+            if (request.businesspartnerAuditEnabled() != null)
                 businesspartnerConfig.setBusinessPartnerAuditEnabled(request.businesspartnerAuditEnabled());
-            if (request.businesspartnerCacheEnabled() != null) 
+            if (request.businesspartnerCacheEnabled() != null)
                 businesspartnerConfig.setBusinessPartnerCacheEnabled(request.businesspartnerCacheEnabled());
-            if (request.businesspartnerNotificationEnabled() != null) 
+            if (request.businesspartnerNotificationEnabled() != null)
                 businesspartnerConfig.setBusinessPartnerNotificationEnabled(request.businesspartnerNotificationEnabled());
-            if (request.businesspartnerTenantCustomizationEnabled() != null) 
+            if (request.businesspartnerTenantCustomizationEnabled() != null)
                 businesspartnerConfig.setBusinessPartnerTenantCustomizationEnabled(request.businesspartnerTenantCustomizationEnabled());
             tenantConfig.setBusinessPartnerConfig(businesspartnerConfig);
         }
-        
+
         // USER CONFIG
         if (hasUserConfig(request)) {
             log.info("[TENANT SERVICE] Updating User Config");
             UserConfig userConfig = new UserConfig();
-            if (request.userApprovalRequired() != null) 
+            if (request.userApprovalRequired() != null)
                 userConfig.setUserApprovalRequired(request.userApprovalRequired());
-            if (request.userCorporateEmailRequired() != null) 
+            if (request.userCorporateEmailRequired() != null)
                 userConfig.setUserCorporateEmailRequired(request.userCorporateEmailRequired());
-            if (request.allowedEmailDomains() != null) 
+            if (request.allowedEmailDomains() != null)
                 userConfig.setAllowedEmailDomains(request.allowedEmailDomains());
             tenantConfig.setUserConfig(userConfig);
         }
-        
+
         // PERMISSION CONFIG
         if (hasPermissionConfig(request)) {
             log.info("[TENANT SERVICE] Updating Permission Config");
             PermissionConfig permissionConfig = new PermissionConfig();
-            if (request.permissionValidationEnabled() != null) 
+            if (request.permissionValidationEnabled() != null)
                 permissionConfig.setPermissionValidationEnabled(request.permissionValidationEnabled());
-            if (request.permissionCacheEnabled() != null) 
+            if (request.permissionCacheEnabled() != null)
                 permissionConfig.setPermissionCacheEnabled(request.permissionCacheEnabled());
-            if (request.permissionAuditEnabled() != null) 
+            if (request.permissionAuditEnabled() != null)
                 permissionConfig.setPermissionAuditEnabled(request.permissionAuditEnabled());
             tenantConfig.setPermissionConfig(permissionConfig);
-            
+
             // Publish event for Permission decorators
             String user = obterUserAtual();
             eventPublisher.publishEvent(new PermissionConfigUpdateEvent(
@@ -227,96 +234,96 @@ public class TenantService implements ITenantService {
                     user
             ));
         }
-        
+
         // INTERNAL TENANT CONFIG
         if (hasInternalTenantConfig(request)) {
             log.info("[TENANT SERVICE] Updating Internal Tenant Config");
             InternalTenantConfig internalTenantConfig = new InternalTenantConfig();
-            if (request.tenantType() != null) 
+            if (request.tenantType() != null)
                 internalTenantConfig.setTenantType(request.tenantType());
-            if (request.tenantSubdomain() != null) 
+            if (request.tenantSubdomain() != null)
                 internalTenantConfig.setTenantSubdomain(request.tenantSubdomain());
-            if (request.tenantCustomCode() != null) 
+            if (request.tenantCustomCode() != null)
                 internalTenantConfig.setTenantCustomCode(request.tenantCustomCode());
-            if (request.tenantFeaturesEnabled() != null) 
+            if (request.tenantFeaturesEnabled() != null)
                 internalTenantConfig.setTenantFeaturesEnabled(request.tenantFeaturesEnabled());
             tenantConfig.setInternalTenantConfig(internalTenantConfig);
         }
-        
+
         // ADDRESS CONFIG
         if (hasAddressConfig(request)) {
             log.info("[TENANT SERVICE] Updating Address Config");
             AddressConfig addressConfig = new AddressConfig();
-            if (request.addressValidationEnabled() != null) 
+            if (request.addressValidationEnabled() != null)
                 addressConfig.setAddressValidationEnabled(request.addressValidationEnabled());
-            if (request.addressAuditEnabled() != null) 
+            if (request.addressAuditEnabled() != null)
                 addressConfig.setAddressAuditEnabled(request.addressAuditEnabled());
-            if (request.addressCacheEnabled() != null) 
+            if (request.addressCacheEnabled() != null)
                 addressConfig.setAddressCacheEnabled(request.addressCacheEnabled());
             tenantConfig.setAddressConfig(addressConfig);
         }
-        
+
         // CONTACT CONFIG
         if (hasContactConfig(request)) {
             log.info("[TENANT SERVICE] Updating Contact Config");
             ContactConfig contactConfig = new ContactConfig();
-            if (request.contactValidationEnabled() != null) 
+            if (request.contactValidationEnabled() != null)
                 contactConfig.setContactValidationEnabled(request.contactValidationEnabled());
-            if (request.contactAuditEnabled() != null) 
+            if (request.contactAuditEnabled() != null)
                 contactConfig.setContactAuditEnabled(request.contactAuditEnabled());
-            if (request.contactCacheEnabled() != null) 
+            if (request.contactCacheEnabled() != null)
                 contactConfig.setContactCacheEnabled(request.contactCacheEnabled());
-            if (request.contactNotificationEnabled() != null) 
+            if (request.contactNotificationEnabled() != null)
                 contactConfig.setContactNotificationEnabled(request.contactNotificationEnabled());
             tenantConfig.setContactConfig(contactConfig);
         }
-        
+
         Tenant tenantSalvo = tenantRepository.save(tenant);
         log.info("[TENANT SERVICE] ✅ Configurations updated successfully for tenant: {}", tenantId);
-        
+
         return tenantSalvo;
     }
-    
+
     // HELPER METHODS para detectar quais configs foram preenchidas
     private boolean hasBusinessPartnerConfig(UnifiedTenantConfigRequest request) {
         return request.businesspartnerValidationEnabled() != null ||
-               request.businesspartnerAuditEnabled() != null ||
-               request.businesspartnerCacheEnabled() != null ||
-               request.businesspartnerNotificationEnabled() != null ||
-               request.businesspartnerTenantCustomizationEnabled() != null;
+                request.businesspartnerAuditEnabled() != null ||
+                request.businesspartnerCacheEnabled() != null ||
+                request.businesspartnerNotificationEnabled() != null ||
+                request.businesspartnerTenantCustomizationEnabled() != null;
     }
-    
+
     private boolean hasUserConfig(UnifiedTenantConfigRequest request) {
         return request.userApprovalRequired() != null ||
-               request.userCorporateEmailRequired() != null ||
-               request.allowedEmailDomains() != null;
+                request.userCorporateEmailRequired() != null ||
+                request.allowedEmailDomains() != null;
     }
-    
+
     private boolean hasPermissionConfig(UnifiedTenantConfigRequest request) {
         return request.permissionValidationEnabled() != null ||
-               request.permissionCacheEnabled() != null ||
-               request.permissionAuditEnabled() != null;
+                request.permissionCacheEnabled() != null ||
+                request.permissionAuditEnabled() != null;
     }
-    
+
     private boolean hasInternalTenantConfig(UnifiedTenantConfigRequest request) {
         return request.tenantType() != null ||
-               request.tenantSubdomain() != null ||
-               request.tenantCustomCode() != null ||
-               request.tenantFeaturesEnabled() != null;
+                request.tenantSubdomain() != null ||
+                request.tenantCustomCode() != null ||
+                request.tenantFeaturesEnabled() != null;
     }
-    
+
     private boolean hasAddressConfig(UnifiedTenantConfigRequest request) {
         return request.addressValidationEnabled() != null ||
-               request.addressAuditEnabled() != null ||
-               request.addressCacheEnabled() != null;
+                request.addressAuditEnabled() != null ||
+                request.addressCacheEnabled() != null;
     }
-    
+
     private boolean hasContactConfig(UnifiedTenantConfigRequest request) {
         return request.contactValidationEnabled() != null ||
-               request.contactAuditEnabled() != null ||
-               request.contactCacheEnabled() != null ||
-               request.contactFormatValidationEnabled() != null ||
-               request.contactNotificationEnabled() != null;
+                request.contactAuditEnabled() != null ||
+                request.contactCacheEnabled() != null ||
+                request.contactFormatValidationEnabled() != null ||
+                request.contactNotificationEnabled() != null;
     }
 
     @Override

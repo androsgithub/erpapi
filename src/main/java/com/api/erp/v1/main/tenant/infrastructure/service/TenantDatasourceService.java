@@ -56,11 +56,21 @@ public class TenantDatasourceService implements ITenantDatasourceService {
 
         // 1. Get tenant
         Tenant tenant = tenantRepository.findById(tenantId)
-            .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND));
+            .orElseThrow(() -> {
+                try {
+                    return new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
         // 2. Validate if datasource is already configured
         if (tenantDatasourceRepository.existsByTenant_IdAndIsActive(tenant.getId(), true)) {
-            throw new ErrorHandler(TenantErrorMessage.DATASOURCE_ALREADY_EXISTS);
+            try {
+                throw new ErrorHandler(TenantErrorMessage.DATASOURCE_ALREADY_EXISTS);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         // 3. Test connection before saving

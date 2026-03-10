@@ -3,10 +3,9 @@ package com.api.erp.v1.main.datasource.routing.core;
 import com.api.erp.v1.main.datasource.routing.cache.DSCache;
 import com.api.erp.v1.main.datasource.routing.domain.IDataSourceRouter;
 import com.api.erp.v1.main.datasource.routing.domain.ITenantConfigProvider;
-import com.api.erp.v1.main.datasource.routing.domain.TenantDataSourceNotFoundException;
 import com.api.erp.v1.main.datasource.routing.infrastructure.HikariDataSourceFactory;
-import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
 import com.api.erp.v1.main.shared.common.error.ErrorHandler;
+import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -80,7 +79,11 @@ public class DataSourceRouter implements IDataSourceRouter {
         var tenantConfig = tenantConfigProvider.getTenantConfig(tenantId)
                 .orElseThrow(() -> {
                     log.error("Tenant configuration not found: {}", finalTenantId);
-                    throw new ErrorHandler(TenantErrorMessage.DATASOURCE_NOT_CONFIGURED);
+                    try {
+                        throw new ErrorHandler(TenantErrorMessage.DATASOURCE_NOT_CONFIGURED);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 });
 
         // 3. Create and register DataSource
@@ -91,7 +94,11 @@ public class DataSourceRouter implements IDataSourceRouter {
             return dataSource;
         } catch (Exception e) {
             log.error("Error creating DataSource for tenant: {}", finalTenantId, e);
-            throw new ErrorHandler(TenantErrorMessage.DATASOURCE_CONNECTION_FAILED);
+            try {
+                throw new ErrorHandler(TenantErrorMessage.DATASOURCE_CONNECTION_FAILED);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 

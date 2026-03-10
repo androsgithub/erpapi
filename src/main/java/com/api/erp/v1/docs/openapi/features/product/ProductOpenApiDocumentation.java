@@ -6,7 +6,6 @@ import com.api.erp.v1.main.features.product.domain.controller.IProductController
 import com.api.erp.v1.main.features.product.domain.entity.ProductType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +19,27 @@ public interface ProductOpenApiDocumentation extends IProductController {
 
     @Override
     @Operation(summary = "Criar novo product", description = "Cria um novo product com validações de domínio")
-    @ApiResponses({@ApiResponse(responseCode = "201", description = "Product criado com sucesso"), @ApiResponse(responseCode = "400", description = "Dados inválidos"), @ApiResponse(responseCode = "404", description = "Unidade de medida não encontrada"), @ApiResponse(responseCode = "409", description = "Código do product já existe")})
+    @ApiResponse(responseCode = "201", description = "Product criado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Unidade de medida não encontrada")
+
+    @ApiResponse(responseCode = "409", description = "Código do product já existe")
     ResponseEntity<ProductResponseDTO> criar(ProductRequestDTO dto);
 
     @Override
     @Operation(summary = "Atualizar product", description = "Atualiza os dados de um product existente")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product atualizado com sucesso"), @ApiResponse(responseCode = "400", description = "Dados inválidos"), @ApiResponse(responseCode = "404", description = "Product não encontrado"), @ApiResponse(responseCode = "409", description = "Código já existe")})
+    @ApiResponse(responseCode = "200", description = "Product atualizado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
+
+    @ApiResponse(responseCode = "409", description = "Código já existe")
     ResponseEntity<ProductResponseDTO> atualizar(Long id, ProductRequestDTO dto);
 
     @Override
     @Operation(summary = "Obter product", description = "Retorna os dados de um product pelo ID")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product encontrado"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product encontrado")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     ResponseEntity<ProductResponseDTO> obter(Long id);
 
     @Override
@@ -45,26 +54,36 @@ public interface ProductOpenApiDocumentation extends IProductController {
 
     @Override
     @Operation(summary = "Ativar product", description = "Muda o status do product para ATIVO")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product ativado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product ativado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     ResponseEntity<ProductResponseDTO> ativar(Long id);
 
     @Override
     @Operation(summary = "Desativar product", description = "Muda o status do product para INATIVO")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product desativado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product desativado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     ResponseEntity<ProductResponseDTO> desativar(Long id);
 
     @Override
     @Operation(summary = "Bloquear product", description = "Muda o status do product para BLOQUEADO")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product bloqueado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product bloqueado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     ResponseEntity<ProductResponseDTO> bloquear(Long id);
 
     @Override
     @Operation(summary = "Descontinuar product", description = "Muda o status do product para DESCONTINUADO")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product descontinuado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product descontinuado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     ResponseEntity<ProductResponseDTO> descontinuar(Long id);
 
     @Override
     @Operation(summary = "Deletar product", description = "Remove um product do sistema")
-    @ApiResponses({@ApiResponse(responseCode = "204", description = "Product deletado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "204", description = "Product deletado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     ResponseEntity<Void> deletar(Long id);
 }

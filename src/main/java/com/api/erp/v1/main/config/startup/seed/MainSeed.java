@@ -65,19 +65,6 @@ public class MainSeed {
             }
         }
 
-        // ❌ COMMENTED: Measure units are now FlywayDB migration
-        // - Use migration: V2__Insert_Measure_Units.sql for default data
-        // - Seed only for tenant-specific units if necessary
-        // try {
-        //     log.debug("3️⃣  Executesndo seeder de unidades de medida...");
-        //     measureUnitSeed.executar();
-        //     log.info("✅ Unidades de medida inicializadas com sucesso");
-        //     sucessos++;
-        // } catch (Exception e) {
-        //     log.error("❌ Erro ao executar seeder de unidades de medida:", e);
-        //     erros++;
-        // }
-
         if (erros == 0) {
             log.info("✅ All {} seeders were executed successfully", sucessos);
         } else {

@@ -8,6 +8,7 @@ import com.api.erp.v1.main.features.measureunit.domain.service.IMeasureUnitServi
 import com.api.erp.v1.main.features.measureunit.domain.validator.MeasureUnitValidator;
 import com.api.erp.v1.main.shared.domain.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -72,6 +73,12 @@ public class MeasureUnitService implements IMeasureUnitService {
      * Gets uma unidade de medida por ID
      */
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "measure-unit",
+            keyGenerator = "principalKeyGenerator",
+            condition = "@tenantService.getTenantConfig().getMeasureUnitConfig().isMeasureUnitCacheEnabled()",
+            unless = "#result == null"
+    )
     public MeasureUnitResponseDTO obter(Long id) {
         return converterParaResponseDTO(obterPorId(id));
     }
@@ -113,6 +120,7 @@ public class MeasureUnitService implements IMeasureUnitService {
     /**
      * Gets uma unidade por ID ou lança exceção
      */
+    @Cacheable(value = "measure-unit", keyGenerator = "principalKeyGenerator")
     private MeasureUnit obterPorId(Long id) {
         return repository.findById(id).orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Unit of measurement not found with ID: " + id));
     }

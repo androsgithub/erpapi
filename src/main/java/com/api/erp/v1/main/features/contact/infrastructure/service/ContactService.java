@@ -7,13 +7,16 @@ import com.api.erp.v1.main.features.contact.domain.repository.ContactRepository;
 import com.api.erp.v1.main.features.contact.domain.service.IContactService;
 import com.api.erp.v1.main.features.contact.domain.validator.ContactValidator;
 import com.api.erp.v1.main.shared.domain.exception.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class ContactService implements IContactService {
 
     @Autowired
@@ -46,6 +49,11 @@ public class ContactService implements IContactService {
 
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "contact",
+            keyGenerator = "principalKeyGenerator",
+            condition = "@tenantService.getTenantConfig().getContactConfig().isContactCacheEnabled()",
+            unless = "#result == null"
+    )
     public Contact buscarPorId(Long id) {
         return contactRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Contact não encontrado com id: " + id));
@@ -53,28 +61,33 @@ public class ContactService implements IContactService {
 
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "contacts", keyGenerator = "principalKeyGenerator")
     public List<Contact> buscarTodos() {
         return contactRepository.findAll();
     }
 
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "contact-enabled", keyGenerator = "principalKeyGenerator")
     public List<Contact> buscarAtivos() {
         return contactRepository.findByAtivoTrue();
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "contact-disabled", keyGenerator = "principalKeyGenerator")
     public List<Contact> buscarInativos() {
         return contactRepository.findByAtivoFalse();
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "contact-type", keyGenerator = "principalKeyGenerator")
     public List<Contact> buscarPorTipo(String tipo) {
         TipoContact tipoContact = TipoContact.valueOf(tipo.toUpperCase());
         return contactRepository.findByTipoAndAtivoTrue(tipoContact);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "contact-principal", keyGenerator = "principalKeyGenerator")
     public Contact buscarPrincipal() {
         return contactRepository.findPrincipal()
                 .orElseThrow(() -> new NotFoundException("Nenhum contact principal encontrado"));

@@ -6,7 +6,6 @@ import com.api.erp.v1.main.features.permission.application.dto.response.RoleResp
 import com.api.erp.v1.main.features.permission.domain.controller.IRoleController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,13 +27,11 @@ public interface RoleOpenApiDocumentation extends IRoleController {
             description = "Cria uma nova role no sistema. " +
                     "As roles agrupam permissões e facilitam o controle de acesso."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Role criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos ou role já existente"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado"),
-            @ApiResponse(responseCode = "403", description = "Sem permissão para criar roles"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
+    @ApiResponse(responseCode = "201", description = "Role criada com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos ou role já existente")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
+    @ApiResponse(responseCode = "403", description = "Sem permissão para criar roles")
+    @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     ResponseEntity<RoleResponse> createRole(
             @RequestBody CreateRoleRequest request
     );
@@ -44,12 +41,10 @@ public interface RoleOpenApiDocumentation extends IRoleController {
             summary = "Listar todas as roles",
             description = "Retorna a lista de todas as roles cadastradas no sistema"
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de roles retornada com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado"),
-            @ApiResponse(responseCode = "403", description = "Sem permissão para listar roles"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
+    @ApiResponse(responseCode = "200", description = "Lista de roles retornada com sucesso")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
+    @ApiResponse(responseCode = "403", description = "Sem permissão para listar roles")
+    @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     ResponseEntity<List<RoleResponse>> getAllRoles();
 
     @Override
@@ -57,14 +52,12 @@ public interface RoleOpenApiDocumentation extends IRoleController {
             summary = "Associar permissão a role",
             description = "Associa uma ou mais permissões a uma role existente"
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Permissão(ões) associada(s) com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Role ou permissão não encontrada"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado"),
-            @ApiResponse(responseCode = "403", description = "Sem permissão para associar permissões"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
+    @ApiResponse(responseCode = "204", description = "Permissão(ões) associada(s) com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Role ou permissão não encontrada")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
+    @ApiResponse(responseCode = "403", description = "Sem permissão para associar permissões")
+    @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     ResponseEntity<Void> associarPermission(
             @RequestBody AssociarPermissionRequest request
     );

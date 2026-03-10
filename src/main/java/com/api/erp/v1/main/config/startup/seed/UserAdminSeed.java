@@ -40,7 +40,7 @@ public class UserAdminSeed {
     private static final String ADMIN_EMAIL = "admin@empresa.com";
     private static final String ADMIN_NAME = "Administrador do Sistema";
     private static final String ADMIN_CPF = "11144477735";
-    private static final String ADMIN_PASSWORD = "Admin@123456";
+    private static final String ENCRYPTED_PASS = "$2a$10$uBJ0lQ.2/j/Mm.w2tVl5DuOQ.WtPsOPn5tyjBZl5BYcSoyGuaJQvm";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -62,7 +62,7 @@ public class UserAdminSeed {
                     .nomeCompleto(ADMIN_NAME)
                     .email(new Email(ADMIN_EMAIL))
                     .cpf(new CPF(ADMIN_CPF))
-                    .senhaHash(passwordEncoder.encode(ADMIN_PASSWORD))
+                    .senhaHash(ENCRYPTED_PASS)
                     .status(StatusUser.ATIVO)
                     .build();
 
@@ -71,7 +71,7 @@ public class UserAdminSeed {
             userRepository.save(admin);
             log.info("✅ Admin user created successfully");
 
-            log.info("📧 Email: {} | 🔐 Default password: {} (CHANGE ON FIRST RUN)", ADMIN_EMAIL, ADMIN_PASSWORD);
+            log.info("📧 Email: {} | 🔐 Default password: {} (CHANGE ON FIRST RUN)", ADMIN_EMAIL, ENCRYPTED_PASS);
 
         } catch (Exception e) {
             log.error("❌ Error creating admin user:", e);

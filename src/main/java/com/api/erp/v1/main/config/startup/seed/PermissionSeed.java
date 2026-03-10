@@ -2,8 +2,8 @@ package com.api.erp.v1.main.config.startup.seed;
 
 import com.api.erp.v1.main.config.startup.util.PermissionReflectionUtil;
 import com.api.erp.v1.main.features.address.domain.entity.AddressPermissions;
-import com.api.erp.v1.main.features.contact.domain.entity.ContactPermissions;
 import com.api.erp.v1.main.features.businesspartner.domain.entity.BusinessPartnerPermissions;
+import com.api.erp.v1.main.features.contact.domain.entity.ContactPermissions;
 import com.api.erp.v1.main.features.permission.domain.entity.*;
 import com.api.erp.v1.main.features.permission.domain.repository.PermissionRepository;
 import com.api.erp.v1.main.features.permission.domain.repository.RoleRepository;
@@ -82,25 +82,21 @@ public class PermissionSeed {
             List<Permission> novasPermissions = new ArrayList<>();
 
             for (Class<?> permissionClass : PERMISSION_CLASSES) {
-                try {
-                    List<String> codigos = PermissionReflectionUtil.extrairPermissions(permissionClass);
-                    String modulo = extrairNomeModulo(permissionClass);
+                List<String> codigos = PermissionReflectionUtil.extrairPermissions(permissionClass);
+                String modulo = extrairNomeModulo(permissionClass);
 
-                    for (String codigo : codigos) {
-                        if (!permissionsPorCodigo.containsKey(codigo)) {
-                            TipoAcao acao = extrairTipoAcao(codigo);
-                            Permission novaPermission = Permission.builder()
-                                    .codigo(codigo)
-                                    .nome(gerarNomeAmigavel(codigo))
-                                    .modulo(modulo)
-                                    .acao(acao)
-                                    .build();
-                            novaPermission.setScope(TenantScope.GLOBAL);
-                            novasPermissions.add(novaPermission);
-                        }
+                for (String codigo : codigos) {
+                    if (!permissionsPorCodigo.containsKey(codigo)) {
+                        TipoAcao acao = extrairTipoAcao(codigo);
+                        Permission novaPermission = Permission.builder()
+                                .codigo(codigo)
+                                .nome(gerarNomeAmigavel(codigo))
+                                .modulo(modulo)
+                                .acao(acao)
+                                .build();
+                        novaPermission.setScope(TenantScope.GLOBAL);
+                        novasPermissions.add(novaPermission);
                     }
-                } catch (Exception e) {
-                    log.warn("⚠️  Error processing class {}: {}", permissionClass.getSimpleName(), e.getMessage());
                 }
             }
 

@@ -4,7 +4,6 @@ import com.api.erp.v1.main.features.product.application.dto.ListaExpandidaRespon
 import com.api.erp.v1.main.features.product.domain.controller.IListaExpandidaController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,11 +33,9 @@ public interface ListaExpandidaOpenApiDocumentation extends IListaExpandidaContr
                     Resultado: Product C = 6x
                     """
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista expandida gerada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Quantidade inválida"),
-            @ApiResponse(responseCode = "404", description = "Product não encontrado ou não é fabricável")
-    })
+    @ApiResponse(responseCode = "200", description = "Lista expandida gerada com sucesso")
+    @ApiResponse(responseCode = "400", description = "Quantidade inválida")
+    @ApiResponse(responseCode = "404", description = "Product não encontrado ou não é fabricável")
     ResponseEntity<ListaExpandidaResponseDTO> gerarListaExpandida(
             @PathVariable Long productId,
             @RequestParam(defaultValue = "1") BigDecimal quantidade);
@@ -59,11 +56,9 @@ public interface ListaExpandidaOpenApiDocumentation extends IListaExpandidaContr
                     Resultado: Lista apenas de B, C, D com quantidades acumuladas
                     """
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista de compras gerada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Quantidade inválida"),
-            @ApiResponse(responseCode = "404", description = "Product não encontrado ou não é fabricável")
-    })
+    @ApiResponse(responseCode = "200", description = "Lista de compras gerada com sucesso")
+    @ApiResponse(responseCode = "400", description = "Quantidade inválida")
+    @ApiResponse(responseCode = "404", description = "Product não encontrado ou não é fabricável")
     ResponseEntity<ListaExpandidaResponseDTO> gerarListaCompras(
             @PathVariable Long productId,
             @RequestParam(defaultValue = "1") BigDecimal quantidade);

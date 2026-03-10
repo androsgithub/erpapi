@@ -6,7 +6,6 @@ import com.api.erp.v1.external.observability.presentation.dto.PageableResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,10 +29,8 @@ public interface ObservabilityOpenApiDocumentation extends IObservabilityControl
             summary = "Obter eventos por trace ID",
             description = "Retorna todos os eventos de uma requisição específica, útil para debugar uma requisição específica"
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Eventos encontrados com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Trace ID não encontrado")
-    })
+    @ApiResponse(responseCode = "200", description = "Eventos encontrados com sucesso")
+    @ApiResponse(responseCode = "404", description = "Trace ID não encontrado")
     ResponseEntity<List<FlowEventDto>> getEventsByTraceId(
             @PathVariable
             @Parameter(description = "Identificador único da requisição")
@@ -45,10 +42,8 @@ public interface ObservabilityOpenApiDocumentation extends IObservabilityControl
             summary = "Health check",
             description = "Verifica se o sistema de observability está funcionando corretamente"
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Sistema funcionando normalmente"),
-            @ApiResponse(responseCode = "503", description = "Sistema indisponível")
-    })
+    @ApiResponse(responseCode = "200", description = "Sistema funcionando normalmente")
+    @ApiResponse(responseCode = "503", description = "Sistema indisponível")
     ResponseEntity<Map<String, String>> health();
 
     @Override
@@ -56,10 +51,8 @@ public interface ObservabilityOpenApiDocumentation extends IObservabilityControl
             summary = "Obter todos os eventos paginados",
             description = "Retorna todos os eventos com suporte a paginação e filtros avançados"
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Eventos retornados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parâmetros de filtro inválidos")
-    })
+    @ApiResponse(responseCode = "200", description = "Eventos retornados com sucesso")
+    @ApiResponse(responseCode = "400", description = "Parâmetros de filtro inválidos")
     ResponseEntity<PageableResponse<FlowEventDto>> getAll(
             @RequestParam(required = false)
             @Parameter(description = "Filtro por status do evento")

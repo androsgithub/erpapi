@@ -17,29 +17,29 @@ public enum PermissionErrorMessage implements IErrorMessage {
     ACCESS_DENIED(
         "Access denied for the requested resource.",
         "PERMISSION_001",
-        HttpStatus.FORBIDDEN
+        ErrorType.FORBIDDEN
     ),
 
     PERMISSION_NOT_FOUND(
         "Permission not found.",
         "PERMISSION_002",
-        HttpStatus.NOT_FOUND
+        ErrorType.NOT_FOUND
     ),
 
     INVALID_PERMISSION_CONFIG(
         "Invalid permission configuration.",
         "PERMISSION_003",
-        HttpStatus.BAD_REQUEST
+        ErrorType.INVALID_ARGUMENT
     );
 
     private final String message;
     private final String code;
-    private final HttpStatus status;
+    private final ErrorType errorType;
 
-    PermissionErrorMessage(String message, String code, HttpStatus status) {
+    PermissionErrorMessage(String message, String code, ErrorType errorType) {
         this.message = message;
         this.code = code;
-        this.status = status;
+        this.errorType = errorType;
     }
 
     @Override
@@ -49,20 +49,7 @@ public enum PermissionErrorMessage implements IErrorMessage {
     public String getCode() { return code; }
 
     @Override
-    public HttpStatus getStatus() { return status; }
-
-    @Override
-    public BusinessException toBusinessException() {
-        return new BusinessException(this.status, this.message);
-    }
-
-    @Override
-    public NotFoundException toNotFoundException() {
-        if (!this.status.equals(HttpStatus.NOT_FOUND)) {
-            throw new IllegalStateException("This error is not of type NOT_FOUND: " + this.code);
-        }
-        return new NotFoundException(this.message);
-    }
+    public ErrorType getErrorType() { return errorType; }
 
     @Override
     public String toString() {

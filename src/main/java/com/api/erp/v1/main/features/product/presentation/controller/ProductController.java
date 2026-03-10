@@ -1,19 +1,18 @@
 package com.api.erp.v1.main.features.product.presentation.controller;
 
+import com.api.erp.v1.docs.openapi.features.product.ProductOpenApiDocumentation;
 import com.api.erp.v1.main.features.product.application.dto.ProductRequestDTO;
 import com.api.erp.v1.main.features.product.application.dto.ProductResponseDTO;
 import com.api.erp.v1.main.features.product.application.mapper.IProductMapper;
 import com.api.erp.v1.main.features.product.domain.controller.IProductController;
-import com.api.erp.v1.docs.openapi.features.product.ProductOpenApiDocumentation;
 import com.api.erp.v1.main.features.product.domain.entity.Product;
 import com.api.erp.v1.main.features.product.domain.entity.ProductPermissions;
 import com.api.erp.v1.main.features.product.domain.entity.ProductType;
 import com.api.erp.v1.main.features.product.domain.service.IProductService;
-import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
+import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -36,7 +35,11 @@ public class ProductController implements IProductController, ProductOpenApiDocu
 
     @PostMapping
     @Operation(summary = "Create novo product", description = "Cria um novo product com validações de domínio")
-    @ApiResponses({@ApiResponse(responseCode = "201", description = "Product criado com sucesso"), @ApiResponse(responseCode = "400", description = "Dados inválidos"), @ApiResponse(responseCode = "404", description = "Unidade de medida não encontrada"), @ApiResponse(responseCode = "409", description = "Código do product já existe")})
+    @ApiResponse(responseCode = "201", description = "Product criado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Unidade de medida não encontrada")
+
+    @ApiResponse(responseCode = "409", description = "Código do product já existe")
     @RequiresXTenantId
     @RequiresPermission(ProductPermissions.CREATE)
     public ResponseEntity<ProductResponseDTO> criar(@RequestBody ProductRequestDTO dto) {
@@ -46,7 +49,11 @@ public class ProductController implements IProductController, ProductOpenApiDocu
 
     @PutMapping("/{id}")
     @Operation(summary = "Update product", description = "Atualiza os dados de um product existente")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product atualizado com sucesso"), @ApiResponse(responseCode = "400", description = "Dados inválidos"), @ApiResponse(responseCode = "404", description = "Product não encontrado"), @ApiResponse(responseCode = "409", description = "Código já existe")})
+    @ApiResponse(responseCode = "200", description = "Product atualizado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
+
+    @ApiResponse(responseCode = "409", description = "Código já existe")
     @RequiresXTenantId
     @RequiresPermission(ProductPermissions.UPDATE)
     public ResponseEntity<ProductResponseDTO> atualizar(@PathVariable Long id, @RequestBody ProductRequestDTO dto) {
@@ -56,7 +63,9 @@ public class ProductController implements IProductController, ProductOpenApiDocu
 
     @GetMapping("/{id}")
     @Operation(summary = "Obter product", description = "Returns os dados de um product pelo ID")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product encontrado"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product encontrado")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     @RequiresXTenantId
     @RequiresPermission(ProductPermissions.VIEW)
     public ResponseEntity<ProductResponseDTO> obter(@PathVariable Long id) {
@@ -88,7 +97,9 @@ public class ProductController implements IProductController, ProductOpenApiDocu
 
     @PatchMapping("/{id}/ativar")
     @Operation(summary = "Ativar product", description = "Muda o status do product para ATIVO")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product ativado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product ativado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     @RequiresXTenantId
     @RequiresPermission(ProductPermissions.ACTIVATE)
     public ResponseEntity<ProductResponseDTO> ativar(@PathVariable Long id) {
@@ -97,7 +108,9 @@ public class ProductController implements IProductController, ProductOpenApiDocu
 
     @PatchMapping("/{id}/desativar")
     @Operation(summary = "Desativar product", description = "Muda o status do product para INATIVO")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product desativado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product desativado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     @RequiresXTenantId
     @RequiresPermission(ProductPermissions.DEACTIVATE)
     public ResponseEntity<ProductResponseDTO> desativar(@PathVariable Long id) {
@@ -106,7 +119,9 @@ public class ProductController implements IProductController, ProductOpenApiDocu
 
     @PatchMapping("/{id}/bloquear")
     @Operation(summary = "Bloquear product", description = "Muda o status do product para BLOQUEADO")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product bloqueado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product bloqueado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     @RequiresXTenantId
     @RequiresPermission(ProductPermissions.LOCK)
     public ResponseEntity<ProductResponseDTO> bloquear(@PathVariable Long id) {
@@ -115,7 +130,9 @@ public class ProductController implements IProductController, ProductOpenApiDocu
 
     @PatchMapping("/{id}/descontinuar")
     @Operation(summary = "Descontinuar product", description = "Muda o status do product para DESCONTINUADO")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product descontinuado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "200", description = "Product descontinuado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     @RequiresXTenantId
     @RequiresPermission(ProductPermissions.DISCONTINUE)
     public ResponseEntity<ProductResponseDTO> descontinuar(@PathVariable Long id) {
@@ -124,7 +141,9 @@ public class ProductController implements IProductController, ProductOpenApiDocu
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete product", description = "Remove um product do sistema")
-    @ApiResponses({@ApiResponse(responseCode = "204", description = "Product deletado com sucesso"), @ApiResponse(responseCode = "404", description = "Product não encontrado")})
+    @ApiResponse(responseCode = "204", description = "Product deletado com sucesso")
+
+    @ApiResponse(responseCode = "404", description = "Product não encontrado")
     @RequiresXTenantId
     @RequiresPermission(ProductPermissions.DELETE)
     public ResponseEntity<Void> deletar(@PathVariable Long id) {

@@ -7,7 +7,6 @@ import com.api.erp.v1.main.features.businesspartner.domain.controller.IBusinessP
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,11 +26,9 @@ public interface BusinessPartnerOpenApiDocumentation extends IBusinessPartnerCon
             description = "Retorna uma lista paginada de businesspartners com informações resumidas. " +
                     "Utilizado principalmente em telas de listagem e pesquisa."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de businesspartners retornada com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão para visualizar businesspartners")
-    })
+    @ApiResponse(responseCode = "200", description = "Lista de businesspartners retornada com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
+    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para visualizar businesspartners")
     Page<BusinessPartnerSimpleResponseDto> listar(
             @Parameter(description = "Número da página (zero-based)", example = "0")
             @RequestParam(defaultValue = "0") int page,
@@ -48,12 +45,10 @@ public interface BusinessPartnerOpenApiDocumentation extends IBusinessPartnerCon
             summary = "Obter businesspartner por ID",
             description = "Retorna todos os dados de um businesspartner específico, incluindo informações completas e relacionamentos."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "BusinessPartner encontrado"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão para visualizar businesspartners"),
-            @ApiResponse(responseCode = "404", description = "BusinessPartner não encontrado")
-    })
+    @ApiResponse(responseCode = "200", description = "BusinessPartner encontrado")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
+    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para visualizar businesspartners")
+    @ApiResponse(responseCode = "404", description = "BusinessPartner não encontrado")
     BusinessPartnerCompleteResponseDto pegar(
             @Parameter(description = "ID do businesspartner", example = "10")
             Long id
@@ -64,12 +59,10 @@ public interface BusinessPartnerOpenApiDocumentation extends IBusinessPartnerCon
             summary = "Excluir businesspartner",
             description = "Remove definitivamente um businesspartner do sistema."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "BusinessPartner removido com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão para excluir businesspartners"),
-            @ApiResponse(responseCode = "404", description = "BusinessPartner não encontrado")
-    })
+    @ApiResponse(responseCode = "204", description = "BusinessPartner removido com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
+    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para excluir businesspartners")
+    @ApiResponse(responseCode = "404", description = "BusinessPartner não encontrado")
     void deletar(
             @Parameter(description = "ID do businesspartner", example = "10")
             Long id
@@ -80,12 +73,10 @@ public interface BusinessPartnerOpenApiDocumentation extends IBusinessPartnerCon
             summary = "Criar businesspartner",
             description = "Cria um novo businesspartner no sistema com base nos dados informados."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "BusinessPartner criado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão para criar businesspartners")
-    })
+    @ApiResponse(responseCode = "201", description = "BusinessPartner criado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
+    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para criar businesspartners")
     BusinessPartnerCompleteResponseDto criar(
             CreateBusinessPartnerDto dto
     );
@@ -95,13 +86,11 @@ public interface BusinessPartnerOpenApiDocumentation extends IBusinessPartnerCon
             summary = "Atualizar businesspartner",
             description = "Atualiza os dados de um businesspartner existente."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "BusinessPartner atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão para atualizar businesspartners"),
-            @ApiResponse(responseCode = "404", description = "BusinessPartner não encontrado")
-    })
+    @ApiResponse(responseCode = "200", description = "BusinessPartner atualizado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
+    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para atualizar businesspartners")
+    @ApiResponse(responseCode = "404", description = "BusinessPartner não encontrado")
     BusinessPartnerCompleteResponseDto atualizar(
             @Parameter(description = "ID do businesspartner", example = "10")
             @RequestParam Long id,

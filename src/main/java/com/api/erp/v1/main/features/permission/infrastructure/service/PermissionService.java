@@ -3,9 +3,8 @@ package com.api.erp.v1.main.features.permission.infrastructure.service;
 import com.api.erp.v1.main.features.permission.domain.repository.PermissionRepository;
 import com.api.erp.v1.main.features.permission.domain.service.IPermissionService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
 
 @Slf4j
 public class PermissionService implements IPermissionService {
@@ -18,7 +17,12 @@ public class PermissionService implements IPermissionService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean hasPermission(Long userId, String permissionCodigo, Map<String, String> contexto) {
+    @Cacheable(
+            value = "has-permission",
+            keyGenerator = "principalKeyGenerator",
+            unless = "#result == null"
+    )
+    public boolean hasPermission(Long userId, String permissionCodigo) {
         return permissionRepository.countPermission(userId, permissionCodigo) > 0;
     }
 

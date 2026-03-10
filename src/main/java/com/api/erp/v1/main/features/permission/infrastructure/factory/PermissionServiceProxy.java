@@ -14,7 +14,7 @@ public class PermissionServiceProxy implements IPermissionService {
     private final PermissionServiceHolder holder;
 
     @Override
-    public boolean hasPermission(Long userId, String permissionCodigo, Map<String, String> contexto) {
-        return holder.getService().hasPermission(userId, permissionCodigo, contexto);
+    public boolean hasPermission(Long userId, String permissionCodigo) {
+        return holder.getService().hasPermission(userId, permissionCodigo);
     }
 }

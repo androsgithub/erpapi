@@ -2,6 +2,7 @@ package com.api.erp.v1.main.config.startup.seed;
 
 import com.api.erp.v1.main.features.measureunit.domain.entity.MeasureUnit;
 import com.api.erp.v1.main.features.measureunit.domain.repository.MeasureUnitRepository;
+import com.api.erp.v1.main.shared.common.error.ErrorHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -96,7 +97,7 @@ public class MeasureUnitSeed {
             new UnidadePadrao("VIDRO","VIDRO")
     );
 
-    public void executar() {
+    public void executar() throws Exception {
         try {
             if (repository.count() > 0) {
                 log.info("⏭️  Measure units already initialized, skipping seed.");
@@ -134,7 +135,7 @@ public class MeasureUnitSeed {
 
         } catch (Exception e) {
             log.error("❌ Error initializing measure units:", e);
-            throw new RuntimeException("Falha ao inicializar unidades de medida", e);
+            throw new ErrorHandler(InitialSeedErrorMessage.FAIL_ON_INIT);
         }
     }
 

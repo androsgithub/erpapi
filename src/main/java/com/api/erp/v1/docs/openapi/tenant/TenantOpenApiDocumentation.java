@@ -1,10 +1,11 @@
 package com.api.erp.v1.docs.openapi.tenant;
 
-import com.api.erp.v1.main.tenant.application.dto.*;
+import com.api.erp.v1.main.tenant.application.dto.TenantRequest;
+import com.api.erp.v1.main.tenant.application.dto.TenantResponse;
+import com.api.erp.v1.main.tenant.application.dto.UnifiedTenantConfigRequest;
 import com.api.erp.v1.main.tenant.domain.controller.ITenantController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,11 +28,9 @@ public interface TenantOpenApiDocumentation extends ITenantController {
             summary = "Obter dados da tenant",
             description = "Retorna os dados cadastrais da tenant vinculada ao tenant do usuário autenticado."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Dados da tenant retornados com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "400", description = "Tenant não configurada para o tenant")
-    })
+    @ApiResponse(responseCode = "200", description = "Dados da tenant retornados com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
+    @ApiResponse(responseCode = "400", description = "Tenant não configurada para o tenant")
     ResponseEntity<TenantResponse> obter();
 
     @Override
@@ -39,10 +38,8 @@ public interface TenantOpenApiDocumentation extends ITenantController {
             summary = "Listar todas as tenants",
             description = "Retorna a lista de todas as tenants cadastradas no sistema."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de tenants retornada com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
-    })
+    @ApiResponse(responseCode = "200", description = "Lista de tenants retornada com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     ResponseEntity<List<TenantResponse>> listar();
 
     @Override
@@ -50,11 +47,9 @@ public interface TenantOpenApiDocumentation extends ITenantController {
             summary = "Atualizar dados principais da tenant",
             description = "Atualiza os dados cadastrais principais da tenant, como razão social, CNPJ e configurações gerais."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tenant atualizada com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "400", description = "Tenant não configurada ou dados inválidos")
-    })
+    @ApiResponse(responseCode = "200", description = "Tenant atualizada com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
+    @ApiResponse(responseCode = "400", description = "Tenant não configurada ou dados inválidos")
     ResponseEntity<TenantResponse> atualizar(
             @RequestBody TenantRequest request
     );
@@ -82,11 +77,9 @@ public interface TenantOpenApiDocumentation extends ITenantController {
                     }
                     """
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Configurações atualizadas com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado"),
-            @ApiResponse(responseCode = "400", description = "Configuração inválida")
-    })
+    @ApiResponse(responseCode = "200", description = "Configurações atualizadas com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
+    @ApiResponse(responseCode = "400", description = "Configuração inválida")
     ResponseEntity<TenantResponse> atualizarConfigUnificada(
             @RequestBody UnifiedTenantConfigRequest request
     );

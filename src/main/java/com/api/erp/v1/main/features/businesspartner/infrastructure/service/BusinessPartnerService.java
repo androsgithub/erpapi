@@ -17,6 +17,7 @@ import com.api.erp.v1.main.shared.domain.valueobject.CPF;
 import com.api.erp.v1.main.shared.domain.valueobject.RG;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,12 +36,14 @@ public class BusinessPartnerService implements IBusinessPartnerService {
     }
 
     @Override
+    @Cacheable(value = "business-partners", keyGenerator = "principalKeyGenerator")
     public Page<BusinessPartner> pegarTodos(Pageable pageable) {
         validator.validarPageable(pageable);
         return repository.findAll(pageable);
     }
 
     @Override
+    @Cacheable(value = "business-partner", keyGenerator = "principalKeyGenerator")
     public BusinessPartner pegarPorId(Long id) {
         validator.validarId(id);
         return repository.findById(id).orElseThrow(() -> new NotFoundException("BusinessPartner não encontrado com id: " + id));

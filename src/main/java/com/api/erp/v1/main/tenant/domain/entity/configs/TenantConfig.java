@@ -42,6 +42,10 @@ public class TenantConfig {
 
     @Embedded
     @Builder.Default
+    private ProductConfig productConfig = new CustomFieldConfig();
+
+    @Embedded
+    @Builder.Default
     private InternalTenantConfig internalTenantConfig = new InternalTenantConfig();
 }
 

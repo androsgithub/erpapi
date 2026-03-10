@@ -12,6 +12,7 @@ import com.api.erp.v1.main.tenant.infrastructure.service.TenantService;
 import com.api.erp.v1.main.shared.domain.exception.BusinessException;
 import com.api.erp.v1.main.shared.infrastructure.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -132,7 +133,12 @@ public class CustomFieldDefinitionService {
 
 
     /* ===================== QUERY ===================== */
-
+    @Cacheable(
+            value = "custom-fields",
+            keyGenerator = "principalKeyGenerator",
+            condition = "@tenantService.getTenantConfig().getContactConfig().isContactCacheEnabled()",
+            unless = "#result == null"
+    )
     public List<CustomFieldResponse> listByTable(
             Long tenantId,
             String target

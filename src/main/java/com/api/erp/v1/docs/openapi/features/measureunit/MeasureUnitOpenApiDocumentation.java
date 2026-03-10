@@ -5,7 +5,6 @@ import com.api.erp.v1.main.features.measureunit.application.dto.response.Measure
 import com.api.erp.v1.main.features.measureunit.domain.controller.IMeasureUnitController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +21,9 @@ public interface MeasureUnitOpenApiDocumentation extends IMeasureUnitController 
             summary = "Criar nova unidade de medida",
             description = "Cria uma nova unidade de medida com validações de domínio"
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Unidade criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "409", description = "Sigla já existe")
-    })
+    @ApiResponse(responseCode = "201", description = "Unidade criada com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "409", description = "Sigla já existe")
     ResponseEntity<MeasureUnitResponseDTO> criar(MeasureUnitRequestDTO dto);
 
     @Override
@@ -34,12 +31,10 @@ public interface MeasureUnitOpenApiDocumentation extends IMeasureUnitController 
             summary = "Atualizar unidade de medida",
             description = "Atualiza os dados de uma unidade de medida existente"
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Unidade atualizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Unidade não encontrada"),
-            @ApiResponse(responseCode = "409", description = "Sigla já existe")
-    })
+    @ApiResponse(responseCode = "200", description = "Unidade atualizada com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
+    @ApiResponse(responseCode = "409", description = "Sigla já existe")
     ResponseEntity<MeasureUnitResponseDTO> atualizar(Long id, MeasureUnitRequestDTO dto);
 
     @Override
@@ -47,10 +42,8 @@ public interface MeasureUnitOpenApiDocumentation extends IMeasureUnitController 
             summary = "Obter unidade de medida",
             description = "Retorna os dados de uma unidade de medida pelo ID"
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Unidade encontrada"),
-            @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
-    })
+    @ApiResponse(responseCode = "200", description = "Unidade encontrada")
+    @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
     ResponseEntity<MeasureUnitResponseDTO> obter(Long id);
 
     @Override
@@ -69,10 +62,8 @@ public interface MeasureUnitOpenApiDocumentation extends IMeasureUnitController 
             summary = "Ativar unidade de medida",
             description = "Ativa uma unidade de medida desativada"
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Unidade ativada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
-    })
+    @ApiResponse(responseCode = "200", description = "Unidade ativada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
     ResponseEntity<MeasureUnitResponseDTO> ativar(Long id);
 
     @Override
@@ -80,10 +71,8 @@ public interface MeasureUnitOpenApiDocumentation extends IMeasureUnitController 
             summary = "Desativar unidade de medida",
             description = "Desativa uma unidade de medida ativa"
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Unidade desativada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
-    })
+    @ApiResponse(responseCode = "200", description = "Unidade desativada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
     ResponseEntity<MeasureUnitResponseDTO> desativar(Long id);
 
     @Override
@@ -91,9 +80,7 @@ public interface MeasureUnitOpenApiDocumentation extends IMeasureUnitController 
             summary = "Deletar unidade de medida",
             description = "Remove uma unidade de medida do sistema"
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Unidade deletada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
-    })
+    @ApiResponse(responseCode = "204", description = "Unidade deletada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Unidade não encontrada")
     ResponseEntity<Void> deletar(Long id);
 }
