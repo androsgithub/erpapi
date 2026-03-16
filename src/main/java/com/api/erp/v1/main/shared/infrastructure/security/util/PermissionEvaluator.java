@@ -1,13 +1,10 @@
 package com.api.erp.v1.main.shared.infrastructure.security.util;
 
-import com.api.erp.v1.main.features.permission.domain.service.IPermissionService;
+import com.api.erp.v1.main.master.permission.domain.service.IPermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor

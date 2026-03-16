@@ -2,27 +2,26 @@ package com.api.erp.v1.main.shared.infrastructure.security.interceptors;
 
 import com.api.erp.v1.main.datasource.routing.TenantContext;
 import com.api.erp.v1.main.shared.common.constant.HeaderConst;
+import com.api.erp.v1.main.shared.domain.enums.TenantAccessType;
 import com.api.erp.v1.main.shared.infrastructure.security.jwt.JwtTokenProvider;
 import com.api.erp.v1.main.shared.infrastructure.security.resolver.EndpointSecurityResolver;
-import com.api.erp.v1.main.shared.domain.enums.TenantAccessType;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 /**
  * Interceptor para validação de Tenant e Token JWT baseado no tipo de rota.
- *
+ * <p>
  * Valida diferentes tipos de rotas com regras específicas:
- * 
+ * <p>
  * 1. PUBLIC: Não valida nada (sem token, sem tenant)
  * 2. PUBLIC_WITH_TENANT: Valida apenas X-Tenant-ID (sem token)
  * 3. AUTHENTICATED: Valida apenas token JWT (sem tenant)
  * 4. AUTHENTICATED_WITH_TENANT: Valida token + X-Tenant-ID + correspondência entre eles
- *
+ * <p>
  * Responsibilities:
  * - Resolver o tipo de acesso da rota (PUBLIC, PUBLIC_WITH_TENANT, AUTHENTICATED, AUTHENTICATED_WITH_TENANT)
  * - Validar X-Tenant-ID quando necessário
@@ -69,7 +68,20 @@ public class TenantValidationInterceptor implements HandlerInterceptor {
             return validateAuthenticatedWithTenant(request, response, token, tenantIdHeader, requestUri);
         }
 
+        // 4️⃣ ROTA AUTENTICADA COM TENANT - valida token + X-Tenant-ID + correspondência
+        if (accessType == TenantAccessType.PUBLIC_WITH_OPTIONAL_TENANT) {
+            return validateOptionalTenant(request, response, tenantIdHeader, requestUri);
+        }
+
         return false;
+    }
+
+    public boolean validateOptionalTenant(HttpServletRequest request, HttpServletResponse response, String tenantIdHeader, String requestUri) {
+        if (!tenantIdHeader.isEmpty()) {
+            Long tenantIdFromHeader = Long.valueOf(tenantIdHeader);
+            TenantContext.setTenantId(tenantIdFromHeader);
+        }
+        return true;
     }
 
     /**
@@ -170,7 +182,7 @@ public class TenantValidationInterceptor implements HandlerInterceptor {
             // Valida se X-Tenant-ID do header corresponde ao tenantId do token
             if (!jwtTokenProvider.validateTenant(token, tenantIdFromHeader)) {
                 log.warn("[TenantValidation] ✗ AUTHENTICATED_WITH_TENANT: " +
-                        "X-Tenant-ID does not match JWT token | header: {} | route: {}",
+                                "X-Tenant-ID does not match JWT token | header: {} | route: {}",
                         tenantIdHeader, requestUri);
                 sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN,
                         "X-Tenant-ID does not match JWT token");
@@ -180,13 +192,13 @@ public class TenantValidationInterceptor implements HandlerInterceptor {
             // Configura contexto
             TenantContext.setTenantId(tenantIdFromHeader);
             log.debug("[TenantValidation] ✓ AUTHENTICATED_WITH_TENANT: " +
-                    "Valid token + valid tenant match | tenantId: {} | route: {}",
+                            "Valid token + valid tenant match | tenantId: {} | route: {}",
                     tenantIdFromHeader, requestUri);
             return true;
 
         } catch (NumberFormatException e) {
             log.warn("[TenantValidation] ✗ AUTHENTICATED_WITH_TENANT: " +
-                    "Invalid X-Tenant-ID (not a number) | value: {} | route: {}",
+                            "Invalid X-Tenant-ID (not a number) | value: {} | route: {}",
                     tenantIdHeader, requestUri);
             sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST,
                     "X-Tenant-ID must be a valid number");
@@ -209,7 +221,7 @@ public class TenantValidationInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-            Object handler, Exception ex) throws Exception {
+                                Object handler, Exception ex) throws Exception {
         // Limpa o contexto após a requisição
         TenantContext.clear();
         log.debug("🧹 [TenantValidation] TenantContext limpo");

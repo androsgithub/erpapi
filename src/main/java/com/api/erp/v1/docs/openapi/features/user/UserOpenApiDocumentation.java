@@ -1,12 +1,12 @@
 package com.api.erp.v1.docs.openapi.features.user;
 
-import com.api.erp.v1.main.features.permission.domain.entity.Permission;
-import com.api.erp.v1.main.features.permission.domain.entity.Role;
-import com.api.erp.v1.main.features.user.application.dto.request.*;
-import com.api.erp.v1.main.features.user.application.dto.response.TokenResponse;
-import com.api.erp.v1.main.features.user.application.dto.response.UserPermissionsResponse;
-import com.api.erp.v1.main.features.user.application.dto.response.UserResponse;
-import com.api.erp.v1.main.features.user.domain.controller.IUserController;
+import com.api.erp.v1.main.master.permission.domain.entity.Permission;
+import com.api.erp.v1.main.master.permission.domain.entity.Role;
+import com.api.erp.v1.main.master.user.application.dto.request.*;
+import com.api.erp.v1.main.master.user.application.dto.response.AuthenticationResponse;
+import com.api.erp.v1.main.master.user.application.dto.response.UserPermissionsResponse;
+import com.api.erp.v1.main.master.user.application.dto.response.UserResponse;
+import com.api.erp.v1.main.master.user.domain.controller.IUserController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,7 +27,7 @@ public interface UserOpenApiDocumentation extends IUserController {
     @ApiResponse(responseCode = "200", description = "Login bem-sucedido, token retornado")
     @ApiResponse(responseCode = "400", description = "Email ou senha inválidos")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    TokenResponse login(LoginRequest request);
+    AuthenticationResponse login(LoginRequest request);
 
     @Override
     @Operation(summary = "Criar novo usuário", description = "Cria um novo usuário no sistema (requer autenticação)")
@@ -93,7 +93,7 @@ public interface UserOpenApiDocumentation extends IUserController {
     @ApiResponse(responseCode = "403", description = "Sem permissão para realizar esta ação")
     ResponseEntity<Void> adicionarPermissions(
             @Parameter(description = "ID do usuário") Long userId,
-            AdicionarPermissionsRequest request);
+            AddPermissionsRequest request);
 
     @Override
     @Operation(summary = "Remover permissão de usuário",

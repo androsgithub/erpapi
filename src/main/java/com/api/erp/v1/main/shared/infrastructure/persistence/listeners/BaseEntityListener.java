@@ -1,10 +1,8 @@
 package com.api.erp.v1.main.shared.infrastructure.persistence.listeners;
 
 import com.api.erp.v1.main.datasource.routing.TenantContext;
-import com.api.erp.v1.main.shared.domain.entity.BaseEntity;
+import com.api.erp.v1.main.shared.domain.entity.TenantScopeEntity;
 import jakarta.persistence.*;
-
-import java.time.OffsetDateTime;
 
 public class BaseEntityListener {
 
@@ -12,7 +10,7 @@ public class BaseEntityListener {
     // BEFORE INSERT
     // =========================
     @PrePersist
-    public void beforeCreate(BaseEntity entity) {
+    public void beforeCreate(TenantScopeEntity entity) {
         entity.setTenantId(TenantContext.getTenantId());
         entity.setCreatedBy(0L);
     }
@@ -21,7 +19,7 @@ public class BaseEntityListener {
     // AFTER INSERT
     // =========================
     @PostPersist
-    public void afterCreate(BaseEntity entity) {
+    public void afterCreate(TenantScopeEntity entity) {
         // Ex: publicar evento, log, auditoria externa
     }
 
@@ -29,7 +27,7 @@ public class BaseEntityListener {
     // BEFORE UPDATE
     // =========================
     @PreUpdate
-    public void beforeUpdate(BaseEntity entity) {
+    public void beforeUpdate(TenantScopeEntity entity) {
         entity.setUpdatedBy(0L);
     }
 
@@ -37,24 +35,15 @@ public class BaseEntityListener {
     // AFTER UPDATE
     // =========================
     @PostUpdate
-    public void afterUpdate(BaseEntity entity) {
+    public void afterUpdate(TenantScopeEntity entity) {
         // Ex: invalidar cache, emitir evento
-    }
-
-    // =========================
-    // BEFORE DELETE (lógico)
-    // =========================
-    @PreRemove
-    public void beforeDelete(BaseEntity entity) {
-        entity.setDeleted(true);
-        entity.setDeletedAt(OffsetDateTime.now());
     }
 
     // =========================
     // AFTER DELETE
     // =========================
     @PostRemove
-    public void afterDelete(BaseEntity entity) {
+    public void afterDelete(TenantScopeEntity entity) {
         // Ex: auditoria, histórico, eventos
     }
 
@@ -62,7 +51,7 @@ public class BaseEntityListener {
     // AFTER LOAD
     // =========================
     @PostLoad
-    public void afterLoad(BaseEntity entity) {
+    public void afterLoad(TenantScopeEntity entity) {
         // Ex: cálculos derivados, flags temporárias
     }
 }

@@ -1,4 +1,4 @@
-DO SLEEP (0.125);
+
 
 -- Insert BusinessPartner Addresses
 INSERT INTO

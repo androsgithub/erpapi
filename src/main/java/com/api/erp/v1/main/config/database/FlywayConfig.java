@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.config.database;
 
-import com.api.erp.v1.main.tenant.domain.entity.DBType;
+import com.api.erp.v1.main.master.tenant.domain.entity.DBType;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Qualifier;

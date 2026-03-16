@@ -1,7 +1,7 @@
 package com.api.erp.v1.main.config.startup.seed;
 
-import com.api.erp.v1.main.features.measureunit.domain.entity.MeasureUnit;
-import com.api.erp.v1.main.features.measureunit.domain.repository.MeasureUnitRepository;
+import com.api.erp.v1.main.dynamic.features.measureunit.domain.entity.MeasureUnit;
+import com.api.erp.v1.main.dynamic.features.measureunit.domain.repository.MeasureUnitRepository;
 import com.api.erp.v1.main.shared.common.error.ErrorHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

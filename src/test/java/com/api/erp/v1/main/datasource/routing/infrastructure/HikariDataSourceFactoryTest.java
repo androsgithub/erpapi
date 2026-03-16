@@ -1,7 +1,7 @@
 package com.api.erp.v1.main.datasource.routing.infrastructure;
 
 import com.api.erp.v1.main.datasource.routing.domain.TenantDSConfig;
-import com.api.erp.v1.main.tenant.domain.entity.DBType;
+import com.api.erp.v1.main.master.tenant.domain.entity.DBType;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

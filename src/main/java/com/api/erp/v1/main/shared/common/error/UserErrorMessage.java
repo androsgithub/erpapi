@@ -80,6 +80,12 @@ public enum UserErrorMessage implements IErrorMessage {
             "Password must have at least 8 characters.",
             "USER_012",
             ErrorType.INVALID_ARGUMENT
+    ),
+
+    APPROVE_MANAGEMENT_NOT_ALLOWED(
+            "User approve management is not allowed!",
+            "USER_013",
+            ErrorType.FORBIDDEN
     );
 
     private final String message;

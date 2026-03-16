@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.config.startup.seed;
 
-import com.api.erp.v1.main.tenant.domain.entity.DBType;
+import com.api.erp.v1.main.master.tenant.domain.entity.DBType;
 import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import lombok.extern.slf4j.Slf4j;

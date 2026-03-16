@@ -2,7 +2,7 @@ package com.api.erp.v1.main.migration.service;
 
 import com.api.erp.v1.main.migration.domain.TenantCreatedEvent;
 import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
-import com.api.erp.v1.main.tenant.domain.repository.TenantDatasourceRepository;
+import com.api.erp.v1.main.master.tenant.domain.repository.TenantDatasourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -38,7 +38,7 @@ public class TenantCreationMigrationListener {
     public void onTenantCreated(TenantCreatedEvent event) {
         var tenant = event.getTenant();
         Long tenantId = tenant.getId();
-        String tenantName = tenant.getNome();
+        String tenantName = tenant.getName();
         
         log.info("");
         log.info("✅ [{}] Novo tenant criado: {}", tenantId, tenantName);
@@ -47,7 +47,7 @@ public class TenantCreationMigrationListener {
         try {
             // Busca o datasource do tenant
             var datasource = tenantDatasourceRepository
-                    .findByTenantIdAndStatus(tenantId, true);
+                    .findByTenantIdAndActiveTrue(tenantId).orElse(null);
             
             if (datasource == null) {
                 log.warn("⚠️ [{}] Tenant {} does not have datasource configured yet", 

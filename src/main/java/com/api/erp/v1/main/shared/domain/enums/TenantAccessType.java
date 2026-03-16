@@ -6,7 +6,8 @@ public enum TenantAccessType {
     PUBLIC_WITH_TENANT(false, true),
 
     AUTHENTICATED(true, false),
-    AUTHENTICATED_WITH_TENANT(true, true);
+    AUTHENTICATED_WITH_TENANT(true, true),
+    PUBLIC_WITH_OPTIONAL_TENANT(false, false);
 
     private final boolean requiresAuth;
     private final boolean requiresTenant;

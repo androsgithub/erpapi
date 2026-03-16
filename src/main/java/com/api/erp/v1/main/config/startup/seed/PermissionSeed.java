@@ -1,20 +1,20 @@
 package com.api.erp.v1.main.config.startup.seed;
 
 import com.api.erp.v1.main.config.startup.util.PermissionReflectionUtil;
-import com.api.erp.v1.main.features.address.domain.entity.AddressPermissions;
-import com.api.erp.v1.main.features.businesspartner.domain.entity.BusinessPartnerPermissions;
-import com.api.erp.v1.main.features.contact.domain.entity.ContactPermissions;
-import com.api.erp.v1.main.features.permission.domain.entity.*;
-import com.api.erp.v1.main.features.permission.domain.repository.PermissionRepository;
-import com.api.erp.v1.main.features.permission.domain.repository.RoleRepository;
-import com.api.erp.v1.main.features.product.domain.entity.CompositionPermissions;
-import com.api.erp.v1.main.features.product.domain.entity.ExpandedListPermissions;
-import com.api.erp.v1.main.features.product.domain.entity.ProductPermissions;
-import com.api.erp.v1.main.features.user.domain.entity.UserPermissions;
+import com.api.erp.v1.main.dynamic.features.address.domain.entity.AddressPermissions;
+import com.api.erp.v1.main.dynamic.features.businesspartner.domain.entity.BusinessPartnerPermissions;
+import com.api.erp.v1.main.dynamic.features.contact.domain.entity.ContactPermissions;
+import com.api.erp.v1.main.master.permission.domain.entity.*;
+import com.api.erp.v1.main.master.permission.domain.repository.PermissionRepository;
+import com.api.erp.v1.main.master.permission.domain.repository.RoleRepository;
+import com.api.erp.v1.main.dynamic.features.product.domain.entity.CompositionPermissions;
+import com.api.erp.v1.main.dynamic.features.product.domain.entity.ExpandedListPermissions;
+import com.api.erp.v1.main.dynamic.features.product.domain.entity.ProductPermissions;
+import com.api.erp.v1.main.master.user.domain.entity.UserPermissions;
 import com.api.erp.v1.main.migration.domain.MigrationPermissions;
-import com.api.erp.v1.main.shared.domain.entity.BaseEntity;
+import com.api.erp.v1.main.shared.domain.entity.TenantScopeEntity;
 import com.api.erp.v1.main.shared.domain.entity.TenantScope;
-import com.api.erp.v1.main.tenant.domain.entity.TenantPermissions;
+import com.api.erp.v1.main.master.tenant.domain.entity.TenantPermissions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -134,7 +134,7 @@ public class PermissionSeed {
                 // Como é LAZY, isso está dentro da @Transactional — funciona normalmente
                 Set<Long> permissionsJaVinculadas = roleAdmin.getPermissions()
                         .stream()
-                        .map(BaseEntity::getId)
+                        .map(TenantScopeEntity::getId)
                         .collect(Collectors.toSet());
 
                 List<Permission> newPermissions = permissionsPorCodigo.values().stream()

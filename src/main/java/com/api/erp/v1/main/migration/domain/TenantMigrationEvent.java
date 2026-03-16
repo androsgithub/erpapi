@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.migration.domain;
 
-import com.api.erp.v1.main.tenant.domain.entity.TenantDatasource;
+import com.api.erp.v1.main.master.tenant.domain.entity.TenantDatasource;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

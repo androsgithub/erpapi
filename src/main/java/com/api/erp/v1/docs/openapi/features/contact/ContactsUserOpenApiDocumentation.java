@@ -1,11 +1,11 @@
 package com.api.erp.v1.docs.openapi.features.contact;
 
-import com.api.erp.v1.main.features.contact.application.dto.CreateContactRequest;
-import com.api.erp.v1.main.features.contact.application.dto.request.AssociarContactsRequest;
-import com.api.erp.v1.main.features.contact.application.dto.request.RemoverContactRequest;
-import com.api.erp.v1.main.features.contact.application.dto.response.ContactResponse;
-import com.api.erp.v1.main.features.contact.application.dto.response.UserContactsResponse;
-import com.api.erp.v1.main.features.contact.domain.controller.IContactsUserController;
+import com.api.erp.v1.main.dynamic.features.contact.application.dto.CreateContactRequest;
+import com.api.erp.v1.main.dynamic.features.contact.application.dto.request.AssociarContactsRequest;
+import com.api.erp.v1.main.dynamic.features.contact.application.dto.request.RemoverContactRequest;
+import com.api.erp.v1.main.dynamic.features.contact.application.dto.response.ContactResponse;
+import com.api.erp.v1.main.dynamic.features.contact.application.dto.response.UserContactsResponse;
+import com.api.erp.v1.main.dynamic.features.contact.domain.controller.IContactsUserController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

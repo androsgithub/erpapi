@@ -1,8 +1,8 @@
 package com.api.erp.v1.docs.openapi.features.contact;
 
-import com.api.erp.v1.main.features.contact.application.dto.CreateContactRequest;
-import com.api.erp.v1.main.features.contact.application.dto.response.ContactResponse;
-import com.api.erp.v1.main.features.contact.domain.controller.IContactsController;
+import com.api.erp.v1.main.dynamic.features.contact.application.dto.CreateContactRequest;
+import com.api.erp.v1.main.dynamic.features.contact.application.dto.response.ContactResponse;
+import com.api.erp.v1.main.dynamic.features.contact.domain.controller.IContactsController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

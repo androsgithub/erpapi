@@ -1,10 +1,9 @@
 package com.api.erp.v1.main.datasource.routing.initialization;
 
 import com.api.erp.v1.main.datasource.routing.core.DataSourceRouter;
-import com.api.erp.v1.main.datasource.routing.domain.TenantDataSourceNotFoundException;
 import com.api.erp.v1.main.shared.domain.exception.NotFoundException;
-import com.api.erp.v1.main.tenant.domain.entity.Tenant;
-import com.api.erp.v1.main.tenant.domain.repository.TenantRepository;
+import com.api.erp.v1.main.master.tenant.domain.entity.Tenant;
+import com.api.erp.v1.main.master.tenant.domain.repository.TenantRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
@@ -53,7 +52,7 @@ public class DataSourceInitializer {
         log.info("Starting pre-loading of Tenant DataSources...");
         
         try {
-            List<Tenant> activeTenants = tenantRepository.findAllByAtivaTrue();
+            List<Tenant> activeTenants = tenantRepository.findAllByActiveTrue();
             
             if (activeTenants.isEmpty()) {
                 log.warn("No active tenants found for pre-loading datasources");

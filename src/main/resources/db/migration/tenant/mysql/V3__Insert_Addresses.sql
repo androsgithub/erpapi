@@ -1,4 +1,3 @@
-DO SLEEP(0.125);
 -- Insert Addresses
 INSERT INTO
     tb_address (

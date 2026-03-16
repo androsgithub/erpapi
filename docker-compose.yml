@@ -1,5 +1,111 @@
 services:
 
+  db_test1:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: USER
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: POSTGRES_TEST
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U USER -d POSTGRES_TEST" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_volume_local:/var/lib/postgresql
+
+  oracle_test:
+    image: gvenzl/oracle-free:latest
+    container_name: oracle_test
+    restart: always
+    environment:
+      - ORACLE_PASSWORD=12345
+      - APP_USER=system
+      - APP_USER_PASSWORD=12345
+      - ORACLE_DATABASE=ORCL
+    ports:
+      - 1521:1521
+    volumes:
+      - oracle_volume_data:/opt/oracle/oradata
+
+  sqlserver_test:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_test
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "SqlS3rverPass!"
+      MSSQL_PID: "Developer"
+    ports:
+      - 1433:1433
+    volumes:
+      - sqlserver_volume_data:/var/opt/mssql
+
+  mariadb_test:
+    image: mariadb:latest
+    container_name: mariadb_test
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: 12345
+      MARIADB_DATABASE: ERPAPI_TEST
+    ports:
+      - 3307:3306
+    volumes:
+      - mariadb_volume_data:/var/lib/mysql
+
+  db2_test:
+    image: icr.io/db2_community/db2
+    container_name: db2_test
+    restart: always
+    privileged: true
+    environment:
+      - LICENSE=accept
+      - DB2INSTANCE=db2inst1
+      - DB2INST1_PASSWORD=12345
+      - DBNAME=testdb
+    ports:
+      - 50000:50000
+    volumes:
+      - db2_volume_data:/database
+
+  cockroachdb_test:
+    image: cockroachdb/cockroach:latest-v23.1
+    container_name: cockroachdb_test
+    command: start-single-node --insecure
+    restart: always
+    ports:
+      - 26257:26257
+      - 8084:8080
+    volumes:
+      - cockroachdb_volume_data:/cockroach/cockroach-data
+
+  clickhouse_test:
+    image: clickhouse/clickhouse-server
+    container_name: clickhouse_test
+    restart: always
+    ports:
+      - 8123:8123
+      - 9000:9000
+    volumes:
+      - clickhouse_volume_data:/var/lib/clickhouse
+
+
+  h2_test:
+    image: oscarfonts/h2:latest
+    container_name: h2_test
+    restart: always
+    environment:
+      - H2_OPTIONS=-tcpAllowOthers -ifNotExists
+    ports:
+      - 9092:1521
+    volumes:
+      - h2_volume_data:/opt/h2-data
+
+
+
   redis:
     image: redis:latest
     container_name: redis
@@ -34,3 +140,12 @@ services:
 
 volumes:
   redis_volume_data:
+  postgres_volume_local:
+  oracle_volume_data:
+  sqlserver_volume_data:
+  mariadb_volume_data:
+  db2_volume_data:
+  cockroachdb_volume_data:
+  clickhouse_volume_data:
+  h2_volume_data:
+  firebird_volume_data:

@@ -4,42 +4,48 @@ import com.api.erp.v1.main.datasource.routing.domain.ITenantConfigProvider;
 import com.api.erp.v1.main.datasource.routing.domain.TenantDSConfig;
 import com.api.erp.v1.main.shared.common.error.ErrorHandler;
 import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
-import com.api.erp.v1.main.tenant.domain.entity.DBType;
+import com.api.erp.v1.main.master.tenant.domain.entity.DBType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.Base64;
 import java.util.Optional;
 
 /**
  * INFRASTRUCTURE - Implementação de ITenantConfigProvider usando JDBC
  * <p>
- * Retrieves configurações de tenant do banco de dados Master.
+ * Retrieves configurações de tenant do banco de dados Master usando tb_tnt_datasource.
  * Usa JdbcTemplate para abstração de queries.
  * <p>
- * Responsibility: Retrievesr dados de tenant persistidos
+ * Responsibility: Recuperar dados de configuração de tenant persistidos
+ * - Busca na tabela tb_tnt_datasource por tenant_id
+ * - Desencripta senha (Base64 placeholder, usar AES em produção)
+ * - Converte dbType/driverClass para DBType enum
+ * - Retorna TenantDSConfig pronto para uso
  *
  * @author ERP System
- * @version 1.0
+ * @version 2.0
  */
 @Repository
 @Slf4j
 public class JdbcTenantConfigProvider implements ITenantConfigProvider {
 
     private static final String QUERY_TENANT_CONFIG = """
-            SELECT td.id, td.tenant_id, td.host, td.port, td.database_name, 
-                   td.username, td.password, td.db_type
-            FROM tb_tenant_datasource td
-            WHERE td.tenant_id = ? AND td.is_active = 1
+            SELECT td.id, td.tenant_id, td.url, td.driver_class, td.schema_name,
+                   td.username, td.password_encrypted, td.db_type, 
+                   td.pool_min, td.pool_max, td.connection_timeout, td.idle_timeout
+            FROM tb_tnt_datasource td
+            WHERE td.tenant_id = ? AND td.active = true
             LIMIT 1
             """;
 
     private static final String QUERY_TENANT_EXISTS = """
             SELECT 1
-            FROM tb_tenant_datasource
-            WHERE tenant_id = ? AND is_active = 1
+            FROM tb_tnt_datasource
+            WHERE tenant_id = ? AND active = true
             LIMIT 1
             """;
 
@@ -52,100 +58,124 @@ public class JdbcTenantConfigProvider implements ITenantConfigProvider {
     @Override
     public Optional<TenantDSConfig> getTenantConfig(Long tenantId) {
         if (tenantId == null || tenantId <= 0) {
-            log.warn("Invalid tenant ID: {}", tenantId);
+            log.warn("[JDBC CONFIG PROVIDER] Invalid tenant ID: {}", tenantId);
             throw new IllegalArgumentException("Tenant ID cannot be null or less than 0");
         }
 
         try {
-            return Optional.of(buildTenantDatasourceUrl(tenantId));
+            return buildTenantDatasourceConfig(tenantId);
         } catch (org.springframework.jdbc.BadSqlGrammarException e) {
             log.error(
-                "Error retrieving SQL grammar for tenant {}. " +
-                "Please verify that tb_tenant_datasource table exists and has all required columns. " +
-                "SQL: {}",
+                "[JDBC CONFIG PROVIDER] SQL grammar error for tenant {}. " +
+                "Verify tb_tnt_datasource table exists with columns: " +
+                "url, driver_class, schema_name, username, password_encrypted, db_type, " +
+                "pool_min, pool_max, connection_timeout, idle_timeout. SQL: {}",
                 tenantId, e.getSql(), e
             );
             return Optional.empty();
         } catch (Exception e) {
-            log.error("Error retrieving configuration for tenant: {}", tenantId, e);
+            log.error("[JDBC CONFIG PROVIDER] Error retrieving configuration for tenant: {}", tenantId, e);
             return Optional.empty();
         }
     }
 
-    private TenantDSConfig buildTenantDatasourceUrl(Long tenantId) {
-        log.debug("Fetching tenant {} configuration from tb_tenant_datasource table", tenantId);
-        
+    private Optional<TenantDSConfig> buildTenantDatasourceConfig(Long tenantId) {
+        log.debug("[JDBC CONFIG PROVIDER] Fetching tenant {} configuration", tenantId);
+
         try {
             var results = jdbcTemplate.query(
                     QUERY_TENANT_CONFIG,
                     new Object[]{tenantId},
                     (rs, rowNum) -> {
-                        String host = rs.getString("host");
-                        int port = rs.getInt("port");
-                        String database = rs.getString("database_name");
+                        String url = rs.getString("url");
+                        String driverClass = rs.getString("driver_class");
+                        String schemaName = rs.getString("schema_name");
                         String username = rs.getString("username");
-                        String password = rs.getString("password");
-                        String dbType = rs.getString("db_type");
+                        String passwordEncrypted = rs.getString("password_encrypted");
+                        String dbTypeStr = rs.getString("db_type");
+                        int poolMin = rs.getInt("pool_min");
+                        int poolMax = rs.getInt("pool_max");
+                        int connectionTimeout = rs.getInt("connection_timeout");
+                        int idleTimeout = rs.getInt("idle_timeout");
+
+                        // Desencriptar senha (usando Base64 placeholder, trocar por AES em prod)
+                        String password = decryptPassword(passwordEncrypted);
 
                         log.debug(
-                            "Tenant {} found: DB {} at {}:{} (type: {})",
-                            tenantId, database, host, port, dbType
+                            "[JDBC CONFIG PROVIDER] Tenant {} found: URL={}, Schema={}, Driver={}, DBType={}",
+                            tenantId, url, schemaName, driverClass, dbTypeStr
                         );
 
-                        // Construir URL JDBC baseado no tipo de banco
-                        String jdbcUrl = buildJdbcUrl(host, port, database, dbType);
-
-                        return new TenantDSConfig(
-                                tenantId,
-                                jdbcUrl,
-                                username,
-                                password,
-                                DBType.valueOf(dbType)
-                        );
+                        try {
+                            DBType dbType = DBType.fromNome(dbTypeStr);
+                            return new TenantDSConfig(tenantId, url, username, password, dbType);
+                        } catch (IllegalArgumentException e) {
+                            log.error("[JDBC CONFIG PROVIDER] Invalid DBType for tenant {}: {}", tenantId, dbTypeStr, e);
+                            throw e;
+                        }
                     }
             );
 
             if (results.isEmpty()) {
                 log.warn(
-                    "Tenant configuration not found for tenant_id = {} or is not active in tb_tenant_datasource",
+                    "[JDBC CONFIG PROVIDER] Tenant configuration not found for tenant_id={} " +
+                    "or is not active in tb_tnt_datasource",
                     tenantId
                 );
                 throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
             }
 
-            log.info("Tenant configuration {} retrieved successfully", tenantId);
-            return results.get(0);
+            log.info("[JDBC CONFIG PROVIDER] Tenant configuration {} retrieved successfully", tenantId);
+            return Optional.of(results.get(0));
+
         } catch (org.springframework.jdbc.BadSqlGrammarException e) {
             log.error(
-                "SQL error when fetching tenant {}. " +
-                "Verify if tb_tenant_datasource table exists. SQL: {}",
+                "[JDBC CONFIG PROVIDER] SQL error when fetching tenant {}. " +
+                "Verify tb_tnt_datasource table structure. SQL: {}",
                 tenantId, e.getSql(), e
             );
             throw e;
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            log.error("❌ Unexpected error retrieving tenant configuration {}: {}", tenantId, e.getMessage(), e);
-            throw new RuntimeException(e);
+            log.error("[JDBC CONFIG PROVIDER] Unexpected error retrieving tenant configuration {}: {}", 
+                    tenantId, e.getMessage(), e);
+            throw new IllegalStateException("Failed to retrieve tenant configuration", e);
         }
     }
 
-    private String buildJdbcUrl(String host, int port, String database, String dbType) {
-        return switch (dbType.toLowerCase()) {
-            case "mysql" -> "jdbc:mysql://" + host + ":" + port + "/" + database;
-            case "postgresql" -> "jdbc:postgresql://" + host + ":" + port + "/" + database;
-            case "oracle" -> "jdbc:oracle:thin:@" + host + ":" + port + ":" + database;
-            case "sqlserver" -> "jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + database;
-            case "h2" -> "jdbc:h2:mem:" + database;
-            case "mariadb" -> "jdbc:mariadb://" + host + ":" + port + "/" + database;
-            default -> "jdbc:" + dbType + "://" + host + ":" + port + "/" + database;
-        };
+    /**
+     * Desencripta senha armazenada
+     * 
+     * SECURITY NOTE: Current implementation uses Base64 (development only).
+     * PRODUCTION: Replace with AES-256 encryption using SecureRandom IV.
+     * 
+     * Implementation example for production:
+     * <pre>
+     *   Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+     *   cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmParameterSpec);
+     *   return new String(cipher.doFinal(encryptedBytes));
+     * </pre>
+     */
+    private String decryptPassword(String encryptedPassword) {
+        if (encryptedPassword == null || encryptedPassword.trim().isEmpty()) {
+            return "";
+        }
+
+        try {
+            // Placeholder: Base64 decode (trocar por AES em produção)
+            byte[] decodedBytes = Base64.getDecoder().decode(encryptedPassword);
+            return new String(decodedBytes);
+        } catch (IllegalArgumentException e) {
+            log.warn("[JDBC CONFIG PROVIDER] Failed to decrypt password (invalid Base64): {}", e.getMessage());
+            return encryptedPassword; // Retorna como está se falhar
+        }
     }
 
     @Override
     public boolean tenantExists(String tenantId) {
         if (tenantId == null || tenantId.trim().isEmpty()) {
-            log.warn("Invalid Tenant ID for verification: null or empty");
+            log.warn("[JDBC CONFIG PROVIDER] Invalid Tenant ID for verification: null or empty");
             return false;
         }
 
@@ -157,13 +187,15 @@ public class JdbcTenantConfigProvider implements ITenantConfigProvider {
                     (rs, rowNum) -> 1
             );
             boolean exists = !results.isEmpty();
-            log.debug("Tenant verification {}: {}", tenantId, exists ? "exists" : "does not exist");
+            log.debug("[JDBC CONFIG PROVIDER] Tenant verification {}: {}",
+                    tenantId, exists ? "exists" : "does not exist");
             return exists;
         } catch (NumberFormatException e) {
-            log.warn("Tenant ID is not a valid number: {}", tenantId);
+            log.warn("[JDBC CONFIG PROVIDER] Tenant ID is not a valid number: {}", tenantId);
             return false;
         } catch (Exception e) {
-            log.error("Error verifying tenant existence {}: {}", tenantId, e.getMessage());
+            log.error("[JDBC CONFIG PROVIDER] Error verifying tenant existence {}: {}", 
+                    tenantId, e.getMessage());
             return false;
         }
     }

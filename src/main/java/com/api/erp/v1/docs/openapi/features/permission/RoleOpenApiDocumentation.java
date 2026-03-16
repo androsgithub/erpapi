@@ -1,9 +1,9 @@
 package com.api.erp.v1.docs.openapi.features.permission;
 
-import com.api.erp.v1.main.features.permission.application.dto.request.AssociarPermissionRequest;
-import com.api.erp.v1.main.features.permission.application.dto.request.CreateRoleRequest;
-import com.api.erp.v1.main.features.permission.application.dto.response.RoleResponse;
-import com.api.erp.v1.main.features.permission.domain.controller.IRoleController;
+import com.api.erp.v1.main.master.permission.application.dto.request.AssociarPermissionRequest;
+import com.api.erp.v1.main.master.permission.application.dto.request.CreateRoleRequest;
+import com.api.erp.v1.main.master.permission.application.dto.response.RoleResponse;
+import com.api.erp.v1.main.master.permission.domain.controller.IRoleController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

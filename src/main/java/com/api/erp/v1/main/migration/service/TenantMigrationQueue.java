@@ -1,7 +1,7 @@
 package com.api.erp.v1.main.migration.service;
 
 import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
-import com.api.erp.v1.main.tenant.domain.entity.TenantDatasource;
+import com.api.erp.v1.main.master.tenant.domain.entity.TenantDatasource;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

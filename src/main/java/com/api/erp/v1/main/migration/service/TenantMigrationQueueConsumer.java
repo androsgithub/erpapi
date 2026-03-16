@@ -3,13 +3,11 @@ package com.api.erp.v1.main.migration.service;
 import com.api.erp.v1.main.config.startup.seed.MainSeed;
 import com.api.erp.v1.main.datasource.routing.TenantContext;
 import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
-import com.api.erp.v1.main.tenant.infrastructure.config.TenantMigrationService;
+import com.api.erp.v1.main.master.tenant.infrastructure.config.TenantMigrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * INFRASTRUCTURE - Tenant Migration Queue Consumer
@@ -159,7 +157,7 @@ public class TenantMigrationQueueConsumer {
                 TenantContext.setTenantId(tenantId);
                 
                 // Executes seeders
-                mainSeed.executar();
+//                mainSeed.executar();
                 
                 seedersExecuted = 2; // Default count (adjust if necessary)
                 log.info("✅ [{}] Seeders executed successfully", tenantId);

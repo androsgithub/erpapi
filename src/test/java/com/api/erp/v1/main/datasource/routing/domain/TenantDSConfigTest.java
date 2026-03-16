@@ -1,18 +1,12 @@
 package com.api.erp.v1.main.datasource.routing.domain;
 
-import com.api.erp.v1.main.tenant.domain.entity.DBType;
-import com.zaxxer.hikari.HikariDataSource;
+import com.api.erp.v1.main.master.tenant.domain.entity.DBType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -21,7 +15,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 /**
  * TESTES UNITÁRIOS - TenantDSConfig (Value Object)

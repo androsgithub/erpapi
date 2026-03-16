@@ -1,8 +1,8 @@
 package com.api.erp.v1.docs.openapi.features.address;
 
-import com.api.erp.v1.main.features.address.application.dto.request.CreateAddressRequest;
-import com.api.erp.v1.main.features.address.application.dto.response.AddressResponse;
-import com.api.erp.v1.main.features.address.domain.controller.IAddressController;
+import com.api.erp.v1.main.dynamic.features.address.application.dto.request.CreateAddressRequest;
+import com.api.erp.v1.main.dynamic.features.address.application.dto.response.AddressResponse;
+import com.api.erp.v1.main.dynamic.features.address.domain.controller.IAddressController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

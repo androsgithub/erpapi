@@ -1,9 +1,9 @@
 package com.api.erp.v1.docs.openapi.features.businesspartner;
 
-import com.api.erp.v1.main.features.businesspartner.application.dto.request.CreateBusinessPartnerDto;
-import com.api.erp.v1.main.features.businesspartner.application.dto.response.BusinessPartnerCompleteResponseDto;
-import com.api.erp.v1.main.features.businesspartner.application.dto.response.BusinessPartnerSimpleResponseDto;
-import com.api.erp.v1.main.features.businesspartner.domain.controller.IBusinessPartnerController;
+import com.api.erp.v1.main.dynamic.features.businesspartner.application.dto.request.CreateBusinessPartnerDto;
+import com.api.erp.v1.main.dynamic.features.businesspartner.application.dto.response.BusinessPartnerCompleteResponseDto;
+import com.api.erp.v1.main.dynamic.features.businesspartner.application.dto.response.BusinessPartnerSimpleResponseDto;
+import com.api.erp.v1.main.dynamic.features.businesspartner.domain.controller.IBusinessPartnerController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

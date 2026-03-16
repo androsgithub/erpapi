@@ -1,8 +1,8 @@
 package com.api.erp.v1.docs.openapi.features.measureunit;
 
-import com.api.erp.v1.main.features.measureunit.application.dto.request.MeasureUnitRequestDTO;
-import com.api.erp.v1.main.features.measureunit.application.dto.response.MeasureUnitResponseDTO;
-import com.api.erp.v1.main.features.measureunit.domain.controller.IMeasureUnitController;
+import com.api.erp.v1.main.dynamic.features.measureunit.application.dto.request.MeasureUnitRequestDTO;
+import com.api.erp.v1.main.dynamic.features.measureunit.application.dto.response.MeasureUnitResponseDTO;
+import com.api.erp.v1.main.dynamic.features.measureunit.domain.controller.IMeasureUnitController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

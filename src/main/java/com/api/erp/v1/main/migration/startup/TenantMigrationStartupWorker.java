@@ -3,8 +3,9 @@ package com.api.erp.v1.main.migration.startup;
 import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
 import com.api.erp.v1.main.migration.service.TenantMigrationQueueConsumer;
 import com.api.erp.v1.main.migration.service.TenantMigrationQueue;
-import com.api.erp.v1.main.tenant.domain.repository.TenantDatasourceRepository;
-import com.api.erp.v1.main.tenant.domain.repository.TenantRepository;
+import com.api.erp.v1.main.master.tenant.domain.entity.TenantDatasource;
+import com.api.erp.v1.main.master.tenant.domain.repository.TenantDatasourceRepository;
+import com.api.erp.v1.main.master.tenant.domain.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -66,7 +67,7 @@ public class TenantMigrationStartupWorker {
             // ────────────────────────────────────────────────────────────
             log.info("📋 Buscando tenants ativos para enfileiramento...");
             
-            var tenants = tenantRepository.findAllByAtivaTrue();
+            var tenants = tenantRepository.findAllByActiveTrue();
             
             if (tenants.isEmpty()) {
                 log.warn("⚠️ No active tenant found for migration");
@@ -84,12 +85,12 @@ public class TenantMigrationStartupWorker {
             for (var tenant : tenants) {
                 try {
                     // Busca datasource do tenant
-                    var datasource = tenantDatasourceRepository
-                            .findByTenantIdAndStatus(tenant.getId(), true);
+                    TenantDatasource datasource = tenantDatasourceRepository
+                            .findByTenantIdAndActiveTrue(tenant.getId()).orElse(null);
                     
                     if (datasource == null) {
                         log.warn("⚠️ Tenant {} does not have datasource configured - skipping", 
-                                tenant.getNome());
+                                tenant.getName());
                         skippedCount++;
                         continue;
                     }
@@ -97,17 +98,17 @@ public class TenantMigrationStartupWorker {
                     // Enfileira o evento de migração
                     TenantMigrationEvent event = migrationQueue.enqueueEvent(
                             tenant.getId(),
-                            tenant.getNome(),
+                            tenant.getName(),
                             datasource,
                             TenantMigrationEvent.MigrationEventSource.APPLICATION_STARTUP
                     );
                     
                     enqueuedCount++;
                     log.debug("  ✅ Tenant enfileirado: {} (Event: {})", 
-                            tenant.getNome(), event.getEventId());
+                            tenant.getName(), event.getEventId());
                     
                 } catch (Exception e) {
-                    log.error("❌ Erro ao enfileirar tenant {}: {}", tenant.getNome(), e.getMessage(), e);
+                    log.error("❌ Erro ao enfileirar tenant {}: {}", tenant.getName(), e.getMessage(), e);
                     skippedCount++;
                 }
             }

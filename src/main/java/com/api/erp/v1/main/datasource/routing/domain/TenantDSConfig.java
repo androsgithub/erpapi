@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.datasource.routing.domain;
 
-import com.api.erp.v1.main.tenant.domain.entity.DBType;
+import com.api.erp.v1.main.master.tenant.domain.entity.DBType;
 
 /**
  * DOMAIN - Value Object para Configuration de DataSource de Tenant
@@ -34,7 +34,7 @@ public class TenantDSConfig {
         this.tenantId = validateNotBlank(tenantId, "tenantId");
         this.dbUrl = validateNotBlank(dbUrl, "dbUrl");
         this.dbUsername = validateNotBlank(dbUsername, "dbUsername");
-        this.dbPassword = validateNotBlank(dbPassword, "dbPassword");
+        this.dbPassword = dbPassword;
 
         if (dbType == null) {
             throw new IllegalArgumentException("DBType cannot be null");
@@ -56,7 +56,7 @@ public class TenantDSConfig {
         this.tenantId = Long.valueOf(validateNotBlank(tenantId, "tenantId"));
         this.dbUrl = validateNotBlank(dbUrl, "dbUrl");
         this.dbUsername = validateNotBlank(dbUsername, "dbUsername");
-        this.dbPassword = validateNotBlank(dbPassword, "dbPassword");
+        this.dbPassword = dbPassword;
 
         if (dbTypeString == null || dbTypeString.trim().isEmpty()) {
             throw new IllegalArgumentException("dbTypeString cannot be null or empty");

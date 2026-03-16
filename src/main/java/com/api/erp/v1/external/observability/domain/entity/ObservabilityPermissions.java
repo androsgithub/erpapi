@@ -1,6 +1,6 @@
 package com.api.erp.v1.external.observability.domain.entity;
 
-import com.api.erp.v1.main.features.permission.domain.entity.BasePermissions;
+import com.api.erp.v1.main.master.permission.domain.entity.BasePermissions;
 
 /**
  * Observability-specific permission constants.

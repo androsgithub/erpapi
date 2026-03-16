@@ -1,8 +1,8 @@
 package com.api.erp.v1.docs.openapi.features.product;
 
-import com.api.erp.v1.main.features.product.application.dto.CompositionRequestDTO;
-import com.api.erp.v1.main.features.product.application.dto.CompositionResponseDTO;
-import com.api.erp.v1.main.features.product.domain.controller.ICompositionController;
+import com.api.erp.v1.main.dynamic.features.product.application.dto.CompositionRequestDTO;
+import com.api.erp.v1.main.dynamic.features.product.application.dto.CompositionResponseDTO;
+import com.api.erp.v1.main.dynamic.features.product.domain.controller.ICompositionController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

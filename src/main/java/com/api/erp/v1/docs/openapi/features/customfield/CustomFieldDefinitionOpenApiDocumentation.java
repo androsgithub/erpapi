@@ -1,10 +1,10 @@
 package com.api.erp.v1.docs.openapi.features.customfield;
 
-import com.api.erp.v1.main.features.customfield.application.dto.request.ChangeCustomFieldStatusRequest;
-import com.api.erp.v1.main.features.customfield.application.dto.request.CreateCustomFieldRequest;
-import com.api.erp.v1.main.features.customfield.application.dto.request.UpdateCustomFieldRequest;
-import com.api.erp.v1.main.features.customfield.application.dto.response.CustomFieldResponse;
-import com.api.erp.v1.main.features.customfield.domain.controller.ICustomFieldDefinitionController;
+import com.api.erp.v1.main.dynamic.features.customfield.application.dto.request.ChangeCustomFieldStatusRequest;
+import com.api.erp.v1.main.dynamic.features.customfield.application.dto.request.CreateCustomFieldRequest;
+import com.api.erp.v1.main.dynamic.features.customfield.application.dto.request.UpdateCustomFieldRequest;
+import com.api.erp.v1.main.dynamic.features.customfield.application.dto.response.CustomFieldResponse;
+import com.api.erp.v1.main.dynamic.features.customfield.domain.controller.ICustomFieldDefinitionController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

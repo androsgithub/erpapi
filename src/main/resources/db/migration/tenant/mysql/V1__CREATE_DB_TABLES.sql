@@ -1,4 +1,4 @@
-DO SLEEP (0.125);
+
 
 create table
    tb_business_partner (
@@ -162,31 +162,7 @@ create table
       primary key (id)
    ) engine = InnoDB;
 
-create table
-   tb_permission (
-      id bigint not null auto_increment,
-      created_at datetime (6) not null default current_timestamp(6),
-      created_by bigint,
-      deleted bit not null,
-      deleted_at datetime (6),
-      scope enum ('GLOBAL', 'GROUP', 'TENANT'),
-      tenant_group_id bigint,
-      tenant_id bigint not null,
-      updated_at datetime (6),
-      updated_by bigint,
-      version bigint,
-      acao enum (
-         'CRIAR',
-         'EDITAR',
-         'EXCLUIR',
-         'OUTRO',
-         'VISUALIZAR'
-      ) not null,
-      codigo varchar(255) not null,
-      modulo varchar(255) not null,
-      nome varchar(255) not null,
-      primary key (id)
-   ) engine = InnoDB;
+
 
 create table
    tb_product (
@@ -233,30 +209,6 @@ create table
    ) engine = InnoDB;
 
 create table
-   tb_role (
-      id bigint not null auto_increment,
-      created_at datetime (6) not null default current_timestamp(6),
-      created_by bigint,
-      deleted bit not null,
-      deleted_at datetime (6),
-      scope enum ('GLOBAL', 'GROUP', 'TENANT'),
-      tenant_group_id bigint,
-      tenant_id bigint not null,
-      updated_at datetime (6),
-      updated_by bigint,
-      version bigint,
-      nome varchar(255) not null,
-      primary key (id)
-   ) engine = InnoDB;
-
-create table
-   tb_role_permission (
-      role_id bigint not null,
-      permission_id bigint not null,
-      primary key (role_id, permission_id)
-   ) engine = InnoDB;
-
-create table
    tb_measure_unit (
       id bigint not null auto_increment,
       created_at datetime (6) not null default current_timestamp(6),
@@ -274,71 +226,14 @@ create table
       primary key (id)
    ) engine = InnoDB;
 
-create table
-   tb_user (
-      id bigint not null auto_increment,
-      created_at datetime (6) not null default current_timestamp(6),
-      created_by bigint,
-      deleted bit not null,
-      deleted_at datetime (6),
-      scope enum ('GLOBAL', 'GROUP', 'TENANT'),
-      tenant_group_id bigint,
-      tenant_id bigint not null,
-      updated_at datetime (6),
-      updated_by bigint,
-      version bigint,
-      approved_at datetime (6),
-      aprovado_por bigint,
-      cpf varchar(255) not null,
-      email varchar(255) not null,
-      nome_completo varchar(255) not null,
-      senha_hash varchar(255) not null,
-      status enum (
-         'ATIVO',
-         'BLOQUEADO',
-         'INATIVO',
-         'PENDENTE_APROVACAO',
-         'REJEITADO'
-      ) not null,
-      primary key (id)
-   ) engine = InnoDB;
-
-create table
-   tb_user_contact (
-      user_id bigint not null,
-      contact_id bigint not null,
-      primary key (user_id, contact_id)
-   ) engine = InnoDB;
-
-create table
-   tb_user_permission (
-      user_id bigint not null,
-      permission_id bigint not null,
-      primary key (user_id, permission_id)
-   ) engine = InnoDB;
-
-create table
-   tb_user_role (
-      user_id bigint not null,
-      role_id bigint not null,
-      primary key (user_id, role_id)
-   ) engine = InnoDB;
-
 alter table TB_BUSINESS_PARTNER_CONTACT add constraint UKoyvoyiovpks7mak7a6o9shsjf unique (contact_id);
 
 alter table TB_BUSINESS_PARTNER_ADDRESS add constraint UK3g4mi2jwv887g1adobbi2ty7j unique (address_id);
 
-alter table tb_permission add constraint UK1uq3cg2rbrpk3ykinkkju2gaw unique (codigo);
-
 alter table tb_product add constraint UK472kg512c3fntgnpuqi1wk1l2 unique (codigo);
-
-alter table tb_role add constraint UK6e9vttep485ay7pmjccprgdus unique (nome);
 
 alter table tb_measure_unit add constraint UKqpb3oc1tcjwvcj76341nv6tl3 unique (sigla);
 
-alter table tb_user add constraint UK594wib8ansybtilla48x7vdld unique (cpf);
-
-alter table tb_user add constraint UKspmnyb4dsul95fjmr5kmdmvub unique (email);
 
 alter table TB_BUSINESS_PARTNER_CONTACT add constraint FKar3q0fwokcc43i1w07alv1u9t foreign key (contact_id) references tb_contacts (id);
 
@@ -360,18 +255,4 @@ alter table tb_product_composition add constraint FKp0ouw2m2gjdkq1ifxqeewbu1d fo
 
 alter table tb_product_composition add constraint FKwol2pcy2wvmbq3q7x99dn1lp foreign key (product_fabricado_id) references tb_product (id);
 
-alter table tb_role_permission add constraint FK1i43spbowu8fpdli5h311a97u foreign key (permission_id) references tb_permission (id);
 
-alter table tb_role_permission add constraint FKshhi66xugi1k1chvvygj4of5r foreign key (role_id) references tb_role (id);
-
-alter table tb_user_contact add constraint FK3gh0ltuf1syctfafopd94dqlg foreign key (contact_id) references tb_contacts (id);
-
-alter table tb_user_contact add constraint FK128rl735ifi2ei19hvl9gv6gc foreign key (user_id) references tb_user (id);
-
-alter table tb_user_permission add constraint FKduh5ix0b4v9ns4ehping4wl68 foreign key (permission_id) references tb_permission (id);
-
-alter table tb_user_permission add constraint FKse5klwt0ivx37h6opgx6ipjuw foreign key (user_id) references tb_user (id);
-
-alter table tb_user_role add constraint FKkix4nwaehqjwnk40e2e36903j foreign key (role_id) references tb_role (id);
-
-alter table tb_user_role add constraint FKj4syki71kai6syrfuly9xfcq foreign key (user_id) references tb_user (id);

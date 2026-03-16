@@ -1,0 +1,22 @@
+package com.api.erp.v1.main.master.permission.domain.service;
+
+import com.api.erp.v1.main.master.permission.application.dto.request.AssociarPermissionRequest;
+import com.api.erp.v1.main.master.permission.application.dto.request.CreatePermissionRequest;
+import com.api.erp.v1.main.master.permission.application.dto.request.CreateRoleRequest;
+import com.api.erp.v1.main.master.permission.domain.entity.Permission;
+import com.api.erp.v1.main.master.permission.domain.entity.Role;
+
+import java.util.List;
+
+public interface IManagementPermissionService {
+
+    Permission createPermission(CreatePermissionRequest request);
+
+    Role createRole(CreateRoleRequest request);
+
+    void associarPermission(AssociarPermissionRequest request);
+    
+    List<Permission> getAllPermissions();
+
+    List<Role> getAllRoles();
+}

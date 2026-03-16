@@ -38,6 +38,13 @@ spring:
         use_sql_comments: true
     show-sql: false
 
+  cache:
+    type: redis
+    redis:
+      host: localhost
+      port: 6379
+      password: RedisPass
+
   boot:
     admin:
       client:
@@ -87,6 +94,7 @@ springdoc:
     url: /v3/api-docs
     operations-sorter: method
     tags-sorter: alpha
+    persistAuthorization: true
   api-docs:
     path: /v3/api-docs
 
@@ -105,7 +113,7 @@ logging:
         orm:
           jdbc:
 #            bind: TRACE
-        SQL: DEBUG
+#        SQL: DEBUG
       flywaydb: DEBUG
     root: INFO
     com:
@@ -124,3 +132,8 @@ dros:
       schema: false
       permission: true
       user-admin: true
+
+# - SCALAR
+scalar:
+  enabled: true
+  url: http://localhost:8080/v3/api-docs

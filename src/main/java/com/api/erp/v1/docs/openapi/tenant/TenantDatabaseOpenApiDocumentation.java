@@ -1,9 +1,9 @@
 package com.api.erp.v1.docs.openapi.tenant;
 
-import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceRequest;
-import com.api.erp.v1.main.tenant.application.dto.TenantDatasourceResponse;
-import com.api.erp.v1.main.tenant.application.dto.UpdateDatasourceResponse;
-import com.api.erp.v1.main.tenant.domain.controller.ITenantDatabaseController;
+import com.api.erp.v1.main.master.tenant.application.dto.TenantDatasourceRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.TenantDatasourceResponse;
+import com.api.erp.v1.main.master.tenant.application.dto.UpdateDatasourceResponse;
+import com.api.erp.v1.main.master.tenant.domain.controller.ITenantDatabaseController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

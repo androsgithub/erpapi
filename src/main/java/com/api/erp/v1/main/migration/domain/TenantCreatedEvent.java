@@ -1,6 +1,6 @@
 package com.api.erp.v1.main.migration.domain;
 
-import com.api.erp.v1.main.tenant.domain.entity.Tenant;
+import com.api.erp.v1.main.master.tenant.domain.entity.Tenant;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 

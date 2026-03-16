@@ -1,9 +1,9 @@
 package com.api.erp.v1.docs.openapi.features.product;
 
-import com.api.erp.v1.main.features.product.application.dto.ProductRequestDTO;
-import com.api.erp.v1.main.features.product.application.dto.ProductResponseDTO;
-import com.api.erp.v1.main.features.product.domain.controller.IProductController;
-import com.api.erp.v1.main.features.product.domain.entity.ProductType;
+import com.api.erp.v1.main.dynamic.features.product.application.dto.ProductRequestDTO;
+import com.api.erp.v1.main.dynamic.features.product.application.dto.ProductResponseDTO;
+import com.api.erp.v1.main.dynamic.features.product.domain.controller.IProductController;
+import com.api.erp.v1.main.dynamic.features.product.domain.entity.ProductType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

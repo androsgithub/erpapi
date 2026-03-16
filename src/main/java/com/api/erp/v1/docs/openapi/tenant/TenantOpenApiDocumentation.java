@@ -1,9 +1,9 @@
 package com.api.erp.v1.docs.openapi.tenant;
 
-import com.api.erp.v1.main.tenant.application.dto.TenantRequest;
-import com.api.erp.v1.main.tenant.application.dto.TenantResponse;
-import com.api.erp.v1.main.tenant.application.dto.UnifiedTenantConfigRequest;
-import com.api.erp.v1.main.tenant.domain.controller.ITenantController;
+import com.api.erp.v1.main.master.tenant.application.dto.TenantRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.TenantResponse;
+import com.api.erp.v1.main.master.tenant.application.dto.UnifiedTenantConfigRequest;
+import com.api.erp.v1.main.master.tenant.domain.controller.ITenantController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

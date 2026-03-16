@@ -1,4 +1,3 @@
-DO SLEEP(0.125);
 -- Insert BusinessPartners
 INSERT INTO
     tb_business_partner (

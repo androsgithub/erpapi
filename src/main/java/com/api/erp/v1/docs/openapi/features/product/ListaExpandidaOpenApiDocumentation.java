@@ -1,7 +1,7 @@
 package com.api.erp.v1.docs.openapi.features.product;
 
-import com.api.erp.v1.main.features.product.application.dto.ListaExpandidaResponseDTO;
-import com.api.erp.v1.main.features.product.domain.controller.IListaExpandidaController;
+import com.api.erp.v1.main.dynamic.features.product.application.dto.ListaExpandidaResponseDTO;
+import com.api.erp.v1.main.dynamic.features.product.domain.controller.IListaExpandidaController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

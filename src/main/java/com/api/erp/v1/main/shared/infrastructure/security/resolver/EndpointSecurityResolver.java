@@ -18,9 +18,13 @@ public class EndpointSecurityResolver {
                     "/swagger-ui.html",
                     "/swagger-resources/**",
                     "/webjars/**",
-                    "/health"
+                    "/health",
+                    "/scalar/**",
+                    "/favicon.svg"
             ),
             TenantAccessType.PUBLIC_WITH_TENANT, List.of(
+            ),
+            TenantAccessType.PUBLIC_WITH_OPTIONAL_TENANT, List.of(
                     "/api/v1/users/login"
             ),
             TenantAccessType.AUTHENTICATED, List.of(
@@ -40,6 +44,11 @@ public class EndpointSecurityResolver {
         // 1️⃣ Rotas públicas SEM tenant
         if (matches(TenantAccessType.PUBLIC, uri)) {
             return TenantAccessType.PUBLIC;
+        }
+
+        // 1️⃣ Rotas públicas SEM tenant
+        if (matches(TenantAccessType.PUBLIC_WITH_OPTIONAL_TENANT, uri)) {
+            return TenantAccessType.PUBLIC_WITH_OPTIONAL_TENANT;
         }
 
         // 2️⃣ Rotas públicas COM tenant
