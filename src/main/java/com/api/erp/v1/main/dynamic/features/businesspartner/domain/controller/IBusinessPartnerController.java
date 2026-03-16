@@ -11,7 +11,7 @@ public interface IBusinessPartnerController {
     Page<BusinessPartnerSimpleResponseDto> listar(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "nome") String sortBy
+            @RequestParam(defaultValue = "name") String sortBy
     );
 
     BusinessPartnerCompleteResponseDto pegar(

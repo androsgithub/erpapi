@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Interface de documentação OpenAPI para Contacts.
@@ -36,23 +36,23 @@ public interface ContactsOpenApiDocumentation extends IContactsController {
     @Override
     @Operation(summary = "Listar todos os contacts", description = "Lista todos os contacts cadastrados (requer autenticação)")
     @ApiResponse(responseCode = "200", description = "Lista de contacts")
-    ResponseEntity<List<ContactResponse>> listar();
+    ResponseEntity<Set<ContactResponse>> listar();
 
     @Override
     @Operation(summary = "Listar contacts ativos", description = "Lista todos os contacts ativos (requer autenticação)")
     @ApiResponse(responseCode = "200", description = "Lista de contacts ativos")
-    ResponseEntity<List<ContactResponse>> listarAtivos();
+    ResponseEntity<Set<ContactResponse>> listarAtivos();
 
     @Override
     @Operation(summary = "Listar contacts inativos", description = "Lista todos os contacts inativos (requer autenticação)")
     @ApiResponse(responseCode = "200", description = "Lista de contacts inativos")
-    ResponseEntity<List<ContactResponse>> listarInativos();
+    ResponseEntity<Set<ContactResponse>> listarInativos();
 
     @Override
     @Operation(summary = "Listar contacts por tipo", description = "Lista contacts de um tipo específico (requer autenticação)")
     @ApiResponse(responseCode = "200", description = "Lista de contacts")
     @ApiResponse(responseCode = "400", description = "Tipo de contact inválido")
-    ResponseEntity<List<ContactResponse>> listarPorTipo(
+    ResponseEntity<Set<ContactResponse>> listarPorTipo(
             @Parameter(description = "Tipo de contact (TELEFONE, EMAIL, WHATSAPP, etc.)") String tipo);
 
     @Override

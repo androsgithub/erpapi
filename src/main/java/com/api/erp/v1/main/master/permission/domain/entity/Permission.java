@@ -4,6 +4,7 @@ import com.api.erp.v1.main.shared.domain.entity.TenantScopeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "tb_permission")
 @Data
@@ -12,16 +13,16 @@ import lombok.*;
 @NoArgsConstructor
 public class Permission extends TenantScopeEntity {
 
-    @Column(nullable = false, unique = true)
-    private String codigo;
+    @Column(nullable = false)
+    private String code;
 
     @Column(nullable = false)
-    private String nome;
+    private String name;
 
     @Column(nullable = false)
-    private String modulo;
+    private String module;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TipoAcao acao;
+    private PermissionAction action;
 }

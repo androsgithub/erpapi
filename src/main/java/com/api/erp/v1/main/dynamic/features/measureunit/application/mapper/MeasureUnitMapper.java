@@ -2,14 +2,31 @@ package com.api.erp.v1.main.dynamic.features.measureunit.application.mapper;
 
 import com.api.erp.v1.main.dynamic.features.measureunit.application.dto.response.MeasureUnitResponseDTO;
 import com.api.erp.v1.main.dynamic.features.measureunit.domain.entity.MeasureUnit;
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface MeasureUnitMapper {
+@Component
+public class MeasureUnitMapper {
 
-    MeasureUnitResponseDTO toResponse(MeasureUnit measureUnit);
+    public MeasureUnitResponseDTO toResponse(MeasureUnit measureUnit) {
+        if (measureUnit == null) {
+            return null;
+        }
+        return MeasureUnitResponseDTO.builder()
+                .id(measureUnit.getId())
+                .sigla(measureUnit.getSigla())
+                .descricao(measureUnit.getDescricao())
+                .build();
+    }
 
-    List<MeasureUnitResponseDTO> toResponseList(List<MeasureUnit> unidadesMedida);
+    public List<MeasureUnitResponseDTO> toResponseList(List<MeasureUnit> unidadesMedida) {
+        if (unidadesMedida == null) {
+            return List.of();
+        }
+        return unidadesMedida.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 }

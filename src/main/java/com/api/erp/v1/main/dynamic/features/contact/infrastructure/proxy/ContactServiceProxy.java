@@ -4,12 +4,12 @@ import com.api.erp.v1.main.dynamic.features.contact.application.dto.CreateContac
 import com.api.erp.v1.main.dynamic.features.contact.domain.entity.Contact;
 import com.api.erp.v1.main.dynamic.features.contact.domain.service.IContactService;
 import com.api.erp.v1.main.dynamic.features.contact.infrastructure.service.ContactService;
-import com.api.erp.v1.main.shared.infrastructure.service.SecurityService;
 import com.api.erp.v1.main.master.tenant.infrastructure.service.TenantBeanResolver;
+import com.api.erp.v1.main.shared.infrastructure.service.SecurityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * ContactServiceProxy
@@ -25,9 +25,9 @@ import java.util.List;
 @Service
 @Slf4j
 public class ContactServiceProxy implements IContactService {
-    
+
     static final String FEATURE_KEY = "contactService";
-    
+
     private final ContactService contactServiceDefault;
     private final SecurityService securityService;
     private final TenantBeanResolver tenantBeanResolver;
@@ -49,25 +49,25 @@ public class ContactServiceProxy implements IContactService {
      */
     private IContactService resolverService() {
         String strTenantId = securityService.getAuthTenantId();
-        
+
         // Se não tem autenticação, usa serviço padrão
         if (strTenantId == null || strTenantId.isEmpty()) {
             log.debug("[ContactServiceProxy] No authentication, using default service");
             return contactServiceDefault;
         }
-        
+
         Long tenantId = Long.valueOf(strTenantId);
-        
+
         try {
             // Resolve via TenantBeanResolver (consulta tb_tnt_features)
             IContactService service = tenantBeanResolver.resolve(tenantId, FEATURE_KEY, IContactService.class);
-            log.debug("[ContactServiceProxy] Service resolvido para tenant {}: {} (feature key={})", 
-                      tenantId, service.getClass().getSimpleName(), FEATURE_KEY);
+            log.debug("[ContactServiceProxy] Service resolvido para tenant {}: {} (feature key={})",
+                    tenantId, service.getClass().getSimpleName(), FEATURE_KEY);
             return service;
-        } catch (TenantBeanResolver.TenantFeatureNotFoundException | 
+        } catch (TenantBeanResolver.TenantFeatureNotFoundException |
                  TenantBeanResolver.TenantBeanNotFoundException e) {
-            log.warn("[ContactServiceProxy] Falha ao resolver bean via TenantBeanResolver, usando default: {}", 
-                     e.getMessage());
+            log.warn("[ContactServiceProxy] Falha ao resolver bean via TenantBeanResolver, usando default: {}",
+                    e.getMessage());
             return contactServiceDefault;
         }
     }
@@ -83,22 +83,22 @@ public class ContactServiceProxy implements IContactService {
     }
 
     @Override
-    public List<Contact> buscarTodos() {
+    public Set<Contact> buscarTodos() {
         return resolverService().buscarTodos();
     }
 
     @Override
-    public List<Contact> buscarAtivos() {
+    public Set<Contact> buscarAtivos() {
         return resolverService().buscarAtivos();
     }
 
     @Override
-    public List<Contact> buscarInativos() {
+    public Set<Contact> buscarInativos() {
         return resolverService().buscarInativos();
     }
 
     @Override
-    public List<Contact> buscarPorTipo(String tipo) {
+    public Set<Contact> buscarPorTipo(String tipo) {
         return resolverService().buscarPorTipo(tipo);
     }
 

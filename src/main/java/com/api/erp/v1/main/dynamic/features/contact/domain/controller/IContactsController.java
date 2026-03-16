@@ -5,7 +5,7 @@ import com.api.erp.v1.main.dynamic.features.contact.application.dto.response.Con
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import java.util.Set;
 
 public interface IContactsController {
 
@@ -13,13 +13,13 @@ public interface IContactsController {
 
     public ResponseEntity<ContactResponse> buscar(Long id);
 
-    public ResponseEntity<List<ContactResponse>> listar();
+    public ResponseEntity<Set<ContactResponse>> listar();
 
-    public ResponseEntity<List<ContactResponse>> listarAtivos();
+    public ResponseEntity<Set<ContactResponse>> listarAtivos();
 
-    public ResponseEntity<List<ContactResponse>> listarInativos();
+    public ResponseEntity<Set<ContactResponse>> listarInativos();
 
-    public ResponseEntity<List<ContactResponse>> listarPorTipo(String tipo);
+    public ResponseEntity<Set<ContactResponse>> listarPorTipo(String tipo);
 
     public ResponseEntity<ContactResponse> buscarPrincipal();
 

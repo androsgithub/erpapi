@@ -23,15 +23,15 @@ public class AddressService implements IAddressService {
         validator.validarCriacao(request);
 
         Address address = Address.builder()
-                .rua(request.rua())
-                .numero(request.numero())
-                .complemento(request.complemento())
-                .bairro(request.bairro())
-                .cidade(request.cidade())
-                .estado(request.estado())
-                .cep(new CEP(request.cep()))
-                .tipo(request.tipo())
-                .principal(request.principal())
+                .street(request.rua())
+                .number(request.numero())
+                .complement(request.complemento())
+                .district(request.bairro())
+                .city(request.cidade())
+                .state(request.estado())
+                .postalCode(new CEP(request.cep()))
+                .type(request.tipo())
+                .primary(request.principal())
                 .build();
 
         return addressRepository.save(address);
@@ -53,15 +53,15 @@ public class AddressService implements IAddressService {
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Endereço não encontrado com id: " + id));
 
-        address.setRua(request.rua());
-        address.setNumero(request.numero());
-        address.setComplemento(request.complemento());
-        address.setBairro(request.bairro());
-        address.setCidade(request.cidade());
-        address.setEstado(request.estado());
-        address.setCep(new CEP(request.cep()));
-        address.setTipo(request.tipo());
-        address.setPrincipal(request.principal());
+        address.setStreet(request.rua());
+        address.setNumber(request.numero());
+        address.setComplement(request.complemento());
+        address.setDistrict(request.bairro());
+        address.setCity(request.cidade());
+        address.setState(request.estado());
+        address.setPostalCode(new CEP(request.cep()));
+        address.setType(request.tipo());
+        address.setPrimary(request.principal());
 
         return addressRepository.save(address);
     }

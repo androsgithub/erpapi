@@ -10,32 +10,32 @@ import java.util.Optional;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
-    Optional<Permission> findByCodigo(String codigo);
+    Optional<Permission> findByCode(String code);
 
     @Query(value = """
             SELECT COUNT(*)
             FROM (
                 SELECT 1
-                FROM tb_user_permission up
-                JOIN tb_permission p
-                    ON p.id = up.permission_id
-                WHERE up.user_id = :userId
-                  AND p.codigo = :permissionCodigo
-                
+                FROM TB_USER_PERMISSION UP
+                JOIN TB_PERMISSION P
+                    ON P.ID = UP.PERMISSION_ID
+                WHERE UP.USER_ID = :userId
+                  AND P.CODE = :permissionCode
+            
                 UNION
-                
+            
                 SELECT 1
-                FROM tb_user_role ur
-                JOIN tb_role_permission rp
-                    ON rp.role_id = ur.role_id
-                JOIN tb_permission p
-                    ON p.id = rp.permission_id
-                WHERE ur.user_id = :userId
-                  AND p.codigo = :permissionCodigo
-            ) t
+                FROM TB_USER_ROLE UR
+                JOIN TB_ROLE_PERMISSION RP
+                    ON RP.ROLE_ID = UR.ROLE_ID
+                JOIN TB_PERMISSION P
+                    ON P.ID = RP.PERMISSION_ID
+                WHERE UR.USER_ID = :userId
+                  AND P.CODE = :permissionCode
+            ) T
             """, nativeQuery = true)
     long countPermission(
             @Param("userId") Long userId,
-            @Param("permissionCodigo") String permissionCodigo
+            @Param("permissionCode") String permissionCode
     );
 }

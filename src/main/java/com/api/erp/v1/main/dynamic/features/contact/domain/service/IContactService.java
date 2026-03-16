@@ -3,12 +3,12 @@ package com.api.erp.v1.main.dynamic.features.contact.domain.service;
 import com.api.erp.v1.main.dynamic.features.contact.application.dto.CreateContactRequest;
 import com.api.erp.v1.main.dynamic.features.contact.domain.entity.Contact;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Interface para o serviço de Contact
  * Define o contrato de operações do serviço, permitindo extensão via Decorator Pattern
- * 
+ * <p>
  * IMPORTANTE: Esta interface retorna apenas entidades de domínio (Contact)
  * A conversão para DTOs de response é responsabilidade do controller/mapper
  */
@@ -27,22 +27,22 @@ public interface IContactService {
     /**
      * Lista todos os contacts
      */
-    List<Contact> buscarTodos();
+    Set<Contact> buscarTodos();
 
     /**
      * Lista todos os contacts ativos
      */
-    List<Contact> buscarAtivos();
+    Set<Contact> buscarAtivos();
 
     /**
      * Lista todos os contacts inativos
      */
-    List<Contact> buscarInativos();
+    Set<Contact> buscarInativos();
 
     /**
      * Lista contacts por tipo
      */
-    List<Contact> buscarPorTipo(String tipo);
+    Set<Contact> buscarPorTipo(String tipo);
 
     /**
      * Busca o contact marcado como principal

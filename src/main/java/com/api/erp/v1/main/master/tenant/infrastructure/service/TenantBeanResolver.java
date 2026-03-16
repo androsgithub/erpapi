@@ -102,12 +102,12 @@ public class TenantBeanResolver {
     }
 
     /**
-     * Versão alternativa que resolve pelo nome se a classe não estiver imediatamente disponível
+     * Versão alternativa que resolve pelo name se a classe não estiver imediatamente disponível
      * (útil para casos onde o tipo é genérico ou desconhecido em tempo de compilação)
      *
      * @param tenantId   ID do tenant
      * @param featureKey chave da feature
-     * @param typeName   nome completo da classe (ex: "com.api.erp.v1.main.features.user.domain.service.IUserService")
+     * @param typeName   name completo da classe (ex: "com.api.erp.v1.main.features.user.domain.service.IUserService")
      * @return instância do bean como Object
      */
     @Cacheable(

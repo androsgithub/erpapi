@@ -50,7 +50,7 @@ public class UserAdminSeed {
     private final RoleRepository roleRepository;
 
     @Transactional
-    public void executar() {
+    public void execute() {
         try {
             Set<Tenant> tenants = new HashSet<>(tenantService.listarTenants());
             User admin = userRepository.findByEmail(new Email(ADMIN_EMAIL)).orElse(null);
@@ -63,7 +63,7 @@ public class UserAdminSeed {
 
             log.debug("Creating default Admin user...");
 
-            Role adminRole = roleRepository.findByNome("ADMIN").orElse(null);
+            Role adminRole = roleRepository.findByName("ADMIN").orElse(null);
 
             admin = User.builder()
                     .name(ADMIN_NAME)

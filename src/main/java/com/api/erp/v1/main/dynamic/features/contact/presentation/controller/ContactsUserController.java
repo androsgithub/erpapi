@@ -5,7 +5,7 @@ import com.api.erp.v1.main.dynamic.features.contact.application.dto.request.Asso
 import com.api.erp.v1.main.dynamic.features.contact.application.dto.request.RemoverContactRequest;
 import com.api.erp.v1.main.dynamic.features.contact.application.dto.response.ContactResponse;
 import com.api.erp.v1.main.dynamic.features.contact.application.dto.response.UserContactsResponse;
-import com.api.erp.v1.main.dynamic.features.contact.application.mapper.IContactMapper;
+import com.api.erp.v1.main.dynamic.features.contact.application.mapper.ContactMapper;
 import com.api.erp.v1.main.dynamic.features.contact.domain.controller.IContactsUserController;
 import com.api.erp.v1.docs.openapi.features.contact.ContactsUserOpenApiDocumentation;
 import com.api.erp.v1.main.dynamic.features.contact.domain.entity.ContactPermissions;
@@ -42,11 +42,11 @@ import org.springframework.web.bind.annotation.*;
 public class ContactsUserController implements IContactsUserController, ContactsUserOpenApiDocumentation {
 
     private final IManagementContactService gerenciamentoContactService;
-    private final IContactMapper contactMapper;
+    private final ContactMapper contactMapper;
 
     public ContactsUserController(
             IManagementContactService gerenciamentoContactService,
-            IContactMapper contactMapper) {
+            ContactMapper contactMapper) {
         this.gerenciamentoContactService = gerenciamentoContactService;
         this.contactMapper = contactMapper;
     }

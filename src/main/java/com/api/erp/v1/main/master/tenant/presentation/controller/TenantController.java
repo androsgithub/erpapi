@@ -102,7 +102,7 @@ public class TenantController implements ITenantController, TenantOpenApiDocumen
             put("timestamp", LocalDateTime.now());
             put("tenant", new HashMap<String, Object>() {{
                 put("id", tenant.getId());
-                put("nome", tenant.getName());
+                put("name", tenant.getName());
                 put("email", tenant.getEmail());
             }});
             put("datasource", new HashMap<String, Object>() {{

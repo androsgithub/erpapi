@@ -1,20 +1,21 @@
 package com.api.erp.v1.main.master.permission.presentation.controller;
 
-import com.api.erp.v1.main.master.permission.application.dto.request.CreatePermissionRequest;
+import com.api.erp.v1.docs.openapi.features.permission.PermissionOpenApiDocumentation;
+import com.api.erp.v1.main.master.permission.application.dto.request.create.NewPermissionRequest;
 import com.api.erp.v1.main.master.permission.application.dto.response.PermissionResponse;
 import com.api.erp.v1.main.master.permission.application.mapper.PermissionMapper;
 import com.api.erp.v1.main.master.permission.domain.controller.IPermissionController;
-import com.api.erp.v1.docs.openapi.features.permission.PermissionOpenApiDocumentation;
 import com.api.erp.v1.main.master.permission.domain.entity.PermissionPermissions;
 import com.api.erp.v1.main.master.permission.domain.service.IManagementPermissionService;
-import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
+import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/permissions")
@@ -28,7 +29,7 @@ public class PermissionController implements IPermissionController, PermissionOp
     @PostMapping
     @RequiresXTenantId
     @RequiresPermission(PermissionPermissions.CREATE)
-    public ResponseEntity<PermissionResponse> createPermission(@RequestBody CreatePermissionRequest request) {
+    public ResponseEntity<PermissionResponse> createPermission(@RequestBody NewPermissionRequest request) {
         var permission = gerenciamentoPermissionService.createPermission(request);
         return new ResponseEntity<>(permissionMapper.toResponse(permission), HttpStatus.CREATED);
     }
@@ -36,8 +37,8 @@ public class PermissionController implements IPermissionController, PermissionOp
     @GetMapping
     @RequiresXTenantId
     @RequiresPermission(PermissionPermissions.VIEW)
-    public ResponseEntity<List<PermissionResponse>> getAllPermissions() {
+    public ResponseEntity<Set<PermissionResponse>> getAllPermissions() {
         var permissions = gerenciamentoPermissionService.getAllPermissions();
-        return ResponseEntity.ok(permissionMapper.toResponseList(permissions));
+        return ResponseEntity.ok(permissionMapper.toResponse(permissions));
     }
 }

@@ -96,7 +96,7 @@ WHERE
 -- Seu TODO aqui:
 -- 1. Conecte ao banco de dados e execute: SELECT id, name FROM tb_tnt;
 -- 2. Para cada tenant com beans customizados, adicione um INSERT neste arquivo
--- 3. Padrão de nome de bean: {TENANT_PREFIX}{FEATURE_NAME}
+-- 3. Padrão de name de bean: {TENANT_PREFIX}{FEATURE_NAME}
 --    Ex: tenant Hece → heceUserService, heceProductService
 -- 4. Deixe comentado ou remova os exemplos acima se não forem aplicáveis
 -- Exemplo de como descobrir que beans devem ser migrados:

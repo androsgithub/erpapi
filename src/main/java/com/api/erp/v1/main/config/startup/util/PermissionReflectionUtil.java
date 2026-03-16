@@ -2,13 +2,13 @@ package com.api.erp.v1.main.config.startup.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PermissionReflectionUtil {
 
-    public static List<String> extrairPermissions(Class<?> permissionClass) {
-        List<String> permissions = new ArrayList<>();
+    public static Set<String> extractPermissions(Class<?> permissionClass) {
+        Set<String> permissions = new HashSet<>();
 
         for (Field field : permissionClass.getDeclaredFields()) {
 

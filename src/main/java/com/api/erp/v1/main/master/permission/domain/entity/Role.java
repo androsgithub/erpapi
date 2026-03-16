@@ -4,6 +4,7 @@ import com.api.erp.v1.main.shared.domain.entity.TenantScopeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
@@ -15,14 +16,15 @@ import java.util.Set;
 @NoArgsConstructor
 public class Role extends TenantScopeEntity {
 
-    @Column(nullable = false, unique = true)
-    private String nome;
+    @Column(nullable = false)
+    private String name;
 
     @OneToMany
     @JoinTable(
-            name="tb_role_permission",
-            joinColumns = @JoinColumn( name="role_id"),
-            inverseJoinColumns = @JoinColumn( name="permission_id")
+            name = "tb_role_permission",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<Permission> permissions;
+    @Builder.Default
+    private Set<Permission> permissions = new HashSet<>();
 }

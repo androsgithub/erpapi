@@ -2,12 +2,12 @@ package com.api.erp.v1.main.dynamic.features.businesspartner.application.mapper;
 
 import com.api.erp.v1.main.dynamic.features.businesspartner.application.dto.BusinessPartnerDadosFiscaisDto;
 import com.api.erp.v1.main.dynamic.features.businesspartner.domain.entity.BusinessPartnerDadosFiscais;
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface BusinessPartnerDadosFiscaisMapper {
+@Component
+public class BusinessPartnerDadosFiscaisMapper {
 
-    default BusinessPartnerDadosFiscaisDto toDto(BusinessPartnerDadosFiscais dados) {
+    public BusinessPartnerDadosFiscaisDto toDto(BusinessPartnerDadosFiscais dados) {
         if (dados == null) return null;
 
         return new BusinessPartnerDadosFiscaisDto(

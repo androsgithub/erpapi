@@ -26,7 +26,7 @@ public class BusinessErrorMappingStrategy implements ErrorMappingStrategy {
             return true;
         }
 
-        // Fallback: verificação por nome de classe
+        // Fallback: verificação por name de classe
         String className = exception.getClass().getName();
         return className.contains("BusinessException") ||
                className.contains("ProductException") ||

@@ -5,8 +5,7 @@ import com.api.erp.v1.main.master.permission.domain.entity.Permission;
 import java.util.Set;
 
 public record RoleResponse(
-        Long id,
-        String nome,
+        String name,
         Set<Permission> permissions
 ) {
 }

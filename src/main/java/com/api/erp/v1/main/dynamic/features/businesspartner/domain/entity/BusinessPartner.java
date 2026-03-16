@@ -19,7 +19,7 @@ import java.util.List;
 @SQLDelete(sql = "UPDATE tb_business_partner SET deleted = true, deleted_at = now() WHERE id = ?")
 public class BusinessPartner extends TenantScopeEntity {
 
-    @Column(name = "nome", nullable = false)
+    @Column(name = "name", nullable = false)
     private String nome;
 
     @Enumerated(EnumType.STRING)

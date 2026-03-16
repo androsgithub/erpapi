@@ -59,7 +59,7 @@ public interface ObservabilityOpenApiDocumentation extends IObservabilityControl
             String status,
 
             @RequestParam(required = false)
-            @Parameter(description = "Filtro por nome do passo/step")
+            @Parameter(description = "Filtro por name do passo/step")
             String stepName,
 
             @RequestParam(required = false)

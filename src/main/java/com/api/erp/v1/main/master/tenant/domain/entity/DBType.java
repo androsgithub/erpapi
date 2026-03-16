@@ -41,7 +41,7 @@ public enum DBType {
     }
 
     /**
-     * Resolve DBType pelo nome do banco (case-insensitive com trim)
+     * Resolve DBType pelo name do banco (case-insensitive com trim)
      */
     public static DBType fromNome(String nome) {
         if (nome == null || nome.trim().isEmpty()) {

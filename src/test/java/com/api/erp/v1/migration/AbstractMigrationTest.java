@@ -73,7 +73,7 @@
 //    /**
 //     * Verifica se uma tabela existe no banco de dados.
 //     *
-//     * @param tableName nome da tabela
+//     * @param tableName name da tabela
 //     * @return true se existe, false caso contrário
 //     */
 //    protected boolean tableExists(String tableName) {
@@ -91,12 +91,12 @@
 //     * Retorna informações de todas as colunas de uma tabela.
 //     *
 //     * ColumnInfo contém:
-//     * - name: nome da coluna
+//     * - name: name da coluna
 //     * - type: tipo (VARCHAR, BIGINT, etc)
 //     * - nullable: se aceita NULL
 //     * - isAutoIncrement: se é auto increment
 //     *
-//     * @param tableName nome da tabela
+//     * @param tableName name da tabela
 //     * @return lista de informações sobre colunas
 //     */
 //    protected List<ColumnInfo> getTableColumns(String tableName) {
@@ -129,8 +129,8 @@
 //    /**
 //     * Verifica se uma coluna existe em uma tabela.
 //     *
-//     * @param tableName nome da tabela
-//     * @param columnName nome da coluna
+//     * @param tableName name da tabela
+//     * @param columnName name da coluna
 //     * @return true se existe, false caso contrário
 //     */
 //    protected boolean columnExists(String tableName, String columnName) {
@@ -141,8 +141,8 @@
 //    /**
 //     * Obtém informação sobre uma coluna específica.
 //     *
-//     * @param tableName nome da tabela
-//     * @param columnName nome da coluna
+//     * @param tableName name da tabela
+//     * @param columnName name da coluna
 //     * @return ColumnInfo da coluna, ou null se não existe
 //     */
 //    protected ColumnInfo getColumnInfo(String tableName, String columnName) {
@@ -155,8 +155,8 @@
 //    /**
 //     * Retorna todas as constraints UNIQUE de uma tabela.
 //     *
-//     * @param tableName nome da tabela
-//     * @return mapa com nome da constraint e colunas envolvidas
+//     * @param tableName name da tabela
+//     * @return mapa com name da constraint e colunas envolvidas
 //     */
 //    protected Map<String, List<String>> getUniqueConstraints(String tableName) {
 //        Map<String, List<String>> constraints = new HashMap<>();
@@ -182,7 +182,7 @@
 //    /**
 //     * Obtém informações sobre chaves primárias de uma tabela.
 //     *
-//     * @param tableName nome da tabela
+//     * @param tableName name da tabela
 //     * @return lista com nomes das colunas da PK
 //     */
 //    protected List<String> getPrimaryKeyColumns(String tableName) {
@@ -206,7 +206,7 @@
 //    /**
 //     * Obtém informações sobre chaves estrangeiras que apontam PARA esta tabela.
 //     *
-//     * @param tableName nome da tabela
+//     * @param tableName name da tabela
 //     * @return mapa com informações das FKs
 //     */
 //    protected List<ForeignKeyInfo> getForeignKeys(String tableName) {
@@ -239,8 +239,8 @@
 //    /**
 //     * Obtém informações sobre índices de uma tabela.
 //     *
-//     * @param tableName nome da tabela
-//     * @return mapa com índices (chave = nome do índice, valor = colunas)
+//     * @param tableName name da tabela
+//     * @return mapa com índices (chave = name do índice, valor = colunas)
 //     * @throws SQLException Se erro ao acessar metadados
 //     */
 //    protected Map<String, IndexInfo> getTableIndexes(String tableName) throws SQLException {
@@ -277,7 +277,7 @@
 //    /**
 //     * Executa uma query COUNT na tabela e retorna o número de registros.
 //     *
-//     * @param tableName nome da tabela
+//     * @param tableName name da tabela
 //     * @return quantidade de registros
 //     */
 //    protected long countTableRecords(String tableName) {
@@ -295,7 +295,7 @@
 //    /**
 //     * Verifica se existe pelo menos um registro na tabela.
 //     *
-//     * @param tableName nome da tabela
+//     * @param tableName name da tabela
 //     * @return true se tem registros, false caso contrário
 //     */
 //    protected boolean hasRecords(String tableName) {

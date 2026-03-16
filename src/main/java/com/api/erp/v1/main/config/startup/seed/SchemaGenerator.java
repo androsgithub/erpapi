@@ -69,8 +69,8 @@ public class SchemaGenerator {
     /**
      * Executes schema generation for all available database types.
      */
-    public static void executar() {
-        executar(DBType.values());
+    public static void execute() {
+        execute(DBType.values());
     }
 
     /**
@@ -78,7 +78,7 @@ public class SchemaGenerator {
      *
      * @param dbTypes database types for which to generate schemas
      */
-    public static void executar(DBType... dbTypes) {
+    public static void execute(DBType... dbTypes) {
         log.info("=== Starting schema generation ===");
 
         for (DBType dbType : dbTypes) {

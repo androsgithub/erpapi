@@ -248,7 +248,7 @@
  * Total de Arquivos de Teste Gerados: 10
  * Total de Métodos de Teste: 161
  * 
- * Padrão de Nomenclatura: dado_[cenario]_quando_[acao]_entao_[resultado]
+ * Padrão de Nomenclatura: dado_[cenario]_quando_[action]_entao_[resultado]
  * Framework: JUnit 5 (@ExtendWith(MockitoExtension.class))
  * Assertions: AssertJ (assertThat)
  * Mocking: Mockito (@Mock, @InjectMocks)

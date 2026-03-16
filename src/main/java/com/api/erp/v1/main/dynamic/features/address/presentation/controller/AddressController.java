@@ -47,7 +47,7 @@
 //    @RequiresPermission(AddressPermissions.VIEW)
 //    public ResponseEntity<List<AddressResponse>> listar() {
 //        var addresss = addressService.buscarTodos();
-//        return ResponseEntity.ok(addressMapper.toResponseList(addresss));
+//        return ResponseEntity.ok(addressMapper.toResponse(addresss));
 //    }
 //
 //    @PutMapping("/{id}")

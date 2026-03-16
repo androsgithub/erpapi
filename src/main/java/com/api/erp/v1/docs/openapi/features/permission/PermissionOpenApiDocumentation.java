@@ -1,6 +1,6 @@
 package com.api.erp.v1.docs.openapi.features.permission;
 
-import com.api.erp.v1.main.master.permission.application.dto.request.CreatePermissionRequest;
+import com.api.erp.v1.main.master.permission.application.dto.request.create.NewPermissionRequest;
 import com.api.erp.v1.main.master.permission.application.dto.response.PermissionResponse;
 import com.api.erp.v1.main.master.permission.domain.controller.IPermissionController;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Interface de documentação OpenAPI para Permissão.
@@ -32,7 +32,7 @@ public interface PermissionOpenApiDocumentation extends IPermissionController {
     @ApiResponse(responseCode = "403", description = "Sem permissão para criar permissões")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     ResponseEntity<PermissionResponse> createPermission(
-            @RequestBody CreatePermissionRequest request
+            @RequestBody NewPermissionRequest request
     );
 
     @Override
@@ -44,5 +44,5 @@ public interface PermissionOpenApiDocumentation extends IPermissionController {
     @ApiResponse(responseCode = "401", description = "Não autenticado")
     @ApiResponse(responseCode = "403", description = "Sem permissão para listar permissões")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    ResponseEntity<List<PermissionResponse>> getAllPermissions();
+    ResponseEntity<Set<PermissionResponse>> getAllPermissions();
 }

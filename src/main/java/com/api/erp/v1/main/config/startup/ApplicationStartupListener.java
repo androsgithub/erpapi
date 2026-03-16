@@ -46,7 +46,6 @@ public class ApplicationStartupListener {
     @EventListener(ApplicationReadyEvent.class)
     public void initializeMigrationQueueOnStartup() {
 //        SchemaGenerator.executar();
-        mainSeed.executar();
         migrationStartupWorker.initializeAndStart();
     }
 }

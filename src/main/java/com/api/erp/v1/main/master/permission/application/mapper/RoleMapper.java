@@ -2,17 +2,40 @@ package com.api.erp.v1.main.master.permission.application.mapper;
 
 import com.api.erp.v1.main.master.permission.application.dto.response.RoleResponse;
 import com.api.erp.v1.main.master.permission.domain.entity.Role;
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface RoleMapper {
+@Component
+public class RoleMapper {
 
-    RoleResponse toResponse(Role role);
+    public RoleResponse toResponse(Role role) {
+        if (role == null) {
+            return null;
+        }
+        return new RoleResponse(
+                role.getName(),
+                role.getPermissions() != null ? role.getPermissions() : Set.of()
+        );
+    }
 
-    List<RoleResponse> toResponseList(List<Role> roles);
+    public Set<RoleResponse> toResponse(Set<Role> roles) {
+        if (roles == null) {
+            return Set.of();
+        }
+        return roles.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toSet());
+    }
 
-    Set<RoleResponse> toResponseSet(Set<Role> entities);
+    public Role fromResponse(RoleResponse roleResponse) {
+        if (roleResponse == null) {
+            return null;
+        }
+        return new Role(
+                roleResponse.name(),
+                roleResponse.permissions() != null ? roleResponse.permissions() : Set.of()
+        );
+    }
 }

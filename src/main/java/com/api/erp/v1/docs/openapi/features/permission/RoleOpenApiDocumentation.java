@@ -1,7 +1,7 @@
 package com.api.erp.v1.docs.openapi.features.permission;
 
-import com.api.erp.v1.main.master.permission.application.dto.request.AssociarPermissionRequest;
-import com.api.erp.v1.main.master.permission.application.dto.request.CreateRoleRequest;
+import com.api.erp.v1.main.master.permission.application.dto.request.create.NewRoleRequest;
+import com.api.erp.v1.main.master.permission.application.dto.request.edit.AddPermissionToUserRequest;
 import com.api.erp.v1.main.master.permission.application.dto.response.RoleResponse;
 import com.api.erp.v1.main.master.permission.domain.controller.IRoleController;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface de documentação OpenAPI para Role.
@@ -33,7 +34,7 @@ public interface RoleOpenApiDocumentation extends IRoleController {
     @ApiResponse(responseCode = "403", description = "Sem permissão para criar roles")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     ResponseEntity<RoleResponse> createRole(
-            @RequestBody CreateRoleRequest request
+            @RequestBody NewRoleRequest request
     );
 
     @Override
@@ -45,7 +46,7 @@ public interface RoleOpenApiDocumentation extends IRoleController {
     @ApiResponse(responseCode = "401", description = "Não autenticado")
     @ApiResponse(responseCode = "403", description = "Sem permissão para listar roles")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    ResponseEntity<List<RoleResponse>> getAllRoles();
+    ResponseEntity<Set<RoleResponse>> getAllRoles();
 
     @Override
     @Operation(
@@ -59,6 +60,6 @@ public interface RoleOpenApiDocumentation extends IRoleController {
     @ApiResponse(responseCode = "403", description = "Sem permissão para associar permissões")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     ResponseEntity<Void> associarPermission(
-            @RequestBody AssociarPermissionRequest request
+            @RequestBody AddPermissionToUserRequest request
     );
 }

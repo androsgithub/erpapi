@@ -1,14 +1,14 @@
 package com.api.erp.v1.main.shared.application.mapper;
 
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
-@Mapper(componentModel = "spring")
-public interface BaseMapper {
+@Component
+public class BaseMapper {
 
-    default LocalDateTime map(OffsetDateTime value) {
+    public LocalDateTime map(OffsetDateTime value) {
         return value == null ? null : value.toLocalDateTime();
     }
 }

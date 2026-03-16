@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface TenantRepository extends JpaRepository<Tenant, Long> {
     
     /**
-     * Busca tenant por nome (slug)
+     * Busca tenant por name (slug)
      */
     Optional<Tenant> findByName(String name);
 

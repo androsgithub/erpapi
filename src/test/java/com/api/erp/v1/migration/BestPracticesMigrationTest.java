@@ -223,7 +223,7 @@
 //        @Disabled
 //        @DisplayName("✅ BOM: Um teste por comportamento")
 //        void shouldCreateTbAddressTable() {
-//            // Bom: nome deixa claro o objetivo
+//            // Bom: name deixa claro o objetivo
 //            assertTrue(tableExists("tb_address"), "tb_address deve existir");
 //        }
 //

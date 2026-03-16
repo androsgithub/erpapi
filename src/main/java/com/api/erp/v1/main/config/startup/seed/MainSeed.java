@@ -28,13 +28,14 @@ public class MainSeed {
     private final PermissionSeed permissionSeed;
     private final UserAdminSeed userAdminSeed;
     private final MeasureUnitSeed measureUnitSeed;
+    private final RoleSeed roleSeed;
 
     @Value("${dros.erpapi.bootstrap.permission:false}")
     private boolean bootstrapPermission;
     @Value("${dros.erpapi.bootstrap.user-admin:false}")
     private boolean bootstrapUserAdmin;
 
-    public void executar() {
+    public void execute() {
         if (!(bootstrapUserAdmin || bootstrapPermission)) return;
 
         log.info("📋 Starting initialization seeders execution...");
@@ -43,8 +44,20 @@ public class MainSeed {
 
         if (bootstrapPermission) {
             try {
+                log.debug("1️⃣  Running roles seeder...");
+                roleSeed.execute();
+                log.info("✅ Roles initialized successfully");
+                sucessos++;
+            } catch (Exception e) {
+                log.error("❌ Error executing roles seeder:", e);
+                erros++;
+            }
+        }
+
+        if (bootstrapPermission) {
+            try {
                 log.debug("1️⃣  Running permissions seeder...");
-                permissionSeed.executar();
+                permissionSeed.execute();
                 log.info("✅ Permissions initialized successfully");
                 sucessos++;
             } catch (Exception e) {
@@ -56,7 +69,7 @@ public class MainSeed {
         if (bootstrapUserAdmin) {
             try {
                 log.debug("2️⃣  Running admin user seeder...");
-                userAdminSeed.executar();
+                userAdminSeed.execute();
                 log.info("✅ Admin user initialized successfully");
                 sucessos++;
             } catch (Exception e) {

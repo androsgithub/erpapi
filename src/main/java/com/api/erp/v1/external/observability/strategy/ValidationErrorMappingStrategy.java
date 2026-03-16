@@ -26,7 +26,7 @@ public class ValidationErrorMappingStrategy implements ErrorMappingStrategy {
             return true;
         }
 
-        // Fallback: verificação por nome de classe (para compatibilidade)
+        // Fallback: verificação por name de classe (para compatibilidade)
         String className = exception.getClass().getName();
         return className.contains("ConstraintViolationException") ||
                className.contains("ValidationException");

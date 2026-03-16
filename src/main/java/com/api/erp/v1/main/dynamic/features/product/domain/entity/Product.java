@@ -20,7 +20,7 @@ import java.util.List;
  * - Representar as regras de negócio do domínio
  * <p>
  * Atributos principais:
- * - Descrição: nome/descrição do product
+ * - Descrição: name/descrição do product
  * - Status: ativo, inativo, bloqueado ou descontinuado
  * - Tipo: comprado ou fabricável
  * - Unidade de Medida: referência à unidade padrão

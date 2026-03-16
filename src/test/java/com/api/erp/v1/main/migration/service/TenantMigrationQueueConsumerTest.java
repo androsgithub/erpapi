@@ -54,12 +54,12 @@ class TenantMigrationQueueConsumerTest {
 
         when(migrationQueue.getEvent(eventId)).thenReturn(Optional.of(event));
         doNothing().when(tenantMigrationService).migrateTenantById(1L);
-        doNothing().when(mainSeed).executar();
+        doNothing().when(mainSeed).execute();
 
         consumer.processEventById(eventId);
 
         verify(tenantMigrationService, times(1)).migrateTenantById(1L);
-        verify(mainSeed, times(1)).executar();
+        verify(mainSeed, times(1)).execute();
         verify(migrationQueue, times(1)).recordEventCompletion(event);
     }
 

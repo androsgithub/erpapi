@@ -62,7 +62,7 @@ public interface IObservabilityController {
      * Exemplo: GET /all?status=ERROR&stepName=validateUser&page=0&pageSize=50
      * 
      * @param status filtro por status (opcional)
-     * @param stepName filtro por nome do passo (opcional)
+     * @param stepName filtro por name do passo (opcional)
      * @param traceId filtro por trace ID (opcional)
      * @param minExecutionTime tempo mínimo de execução (opcional)
      * @param maxExecutionTime tempo máximo de execução (opcional)

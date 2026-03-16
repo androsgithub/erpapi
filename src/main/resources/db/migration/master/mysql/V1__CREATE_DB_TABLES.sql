@@ -1,453 +1,422 @@
-create table tb_address (
-                            id bigint not null auto_increment,
-                            created_at datetime(6),
-                            created_by bigint,
-                            deleted bit,
-                            deleted_at datetime(6),
-                            updated_at datetime(6),
-                            updated_by bigint,
-                            version bigint,
-                            scope enum ('GLOBAL','GROUP','TENANT'),
-                            tenant_group_id bigint,
-                            tenant_id bigint not null,
-                            bairro varchar(100) not null,
-                            cep varchar(8) not null,
-                            cidade varchar(100) not null,
-                            complemento varchar(255),
-                            estado varchar(2) not null,
-                            numero varchar(50) not null,
-                            principal bit not null,
-                            rua varchar(255) not null,
-                            tipo enum ('COBRANCA','COMERCIAL','CORRESPONDENCIA','ENTREGA','OUTRO','RESIDENCIAL') not null,
-                            primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_ADDRESS
+(
+    ID              BIGINT                                                                          NOT NULL AUTO_INCREMENT,
+    CREATED_AT      DATETIME(6),
+    CREATED_BY      BIGINT,
+    DELETED         BIT,
+    DELETED_AT      DATETIME(6),
+    UPDATED_AT      DATETIME(6),
+    UPDATED_BY      BIGINT,
+    VERSION         BIGINT,
+    SCOPE           ENUM ('GLOBAL','GROUP','TENANT'),
+    TENANT_GROUP_ID BIGINT,
+    TENANT_ID       BIGINT                                                                          NOT NULL,
+    BAIRRO          VARCHAR(100)                                                                    NOT NULL,
+    CEP             VARCHAR(8)                                                                      NOT NULL,
+    CIDADE          VARCHAR(100)                                                                    NOT NULL,
+    COMPLEMENTO     VARCHAR(255),
+    ESTADO          VARCHAR(2)                                                                      NOT NULL,
+    NUMERO          VARCHAR(50)                                                                     NOT NULL,
+    PRINCIPAL       BIT                                                                             NOT NULL,
+    RUA             VARCHAR(255)                                                                    NOT NULL,
+    TIPO            ENUM ('COBRANCA','COMERCIAL','CORRESPONDENCIA','ENTREGA','OUTRO','RESIDENCIAL') NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_contacts (
-                             id bigint not null auto_increment,
-                             created_at datetime(6),
-                             created_by bigint,
-                             deleted bit,
-                             deleted_at datetime(6),
-                             updated_at datetime(6),
-                             updated_by bigint,
-                             version bigint,
-                             scope enum ('GLOBAL','GROUP','TENANT'),
-                             tenant_group_id bigint,
-                             tenant_id bigint not null,
-                             ativo bit not null,
-                             descricao varchar(255),
-                             principal bit not null,
-                             tipo enum ('CELULAR','EMAIL','FACEBOOK','INSTAGRAM','LINKEDIN','OUTRO','TELEFONE','WEBSITE','WHATSAPP') not null,
-                             valor varchar(255) not null,
-                             primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_CONTACTS
+(
+    ID              BIGINT                                                                                             NOT NULL AUTO_INCREMENT,
+    CREATED_AT      DATETIME(6),
+    CREATED_BY      BIGINT,
+    DELETED         BIT,
+    DELETED_AT      DATETIME(6),
+    UPDATED_AT      DATETIME(6),
+    UPDATED_BY      BIGINT,
+    VERSION         BIGINT,
+    SCOPE           ENUM ('GLOBAL','GROUP','TENANT'),
+    TENANT_GROUP_ID BIGINT,
+    TENANT_ID       BIGINT                                                                                             NOT NULL,
+    ATIVO           BIT                                                                                                NOT NULL,
+    DESCRICAO       VARCHAR(255),
+    PRINCIPAL       BIT                                                                                                NOT NULL,
+    TIPO            ENUM ('CELULAR','EMAIL','FACEBOOK','INSTAGRAM','LINKEDIN','OUTRO','TELEFONE','WEBSITE','WHATSAPP') NOT NULL,
+    VALOR           VARCHAR(255)                                                                                       NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_permission (
-                               id bigint not null auto_increment,
-                               created_at datetime(6),
-                               created_by bigint,
-                               deleted bit,
-                               deleted_at datetime(6),
-                               updated_at datetime(6),
-                               updated_by bigint,
-                               version bigint,
-                               scope enum ('GLOBAL','GROUP','TENANT'),
-                               tenant_group_id bigint,
-                               tenant_id bigint not null,
-                               acao enum ('CRIAR','EDITAR','EXCLUIR','OUTRO','VISUALIZAR') not null,
-                               codigo varchar(255) not null,
-                               modulo varchar(255) not null,
-                               nome varchar(255) not null,
-                               primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_PERMISSION
+(
+    ID              BIGINT                                         NOT NULL AUTO_INCREMENT,
+    CREATED_AT      DATETIME(6),
+    CREATED_BY      BIGINT,
+    DELETED         BIT,
+    DELETED_AT      DATETIME(6),
+    UPDATED_AT      DATETIME(6),
+    UPDATED_BY      BIGINT,
+    VERSION         BIGINT,
+    SCOPE           ENUM ('GLOBAL','GROUP','TENANT'),
+    TENANT_GROUP_ID BIGINT,
+    TENANT_ID       BIGINT                                         NOT NULL,
+    ACTION          ENUM ('VIEW','CREATE','EDIT','DELETE','OTHER') NOT NULL,
+    CODE            VARCHAR(255)                                   NOT NULL,
+    MODULE          VARCHAR(255)                                   NOT NULL,
+    NAME            VARCHAR(255)                                   NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_role (
-                         id bigint not null auto_increment,
-                         created_at datetime(6),
-                         created_by bigint,
-                         deleted bit,
-                         deleted_at datetime(6),
-                         updated_at datetime(6),
-                         updated_by bigint,
-                         version bigint,
-                         scope enum ('GLOBAL','GROUP','TENANT'),
-                         tenant_group_id bigint,
-                         tenant_id bigint not null,
-                         nome varchar(255) not null,
-                         primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_ROLE
+(
+    ID              BIGINT       NOT NULL AUTO_INCREMENT,
+    CREATED_AT      DATETIME(6),
+    CREATED_BY      BIGINT,
+    DELETED         BIT,
+    DELETED_AT      DATETIME(6),
+    UPDATED_AT      DATETIME(6),
+    UPDATED_BY      BIGINT,
+    VERSION         BIGINT,
+    SCOPE           ENUM ('GLOBAL','GROUP','TENANT'),
+    TENANT_GROUP_ID BIGINT,
+    TENANT_ID       BIGINT       NOT NULL,
+    NAME            VARCHAR(255) NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_role_permission (
-                                    role_id bigint not null,
-                                    permission_id bigint not null,
-                                    primary key (role_id, permission_id)
-) engine=InnoDB;
+CREATE TABLE TB_ROLE_PERMISSION
+(
+    ROLE_ID       BIGINT NOT NULL,
+    PERMISSION_ID BIGINT NOT NULL,
+    PRIMARY KEY (ROLE_ID, PERMISSION_ID)
+) ENGINE = InnoDB;
 
-create table tb_tenant_group (
-                                 id bigint not null auto_increment,
-                                 active bit not null,
-                                 created_at datetime(6) not null,
-                                 description varchar(500),
-                                 name varchar(255) not null,
-                                 updated_at datetime(6) not null,
-                                 primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TENANT_GROUP
+(
+    ID          BIGINT       NOT NULL AUTO_INCREMENT,
+    ACTIVE      BIT          NOT NULL,
+    CREATED_AT  DATETIME(6)  NOT NULL,
+    DESCRIPTION VARCHAR(500),
+    NAME        VARCHAR(255) NOT NULL,
+    UPDATED_AT  DATETIME(6)  NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt (
-                        id bigint not null auto_increment,
-                        active bit not null,
-                        created_at datetime(6) not null,
-                        email varchar(150) not null,
-                        name varchar(200) not null,
-                        phone varchar(20),
-                        trial bit not null,
-                        trial_expires_at datetime(6),
-                        updated_at datetime(6),
-                        plan_id bigint not null,
-                        primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT
+(
+    ID               BIGINT       NOT NULL AUTO_INCREMENT,
+    ACTIVE           BIT          NOT NULL,
+    CREATED_AT       DATETIME(6)  NOT NULL,
+    EMAIL            VARCHAR(150) NOT NULL,
+    NAME             VARCHAR(200) NOT NULL,
+    PHONE            VARCHAR(20),
+    TRIAL            BIT          NOT NULL,
+    TRIAL_EXPIRES_AT DATETIME(6),
+    UPDATED_AT       DATETIME(6),
+    PLAN_ID          BIGINT       NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt_allow_domains (
-                                      id bigint not null auto_increment,
-                                      active bit not null,
-                                      created_at datetime(6) not null,
-                                      domain varchar(255) not null,
-                                      type enum ('CORS','EMAIL','SSO') not null,
-                                      tenant_id bigint not null,
-                                      primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT_ALLOW_DOMAINS
+(
+    ID         BIGINT                      NOT NULL AUTO_INCREMENT,
+    ACTIVE     BIT                         NOT NULL,
+    CREATED_AT DATETIME(6)                 NOT NULL,
+    DOMAIN     VARCHAR(255)                NOT NULL,
+    TYPE       ENUM ('CORS','EMAIL','SSO') NOT NULL,
+    TENANT_ID  BIGINT                      NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt_config (
-                               id bigint not null auto_increment,
-                               allow_api_access bit not null,
-                               app_description varchar(500),
-                               app_name varchar(150) not null,
-                               created_at datetime(6) not null,
-                               maintenance_mode bit not null,
-                               multi_branch bit not null,
-                               onboarding_done bit not null,
-                               slug varchar(100) not null,
-                               support_email varchar(150),
-                               updated_at datetime(6),
-                               white_label bit not null,
-                               tenant_id bigint not null,
-                               primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT_CONFIG
+(
+    ID               BIGINT       NOT NULL AUTO_INCREMENT,
+    ALLOW_API_ACCESS BIT          NOT NULL,
+    APP_DESCRIPTION  VARCHAR(500),
+    APP_NAME         VARCHAR(150) NOT NULL,
+    CREATED_AT       DATETIME(6)  NOT NULL,
+    MAINTENANCE_MODE BIT          NOT NULL,
+    MULTI_BRANCH     BIT          NOT NULL,
+    ONBOARDING_DONE  BIT          NOT NULL,
+    SLUG             VARCHAR(100) NOT NULL,
+    SUPPORT_EMAIL    VARCHAR(150),
+    UPDATED_AT       DATETIME(6),
+    WHITE_LABEL      BIT          NOT NULL,
+    TENANT_ID        BIGINT       NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt_datasource (
-                                   id bigint not null auto_increment,
-                                   active bit not null,
-                                   connection_timeout integer,
-                                   created_at datetime(6) not null,
-                                   db_type enum ('CLICKHOUSE','COCKROACHDB','DB2','DERBY','FIREBIRD','H2','HSQLDB','INFORMIX','MARIADB','MYSQL','ORACLE','POSTGRESQL','SQLITE','SQL_SERVER','SYBASE','VERTICA') not null,
-                                   driver_class varchar(200) not null,
-                                   idle_timeout integer,
-                                   password_encrypted varchar(500) not null,
-                                   pool_max integer,
-                                   pool_min integer,
-                                   schema_name varchar(100),
-                                   test_status enum ('FAILED','PENDING','SUCCESS'),
-                                   tested_at datetime(6),
-                                   updated_at datetime(6),
-                                   url varchar(500) not null,
-                                   username varchar(100) not null,
-                                   tenant_id bigint not null,
-                                   primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT_DATASOURCE
+(
+    ID                 BIGINT                                                                                                                                                               NOT NULL AUTO_INCREMENT,
+    ACTIVE             BIT                                                                                                                                                                  NOT NULL,
+    CONNECTION_TIMEOUT INTEGER,
+    CREATED_AT         DATETIME(6)                                                                                                                                                          NOT NULL,
+    DB_TYPE            ENUM ('CLICKHOUSE','COCKROACHDB','DB2','DERBY','FIREBIRD','H2','HSQLDB','INFORMIX','MARIADB','MYSQL','ORACLE','POSTGRESQL','SQLITE','SQL_SERVER','SYBASE','VERTICA') NOT NULL,
+    DRIVER_CLASS       VARCHAR(200)                                                                                                                                                         NOT NULL,
+    IDLE_TIMEOUT       INTEGER,
+    PASSWORD_ENCRYPTED VARCHAR(500)                                                                                                                                                         NOT NULL,
+    POOL_MAX           INTEGER,
+    POOL_MIN           INTEGER,
+    SCHEMA_NAME        VARCHAR(100),
+    TEST_STATUS        ENUM ('FAILED','PENDING','SUCCESS'),
+    TESTED_AT          DATETIME(6),
+    UPDATED_AT         DATETIME(6),
+    URL                VARCHAR(500)                                                                                                                                                         NOT NULL,
+    USERNAME           VARCHAR(100)                                                                                                                                                         NOT NULL,
+    TENANT_ID          BIGINT                                                                                                                                                               NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt_features (
-                                 id bigint not null auto_increment,
-                                 active bit not null,
-                                 bean_name varchar(200) not null,
-                                 created_at datetime(6) not null,
-                                 description varchar(500),
-                                 feature_key varchar(100) not null,
-                                 updated_at datetime(6),
-                                 tenant_id bigint not null,
-                                 primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT_FEATURES
+(
+    ID          BIGINT       NOT NULL AUTO_INCREMENT,
+    ACTIVE      BIT          NOT NULL,
+    BEAN_NAME   VARCHAR(200) NOT NULL,
+    CREATED_AT  DATETIME(6)  NOT NULL,
+    DESCRIPTION VARCHAR(500),
+    FEATURE_KEY VARCHAR(100) NOT NULL,
+    UPDATED_AT  DATETIME(6),
+    TENANT_ID   BIGINT       NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt_fiscal (
-                               id bigint not null auto_increment,
-                               city_registration varchar(20),
-                               cnpj varchar(14) not null,
-                               created_at datetime(6) not null,
-                               legal_name varchar(150) not null,
-                               state_registration varchar(20),
-                               tax_regime varchar(50),
-                               trade_name varchar(150),
-                               updated_at datetime(6),
-                               tenant_id bigint not null,
-                               primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT_FISCAL
+(
+    ID                 BIGINT       NOT NULL AUTO_INCREMENT,
+    CITY_REGISTRATION  VARCHAR(20),
+    CNPJ               VARCHAR(14)  NOT NULL,
+    CREATED_AT         DATETIME(6)  NOT NULL,
+    LEGAL_NAME         VARCHAR(150) NOT NULL,
+    STATE_REGISTRATION VARCHAR(20),
+    TAX_REGIME         VARCHAR(50),
+    TRADE_NAME         VARCHAR(150),
+    UPDATED_AT         DATETIME(6),
+    TENANT_ID          BIGINT       NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt_group_tnt (
-                                  tnt_group_id bigint not null,
-                                  tnt_id bigint not null,
-                                  primary key (tnt_group_id, tnt_id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT_GROUP_TNT
+(
+    TNT_GROUP_ID BIGINT NOT NULL,
+    TNT_ID       BIGINT NOT NULL,
+    PRIMARY KEY (TNT_GROUP_ID, TNT_ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt_plan (
-                             id bigint not null auto_increment,
-                             active bit not null,
-                             created_at datetime(6) not null,
-                             description varchar(500),
-                             max_users integer not null,
-                             monthly_price decimal(10,2) not null,
-                             name varchar(100) not null,
-                             updated_at datetime(6),
-                             primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT_PLAN
+(
+    ID            BIGINT         NOT NULL AUTO_INCREMENT,
+    ACTIVE        BIT            NOT NULL,
+    CREATED_AT    DATETIME(6)    NOT NULL,
+    DESCRIPTION   VARCHAR(500),
+    MAX_USERS     INTEGER        NOT NULL,
+    MONTHLY_PRICE DECIMAL(10, 2) NOT NULL,
+    NAME          VARCHAR(100)   NOT NULL,
+    UPDATED_AT    DATETIME(6),
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt_security (
-                                 id bigint not null auto_increment,
-                                 created_at datetime(6) not null,
-                                 lockout_duration_min integer,
-                                 max_login_attempts integer,
-                                 min_password_length integer,
-                                 password_expiration_days integer,
-                                 require_number bit not null,
-                                 require_special bit not null,
-                                 require_uppercase bit not null,
-                                 updated_at datetime(6),
-                                 tenant_id bigint not null,
-                                 primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT_SECURITY
+(
+    ID                       BIGINT      NOT NULL AUTO_INCREMENT,
+    CREATED_AT               DATETIME(6) NOT NULL,
+    LOCKOUT_DURATION_MIN     INTEGER,
+    MAX_LOGIN_ATTEMPTS       INTEGER,
+    MIN_PASSWORD_LENGTH      INTEGER,
+    PASSWORD_EXPIRATION_DAYS INTEGER,
+    REQUIRE_NUMBER           BIT         NOT NULL,
+    REQUIRE_SPECIAL          BIT         NOT NULL,
+    REQUIRE_UPPERCASE        BIT         NOT NULL,
+    UPDATED_AT               DATETIME(6),
+    TENANT_ID                BIGINT      NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_tnt_visual (
-                               id bigint not null auto_increment,
-                               background_image_url varchar(500),
-                               border_radius varchar(20),
-                               color_accent varchar(7),
-                               color_background varchar(7),
-                               color_danger varchar(7),
-                               color_primary varchar(7),
-                               color_secondary varchar(7),
-                               color_success varchar(7),
-                               color_text varchar(7),
-                               color_warning varchar(7),
-                               created_at datetime(6) not null,
-                               email_logo_url varchar(500),
-                               favicon_url varchar(500),
-                               font_cdn_url varchar(500),
-                               font_family varchar(100),
-                               logo_large_url varchar(500),
-                               logo_url varchar(500),
-                               sidebar_collapsed bit not null,
-                               theme varchar(50),
-                               updated_at datetime(6),
-                               tenant_id bigint not null,
-                               primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_TNT_VISUAL
+(
+    ID                   BIGINT      NOT NULL AUTO_INCREMENT,
+    BACKGROUND_IMAGE_URL VARCHAR(500),
+    BORDER_RADIUS        VARCHAR(20),
+    COLOR_ACCENT         VARCHAR(7),
+    COLOR_BACKGROUND     VARCHAR(7),
+    COLOR_DANGER         VARCHAR(7),
+    COLOR_PRIMARY        VARCHAR(7),
+    COLOR_SECONDARY      VARCHAR(7),
+    COLOR_SUCCESS        VARCHAR(7),
+    COLOR_TEXT           VARCHAR(7),
+    COLOR_WARNING        VARCHAR(7),
+    CREATED_AT           DATETIME(6) NOT NULL,
+    EMAIL_LOGO_URL       VARCHAR(500),
+    FAVICON_URL          VARCHAR(500),
+    FONT_CDN_URL         VARCHAR(500),
+    FONT_FAMILY          VARCHAR(100),
+    LOGO_LARGE_URL       VARCHAR(500),
+    LOGO_URL             VARCHAR(500),
+    SIDEBAR_COLLAPSED    BIT         NOT NULL,
+    THEME                VARCHAR(50),
+    UPDATED_AT           DATETIME(6),
+    TENANT_ID            BIGINT      NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_user (
-                         id bigint not null auto_increment,
-                         created_at datetime(6),
-                         created_by bigint,
-                         deleted bit,
-                         deleted_at datetime(6),
-                         updated_at datetime(6),
-                         updated_by bigint,
-                         version bigint,
-                         approved_at datetime(6),
-                         approved_by bigint,
-                         cpf varchar(255) not null,
-                         email varchar(255) not null,
-                         name varchar(255) not null,
-                         password_hash varchar(255) not null,
-                         status enum ('APPROVE_PENDING','BLOCKED','DISABLED','ENABLED','REJECTED') not null,
-                         primary key (id)
-) engine=InnoDB;
+CREATE TABLE TB_USER
+(
+    ID            BIGINT                                                             NOT NULL AUTO_INCREMENT,
+    CREATED_AT    DATETIME(6),
+    CREATED_BY    BIGINT,
+    DELETED       BIT,
+    DELETED_AT    DATETIME(6),
+    UPDATED_AT    DATETIME(6),
+    UPDATED_BY    BIGINT,
+    VERSION       BIGINT,
+    APPROVED_AT   DATETIME(6),
+    APPROVED_BY   BIGINT,
+    CPF           VARCHAR(255)                                                       NOT NULL,
+    EMAIL         VARCHAR(255)                                                       NOT NULL,
+    NAME          VARCHAR(255)                                                       NOT NULL,
+    PASSWORD_HASH VARCHAR(255)                                                       NOT NULL,
+    STATUS        ENUM ('APPROVE_PENDING','BLOCKED','DISABLED','ENABLED','REJECTED') NOT NULL,
+    PRIMARY KEY (ID)
+) ENGINE = InnoDB;
 
-create table tb_user_contact (
-                                 user_id bigint not null,
-                                 contact_id bigint not null,
-                                 primary key (user_id, contact_id)
-) engine=InnoDB;
+CREATE TABLE TB_USER_CONTACT
+(
+    USER_ID    BIGINT NOT NULL,
+    CONTACT_ID BIGINT NOT NULL,
+    PRIMARY KEY (USER_ID, CONTACT_ID)
+) ENGINE = InnoDB;
 
-create table tb_user_permission (
-                                    user_id bigint not null,
-                                    permission_id bigint not null,
-                                    primary key (user_id, permission_id)
-) engine=InnoDB;
+CREATE TABLE TB_USER_PERMISSION
+(
+    USER_ID       BIGINT NOT NULL,
+    PERMISSION_ID BIGINT NOT NULL,
+    PRIMARY KEY (USER_ID, PERMISSION_ID)
+) ENGINE = InnoDB;
 
-create table tb_user_role (
-                              user_id bigint not null,
-                              role_id bigint not null,
-                              primary key (user_id, role_id)
-) engine=InnoDB;
+CREATE TABLE TB_USER_ROLE
+(
+    USER_ID BIGINT NOT NULL,
+    ROLE_ID BIGINT NOT NULL,
+    PRIMARY KEY (USER_ID, ROLE_ID)
+) ENGINE = InnoDB;
 
-create table tb_user_tnt (
-                             user_id bigint not null,
-                             tnt_id bigint not null,
-                             primary key (user_id, tnt_id)
-) engine=InnoDB;
+CREATE TABLE TB_USER_TNT
+(
+    USER_ID BIGINT NOT NULL,
+    TNT_ID  BIGINT NOT NULL,
+    PRIMARY KEY (USER_ID, TNT_ID)
+) ENGINE = InnoDB;
 
-alter table tb_permission
-    add constraint UKqvmybc9gau6vod2h7wl1wragk unique (codigo);
+ALTER TABLE TB_ROLE_PERMISSION
+    ADD CONSTRAINT UKG7V1TR7UO3KF265HEXPLC4XVV UNIQUE (PERMISSION_ID);
 
-alter table tb_role
-    add constraint UK6e9vttep485ay7pmjccprgdus unique (nome);
+CREATE INDEX IDX_TENANT_GROUP_ACTIVE ON TB_TENANT_GROUP (ACTIVE);
 
-alter table tb_role_permission
-    add constraint UKg7v1tr7uo3kf265hexplc4xvv unique (permission_id);
+CREATE INDEX IDX_TENANT_ALLOW_DOMAINS_TENANT_ID ON TB_TNT_ALLOW_DOMAINS (TENANT_ID);
 
-create index idx_tenant_group_active
-    on tb_tenant_group (active);
+ALTER TABLE TB_TNT_ALLOW_DOMAINS
+    ADD CONSTRAINT UKRLSG28H08NKOUCGFTB1TWRAUD UNIQUE (TENANT_ID, DOMAIN);
 
-create index idx_tenant_allow_domains_tenant_id
-    on tb_tnt_allow_domains (tenant_id);
+ALTER TABLE TB_TNT_CONFIG
+    ADD CONSTRAINT UKFXYA4IKQAIN54SO79FUW32KPW UNIQUE (TENANT_ID);
 
-alter table tb_tnt_allow_domains
-    add constraint UKrlsg28h08nkoucgftb1twraud unique (tenant_id, domain);
+CREATE INDEX IDX_TENANT_DATASOURCE_TENANT_ID ON TB_TNT_DATASOURCE (TENANT_ID);
 
-alter table tb_tnt_config
-    add constraint UKfxya4ikqain54so79fuw32kpw unique (tenant_id);
+CREATE INDEX IDX_TENANT_DATASOURCE_ACTIVE ON TB_TNT_DATASOURCE (ACTIVE);
 
-create index idx_tenant_datasource_tenant_id
-    on tb_tnt_datasource (tenant_id);
+ALTER TABLE TB_TNT_DATASOURCE
+    ADD CONSTRAINT UK9VVEYTE2PQLBX954QJAFVBOIH UNIQUE (TENANT_ID);
 
-create index idx_tenant_datasource_active
-    on tb_tnt_datasource (active);
+CREATE INDEX IDX_TENANT_FEATURES_TENANT_ID ON TB_TNT_FEATURES (TENANT_ID);
 
-alter table tb_tnt_datasource
-    add constraint UK9vveyte2pqlbx954qjafvboih unique (tenant_id);
+CREATE INDEX IDX_TENANT_FEATURES_ACTIVE ON TB_TNT_FEATURES (ACTIVE);
 
-create index idx_tenant_features_tenant_id
-    on tb_tnt_features (tenant_id);
+ALTER TABLE TB_TNT_FEATURES
+    ADD CONSTRAINT UK1EPCLAJMQMJ3LGIJ5I49IISAF UNIQUE (TENANT_ID, FEATURE_KEY);
 
-create index idx_tenant_features_active
-    on tb_tnt_features (active);
+ALTER TABLE TB_TNT_FISCAL
+    ADD CONSTRAINT UK1GO9A7WOA7YYTKL6BBHYVQIMU UNIQUE (TENANT_ID);
 
-alter table tb_tnt_features
-    add constraint UK1epclajmqmj3lgij5i49iisaf unique (tenant_id, feature_key);
+ALTER TABLE TB_TNT_FISCAL
+    ADD CONSTRAINT UKLT2ESGYL2JGLLNBKRWANAKH3E UNIQUE (CNPJ);
 
-alter table tb_tnt_fiscal
-    add constraint UK1go9a7woa7yytkl6bbhyvqimu unique (tenant_id);
+ALTER TABLE TB_TNT_SECURITY
+    ADD CONSTRAINT UKAAXB6CVS7W8E8HX8NN5L3P8A3 UNIQUE (TENANT_ID);
 
-alter table tb_tnt_fiscal
-    add constraint UKlt2esgyl2jgllnbkrwanakh3e unique (cnpj);
+ALTER TABLE TB_TNT_VISUAL
+    ADD CONSTRAINT UKB90N2C9P2CJ0BFNVAQF1I6YOC UNIQUE (TENANT_ID);
 
-alter table tb_tnt_security
-    add constraint UKaaxb6cvs7w8e8hx8nn5l3p8a3 unique (tenant_id);
+ALTER TABLE TB_USER
+    ADD CONSTRAINT UK869SA3REBUF3NM0D4JWXDTOUK UNIQUE (CPF);
 
-alter table tb_tnt_visual
-    add constraint UKb90n2c9p2cj0bfnvaqf1i6yoc unique (tenant_id);
+ALTER TABLE TB_USER
+    ADD CONSTRAINT UK4VIH17MUBE9J7CQYJLFBCRK4M UNIQUE (EMAIL);
 
-alter table tb_user
-    add constraint UK869sa3rebuf3nm0d4jwxdtouk unique (cpf);
+ALTER TABLE TB_USER_CONTACT
+    ADD CONSTRAINT UK6EAOE63EXXESFELBOTOBXWV7F UNIQUE (CONTACT_ID);
 
-alter table tb_user
-    add constraint UK4vih17mube9j7cqyjlfbcrk4m unique (email);
+ALTER TABLE TB_USER_PERMISSION
+    ADD CONSTRAINT UK44W3GAQXMTFVN2XSLNG1A5PI0 UNIQUE (PERMISSION_ID);
 
-alter table tb_user_contact
-    add constraint UK6eaoe63exxesfelbotobxwv7f unique (contact_id);
+ALTER TABLE TB_USER_ROLE
+    ADD CONSTRAINT UK1TXPCISCO2L99TL5QQSHR6PTP UNIQUE (ROLE_ID);
 
-alter table tb_user_permission
-    add constraint UK44w3gaqxmtfvn2xslng1a5pi0 unique (permission_id);
+ALTER TABLE TB_USER_TNT
+    ADD CONSTRAINT UKIV97FE2SU39QD9WW0VJ96TI92 UNIQUE (TNT_ID);
 
-alter table tb_user_role
-    add constraint UK1txpcisco2l99tl5qqshr6ptp unique (role_id);
+ALTER TABLE TB_ROLE_PERMISSION
+    ADD CONSTRAINT FKN1FUQ85QVJB8I00N532HJI0K5 FOREIGN KEY (PERMISSION_ID) REFERENCES TB_PERMISSION (ID);
 
-alter table tb_user_tnt
-    add constraint UKiv97fe2su39qd9ww0vj96ti92 unique (tnt_id);
+ALTER TABLE TB_ROLE_PERMISSION
+    ADD CONSTRAINT FKOPY61IG7UC3G8PC5XKY4C9SQS FOREIGN KEY (ROLE_ID) REFERENCES TB_ROLE (ID);
 
-alter table tb_role_permission
-    add constraint FKn1fuq85qvjb8i00n532hji0k5
-        foreign key (permission_id)
-            references tb_permission (id);
+ALTER TABLE TB_TNT
+    ADD CONSTRAINT FKIUOQTMR51CHSEBYOIEL7FI4GJ FOREIGN KEY (PLAN_ID) REFERENCES TB_TNT_PLAN (ID);
 
-alter table tb_role_permission
-    add constraint FKopy61ig7uc3g8pc5xky4c9sqs
-        foreign key (role_id)
-            references tb_role (id);
+ALTER TABLE TB_TNT_ALLOW_DOMAINS
+    ADD CONSTRAINT FKH2HFST1LAICHN7B9PABXPPF61 FOREIGN KEY (TENANT_ID) REFERENCES TB_TNT (ID);
 
-alter table tb_tnt
-    add constraint FKiuoqtmr51chsebyoiel7fi4gj
-        foreign key (plan_id)
-            references tb_tnt_plan (id);
+ALTER TABLE TB_TNT_CONFIG
+    ADD CONSTRAINT FK24412V0F2ABULGCKLVL88NTQ0 FOREIGN KEY (TENANT_ID) REFERENCES TB_TNT (ID);
 
-alter table tb_tnt_allow_domains
-    add constraint FKh2hfst1laichn7b9pabxppf61
-        foreign key (tenant_id)
-            references tb_tnt (id);
+ALTER TABLE TB_TNT_DATASOURCE
+    ADD CONSTRAINT FKOLFT6U9CDQTLTK5OD8FI3WDPJ FOREIGN KEY (TENANT_ID) REFERENCES TB_TNT (ID);
 
-alter table tb_tnt_config
-    add constraint FK24412v0f2abulgcklvl88ntq0
-        foreign key (tenant_id)
-            references tb_tnt (id);
+ALTER TABLE TB_TNT_FEATURES
+    ADD CONSTRAINT FKN6OX8RO48O16TAQLMPF4P94JB FOREIGN KEY (TENANT_ID) REFERENCES TB_TNT (ID);
 
-alter table tb_tnt_datasource
-    add constraint FKolft6u9cdqtltk5od8fi3wdpj
-        foreign key (tenant_id)
-            references tb_tnt (id);
+ALTER TABLE TB_TNT_FISCAL
+    ADD CONSTRAINT FKKCWPSDR9BIICCUYCQBYUEIPBP FOREIGN KEY (TENANT_ID) REFERENCES TB_TNT (ID);
 
-alter table tb_tnt_features
-    add constraint FKn6ox8ro48o16taqlmpf4p94jb
-        foreign key (tenant_id)
-            references tb_tnt (id);
+ALTER TABLE TB_TNT_GROUP_TNT
+    ADD CONSTRAINT FKRA6XV7GFKQDKJAB0FDGPQ7QHR FOREIGN KEY (TNT_ID) REFERENCES TB_TNT (ID);
 
-alter table tb_tnt_fiscal
-    add constraint FKkcwpsdr9biiccuycqbyueipbp
-        foreign key (tenant_id)
-            references tb_tnt (id);
+ALTER TABLE TB_TNT_GROUP_TNT
+    ADD CONSTRAINT FKFV5AAGMKDPLDXS9OMAKE8IXW6 FOREIGN KEY (TNT_GROUP_ID) REFERENCES TB_TENANT_GROUP (ID);
 
-alter table tb_tnt_group_tnt
-    add constraint FKra6xv7gfkqdkjab0fdgpq7qhr
-        foreign key (tnt_id)
-            references tb_tnt (id);
+ALTER TABLE TB_TNT_SECURITY
+    ADD CONSTRAINT FKKFHFAGFLMQEAUXFJWLSC45G8S FOREIGN KEY (TENANT_ID) REFERENCES TB_TNT (ID);
 
-alter table tb_tnt_group_tnt
-    add constraint FKfv5aagmkdpldxs9omake8ixw6
-        foreign key (tnt_group_id)
-            references tb_tenant_group (id);
+ALTER TABLE TB_TNT_VISUAL
+    ADD CONSTRAINT FKS5Y36AD5XPTJH6L247Q87A2X8 FOREIGN KEY (TENANT_ID) REFERENCES TB_TNT (ID);
 
-alter table tb_tnt_security
-    add constraint FKkfhfagflmqeauxfjwlsc45g8s
-        foreign key (tenant_id)
-            references tb_tnt (id);
+ALTER TABLE TB_USER_CONTACT
+    ADD CONSTRAINT FKA67D7O0DT7QDHBY08X6ERV3BN FOREIGN KEY (CONTACT_ID) REFERENCES TB_CONTACTS (ID);
 
-alter table tb_tnt_visual
-    add constraint FKs5y36ad5xptjh6l247q87a2x8
-        foreign key (tenant_id)
-            references tb_tnt (id);
+ALTER TABLE TB_USER_CONTACT
+    ADD CONSTRAINT FKLHGJ4R45VL0IOA06Q7DGAM6N0 FOREIGN KEY (USER_ID) REFERENCES TB_USER (ID);
 
-alter table tb_user_contact
-    add constraint FKa67d7o0dt7qdhby08x6erv3bn
-        foreign key (contact_id)
-            references tb_contacts (id);
+ALTER TABLE TB_USER_PERMISSION
+    ADD CONSTRAINT FKJHGG2P2M7J547G6WL1DUR8SGA FOREIGN KEY (PERMISSION_ID) REFERENCES TB_PERMISSION (ID);
 
-alter table tb_user_contact
-    add constraint FKlhgj4r45vl0ioa06q7dgam6n0
-        foreign key (user_id)
-            references tb_user (id);
+ALTER TABLE TB_USER_PERMISSION
+    ADD CONSTRAINT FKOOH8T1QMJ769TTJNSQTIERIQB FOREIGN KEY (USER_ID) REFERENCES TB_USER (ID);
 
-alter table tb_user_permission
-    add constraint FKjhgg2p2m7j547g6wl1dur8sga
-        foreign key (permission_id)
-            references tb_permission (id);
+ALTER TABLE TB_USER_ROLE
+    ADD CONSTRAINT FKEA2OOTW6B6BB0XT3PTL28BYMV FOREIGN KEY (ROLE_ID) REFERENCES TB_ROLE (ID);
 
-alter table tb_user_permission
-    add constraint FKooh8t1qmj769ttjnsqtieriqb
-        foreign key (user_id)
-            references tb_user (id);
+ALTER TABLE TB_USER_ROLE
+    ADD CONSTRAINT FK7VN3H53D0TQDIMM8CP45GC0KL FOREIGN KEY (USER_ID) REFERENCES TB_USER (ID);
 
-alter table tb_user_role
-    add constraint FKea2ootw6b6bb0xt3ptl28bymv
-        foreign key (role_id)
-            references tb_role (id);
+ALTER TABLE TB_USER_TNT
+    ADD CONSTRAINT FK5D22DDKOOK556EFNCTJJ2F58K FOREIGN KEY (TNT_ID) REFERENCES TB_TNT (ID);
 
-alter table tb_user_role
-    add constraint FK7vn3h53d0tqdimm8cp45gc0kl
-        foreign key (user_id)
-            references tb_user (id);
-
-alter table tb_user_tnt
-    add constraint FK5d22ddkook556efnctjj2f58k
-        foreign key (tnt_id)
-            references tb_tnt (id);
-
-alter table tb_user_tnt
-    add constraint FKqy6u5x9j7trpatc0w97nlfaxk
-        foreign key (user_id)
-            references tb_user (id);
+ALTER TABLE TB_USER_TNT
+    ADD CONSTRAINT FKQY6U5X9J7TRPATC0W97NLFAXK FOREIGN KEY (USER_ID) REFERENCES TB_USER (ID);

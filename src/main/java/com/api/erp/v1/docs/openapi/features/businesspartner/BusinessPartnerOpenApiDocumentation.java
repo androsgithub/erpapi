@@ -36,8 +36,8 @@ public interface BusinessPartnerOpenApiDocumentation extends IBusinessPartnerCon
             @Parameter(description = "Quantidade de registros por página", example = "20")
             @RequestParam(defaultValue = "20") int size,
 
-            @Parameter(description = "Campo utilizado para ordenação", example = "nome")
-            @RequestParam(defaultValue = "nome") String sortBy
+            @Parameter(description = "Campo utilizado para ordenação", example = "name")
+            @RequestParam(defaultValue = "name") String sortBy
     );
 
     @Override

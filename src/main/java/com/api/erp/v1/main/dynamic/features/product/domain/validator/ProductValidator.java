@@ -37,16 +37,16 @@ public class ProductValidator {
      */
     public void validarCodigo(String codigo) {
         if (codigo == null || codigo.trim().isEmpty()) {
-            throw new ValidationException("codigo", "Product code is required");
+            throw new ValidationException("code", "Product code is required");
         }
         
         if (codigo.length() > 50) {
-            throw new ValidationException("codigo", "Code cannot exceed 50 characters");
+            throw new ValidationException("code", "Code cannot exceed 50 characters");
         }
         
         if (!codigo.matches("^[A-Z0-9-._]+$")) {
             throw new ValidationException(
-                "codigo",
+                "code",
                 "Code must contain only uppercase letters, numbers, hyphen, period and underscore"
             );
         }

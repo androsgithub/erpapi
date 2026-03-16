@@ -7,6 +7,7 @@ import com.api.erp.v1.main.master.user.domain.entity.StatusUser;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter

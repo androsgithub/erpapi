@@ -13,7 +13,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -62,28 +63,28 @@ public class ContactService implements IContactService {
 
     @Transactional(readOnly = true)
     @Cacheable(value = "contacts", keyGenerator = "principalKeyGenerator")
-    public List<Contact> buscarTodos() {
-        return contactRepository.findAll();
+    public Set<Contact> buscarTodos() {
+        return new HashSet<>(contactRepository.findAll());
     }
 
 
     @Transactional(readOnly = true)
     @Cacheable(value = "contact-enabled", keyGenerator = "principalKeyGenerator")
-    public List<Contact> buscarAtivos() {
-        return contactRepository.findByAtivoTrue();
+    public Set<Contact> buscarAtivos() {
+        return new HashSet<>(contactRepository.findByAtivoTrue());
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = "contact-disabled", keyGenerator = "principalKeyGenerator")
-    public List<Contact> buscarInativos() {
-        return contactRepository.findByAtivoFalse();
+    public Set<Contact> buscarInativos() {
+        return new HashSet<>(contactRepository.findByAtivoFalse());
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = "contact-type", keyGenerator = "principalKeyGenerator")
-    public List<Contact> buscarPorTipo(String tipo) {
+    public Set<Contact> buscarPorTipo(String tipo) {
         TipoContact tipoContact = TipoContact.valueOf(tipo.toUpperCase());
-        return contactRepository.findByTipoAndAtivoTrue(tipoContact);
+        return new HashSet<>(contactRepository.findByTipoAndAtivoTrue(tipoContact));
     }
 
     @Transactional(readOnly = true)
