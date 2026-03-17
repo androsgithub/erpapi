@@ -28,8 +28,10 @@ public class TenantIdentifierAspect {
         this.tenantGroupRepository = tenantGroupRepository;
     }
 
-    @Before("execution(* com.api.erp.v1.main.features..*(..))" + " || " +
-            "execution(* com.api.erp.v1.main.shared.infrastructure.config.startup.seed..*(..))")
+    @Before("execution(* com.api.erp.v1..main.master.permission..*(..))" + " || " +
+            "execution(* com.api.erp.v1..main.master.role..*(..))" + " || " +
+            "execution(* com.api.erp.v1..main.dynamic.features..*(..))" + " || " +
+            "execution(* com.api.erp.v1.main.config.startup..*(..))")
     public void setTenantIdentifier() {
         Long tenantId = TenantContext.getTenantId();
         if (tenantId == null) {

@@ -1,191 +1,248 @@
 package com.api.erp.v1.main.master.tenant.presentation.controller;
 
-import com.api.erp.v1.main.datasource.routing.TenantContext;
-import com.api.erp.v1.main.master.tenant.application.dto.CreateNewTenantWithDatasourceRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.TenantRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.TenantResponse;
-import com.api.erp.v1.main.master.tenant.application.dto.UnifiedTenantConfigRequest;
-import com.api.erp.v1.main.master.tenant.application.mapper.TenantMapper;
-import com.api.erp.v1.main.master.tenant.domain.controller.ITenantController;
 import com.api.erp.v1.docs.openapi.tenant.TenantOpenApiDocumentation;
-import com.api.erp.v1.main.master.tenant.domain.entity.Tenant;
+import com.api.erp.v1.main.datasource.routing.TenantContext;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.ProvisionTenantRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.TenantRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.update.UnifiedTenantConfigRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.response.TenantResponse;
+import com.api.erp.v1.main.master.tenant.application.dto.response.TenantSummaryResponse;
+import com.api.erp.v1.main.master.tenant.application.usecase.*;
+import com.api.erp.v1.main.master.tenant.domain.controller.ITenantController;
 import com.api.erp.v1.main.master.tenant.domain.entity.TenantPermissions;
-import com.api.erp.v1.main.master.tenant.domain.service.ITenantService;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
-import com.api.erp.v1.main.master.tenant.infrastructure.service.NewTenantProvisionerUseCase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
 /**
- * Controller para gerenciar Tenants
- * Todos os métodos usam o datasource padrão (default)
+ * Presentation Controller - REST API for Tenant Management
+ * <p>
+ * ARCHITECTURE:
+ * - Receives HTTP requests
+ * - Delegates to UseCases (application layer)
+ * - UseCases call domain services (domain layer)
+ * - Returns HTTP responses
+ * <p>
+ * Dependency Flow: Controller → UseCase → Domain Service → Repository
+ * <p>
+ * NO direct service calls - all logic orchestrated via UseCases
+ * NO domain logic in controller - only request/response handling
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/tenant")
+@RequestMapping("/api/v1/admin/tenants")
 public class TenantController implements ITenantController, TenantOpenApiDocumentation {
 
-    private final ITenantService tenantService;
-    private final TenantMapper tenantMapper;
-    private final NewTenantProvisionerUseCase newTenantProvisionerService;
+    // UseCases (Application Layer)
+    private final CreateTenantUseCase createTenantUseCase;
+    private final GetTenantUseCase getTenantUseCase;
+    private final ListTenantsUseCase listTenantsUseCase;
+    private final UpdateTenantUseCase updateTenantUseCase;
+    private final UpdateTenantConfigUseCase updateTenantConfigUseCase;
+    private final GetTenantConfigUseCase getTenantConfigUseCase;
 
     public TenantController(
-            ITenantService tenantService,
-            TenantMapper tenantMapper,
-            NewTenantProvisionerUseCase newTenantProvisionerService) {
-        this.tenantService = tenantService;
-        this.tenantMapper = tenantMapper;
-        this.newTenantProvisionerService = newTenantProvisionerService;
+            CreateTenantUseCase createTenantUseCase,
+            GetTenantUseCase getTenantUseCase,
+            ListTenantsUseCase listTenantsUseCase,
+            UpdateTenantUseCase updateTenantUseCase,
+            UpdateTenantConfigUseCase updateTenantConfigUseCase,
+            GetTenantConfigUseCase getTenantConfigUseCase) {
+        this.createTenantUseCase = createTenantUseCase;
+        this.getTenantUseCase = getTenantUseCase;
+        this.listTenantsUseCase = listTenantsUseCase;
+        this.updateTenantUseCase = updateTenantUseCase;
+        this.updateTenantConfigUseCase = updateTenantConfigUseCase;
+        this.getTenantConfigUseCase = getTenantConfigUseCase;
     }
 
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * GET CURRENT TENANT DETAILS
+     * <p>
+     * Endpoint: GET /api/v1/admin/tenants
+     * Requires: X-Tenant-ID header (via @RequiresXTenantId)
+     * Returns: 200 OK with tenant details
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
     @GetMapping()
     @RequiresXTenantId
     @RequiresPermission(TenantPermissions.SEARCH)
-    public ResponseEntity<TenantResponse> obter() {
+    public ResponseEntity<TenantSummaryResponse> obter() {
         Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.getDadosTenant(tenantId);
-        return ResponseEntity.ok(tenantMapper.toResponse(tenant));
+        log.info("[TENANT CONTROLLER] Getting tenant details: {}", tenantId);
+
+        // Delegate to UseCase
+        TenantResponse response = getTenantUseCase.execute(tenantId);
+        TenantSummaryResponse summaryResponse = new TenantSummaryResponse(
+                response.id(),
+                response.name(),
+                response.active(),
+                response.trial()
+        );
+
+        return ResponseEntity.ok(summaryResponse);
     }
 
     /**
-     * ═════════════════════════════════════════════════════════════════════════
-     * CREATE NEW TENANT WITH DATASOURCE AND QUEUE MIGRATIONS
-     * 
-     * Lógica complexa delegada para NewTenantProvisionerService
-     * 
-     * Resposta: 201 Created com tenant, datasource e migration task
-     * ═════════════════════════════════════════════════════════════════════════
+     * ═══════════════════════════════════════════════════════════════════════════
+     * CREATE NEW TENANT
+     * <p>
+     * Endpoint: POST /api/v1/admin/tenants
+     * Returns: 201 Created with tenant details
+     * <p>
+     * Delegates to CreateTenantUseCase - simpler creation without immediate datasource
+     * ═══════════════════════════════════════════════════════════════════════════
      */
-    @PostMapping("/register")
-    public ResponseEntity<?> criarTenantComDatasource(
-            @RequestBody CreateNewTenantWithDatasourceRequest request) {
-        
+    @PostMapping()
+    public ResponseEntity<TenantSummaryResponse> criar(
+            @RequestBody ProvisionTenantRequest request) {
+
+        log.info("[TENANT CONTROLLER] Creating new tenant: {}", request.name());
+
         try {
-            // Delega para o serviço de provisionamento
-            NewTenantProvisionerUseCase.NewTenantProvisionResult result =
-                    newTenantProvisionerService.execute(request);
-            
-            // Returns resposta estruturada
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    buildSuccessResponse(result)
+            // Delegate to CreateTenantUseCase
+            TenantResponse response = createTenantUseCase.execute(request);
+
+            TenantSummaryResponse summaryResponse = new TenantSummaryResponse(
+                    response.id(),
+                    response.name(),
+                    response.active(),
+                    response.trial()
             );
-            
+
+            log.info("[TENANT CONTROLLER] ✅ Tenant created successfully with ID: {}", response.id());
+            return ResponseEntity.status(HttpStatus.CREATED).body(summaryResponse);
+
         } catch (IllegalArgumentException e) {
-            log.error("❌ Validation error: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(
-                    buildErrorResponse("Validation falhou", e.getMessage())
-            );
-            
+            log.error("[TENANT CONTROLLER] ❌ Validation error: {}", e.getMessage());
+            throw e;
+
         } catch (Exception e) {
-            log.error("❌ Erro ao criar novo tenant", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    buildErrorResponse("Erro interno do servidor", e.getMessage())
-            );
+            log.error("[TENANT CONTROLLER] ❌ Error creating tenant", e);
+            throw e;
         }
     }
-    
-    private Map<String, Object> buildSuccessResponse(
-            NewTenantProvisionerUseCase.NewTenantProvisionResult result) {
-        
-        var tenant = result.getTenant();
-        var datasource = result.getDatasource();
-        var migrationEvent = result.getMigrationEvent();
-        
-        return new HashMap<>() {{
-            put("success", true);
-            put("timestamp", LocalDateTime.now());
-            put("tenant", new HashMap<String, Object>() {{
-                put("id", tenant.getId());
-                put("name", tenant.getName());
-                put("email", tenant.getEmail());
-            }});
-            put("datasource", new HashMap<String, Object>() {{
-                put("id", datasource.id());
-                put("host", datasource.host());
-                put("database", datasource.databaseName());
-                put("dbType", datasource.dbType());
-            }});
-            put("migration", new HashMap<String, Object>() {{
-                put("eventId", migrationEvent.getEventId());
-                put("status", migrationEvent.getStatus().getLabel());
-                put("tenantId", migrationEvent.getTenantId());
-                put("source", migrationEvent.getSource().name());
-                put("enqueuedAt", migrationEvent.getEnqueuedAt());
-            }});
-            put("message", "Tenant provisionado com sucesso. Migrações em progresso.");
-        }};
-    }
-    
-    private Map<String, Object> buildErrorResponse(String error, String message) {
-        return new HashMap<>() {{
-            put("success", false);
-            put("error", error);
-            put("message", message);
-            put("timestamp", LocalDateTime.now());
-        }};
-    }
 
-    @GetMapping("/listar")    
-    @RequiresXTenantId    
-    @RequiresPermission(TenantPermissions.SEARCH)
-    public ResponseEntity<List<TenantResponse>> listar() {
-        log.info("[EMPRESA CONTROLLER] Listando todas as tenants");
-        List<Tenant> tenants = tenantService.listarTenants();
-        List<TenantResponse> responses = tenants.stream()
-                .map(tenantMapper::toResponse)
-                .toList();
-        return ResponseEntity.ok(responses);
-    }
 
-    @PutMapping("")
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * LIST ALL TENANTS
+     * <p>
+     * Endpoint: GET /api/v1/admin/tenants (with query param or as separate method)
+     * Returns: 200 OK with list of all tenants
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+    @GetMapping("/list")
     @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.UPDATE)
-    public ResponseEntity<TenantResponse> atualizar(
+    @RequiresPermission(TenantPermissions.SEARCH)
+    public ResponseEntity<List<TenantSummaryResponse>> listar() {
+        log.info("[TENANT CONTROLLER] Listing all tenants");
 
-            @RequestBody TenantRequest request) {
-        Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateDadosTenant(tenantId, request);
-        return ResponseEntity.ok(tenantMapper.toResponse(tenant));
+        // Delegate to UseCase
+        List<TenantResponse> responses = listTenantsUseCase.execute();
+
+        // Map to TenantSummaryResponse for consistent response format
+        List<TenantSummaryResponse> summaryResponses = responses.stream()
+                .map(r -> new TenantSummaryResponse(
+                        r.id(),
+                        r.name(),
+                        r.active(),
+                        r.trial()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(summaryResponses);
     }
 
     /**
-     * ═════════════════════════════════════════════════════════════════════════
-     * UNIFIED CONFIG PATCH - Consolidação dos 6 PUTs antigos em 1 PATCH
-     * 
-     * Substitui:
-     * - PUT /config/businesspartner
-     * - PUT /config/user
-     * - PUT /config/permission
-     * - PUT /config/tenant
-     * - PUT /config/address
-     * - PUT /config/contact
-     * 
-     * Agora: PATCH /config (com campos opcionais para cada tipo de config)
-     * 
-     * Envie apenas os campos que deseja atualizar:
-     * {
-     *   "businesspartnerValidationEnabled": true,
-     *   "userApprovalRequired": false,
-     *   "permissionCacheEnabled": true,
-     *   ...outros campos opcionais
-     * }
-     * 
-     * Resposta: 200 OK com tenant atualizado
-     * ═════════════════════════════════════════════════════════════════════════
+     * ═══════════════════════════════════════════════════════════════════════════
+     * UPDATE TENANT BASIC DATA
+     * <p>
+     * Endpoint: PATCH /api/v1/admin/tenants/{id}
+     * Returns: 200 OK with updated tenant
+     * ═══════════════════════════════════════════════════════════════════════════
      */
-    @PatchMapping("/config")
+    @PatchMapping("/{id}")
     @RequiresXTenantId
     @RequiresPermission(TenantPermissions.UPDATE)
-    public ResponseEntity<TenantResponse> atualizarConfigUnificada(
+    public ResponseEntity<TenantSummaryResponse> atualizar(
+            @PathVariable Long id,
+            @RequestBody TenantRequest request) {
+
+        log.info("[TENANT CONTROLLER] Updating tenant: {}", id);
+
+        // Delegate to UseCase
+        TenantResponse response = updateTenantUseCase.execute(id, request);
+        TenantSummaryResponse summaryResponse = new TenantSummaryResponse(
+                response.id(),
+                response.name(),
+                response.active(),
+                response.trial()
+        );
+
+        return ResponseEntity.ok(summaryResponse);
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * GET TENANT CONFIGURATION
+     * <p>
+     * Endpoint: GET /api/v1/admin/tenants/{id}/config
+     * Returns: 200 OK with tenant configuration
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+    @GetMapping("/{id}/config")
+    @RequiresXTenantId
+    @RequiresPermission(TenantPermissions.SEARCH)
+    public ResponseEntity<?> obterConfig(@PathVariable Long id) {
+        log.info("[TENANT CONTROLLER] Getting tenant config: {}", id);
+
+        try {
+            // Delegate to UseCase
+            var configResponse = getTenantConfigUseCase.execute(id);
+            return ResponseEntity.ok(configResponse);
+        } catch (Exception e) {
+            log.error("[TENANT CONTROLLER] Error getting config", e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * UPDATE TENANT CONFIGURATION (UNIFIED)
+     * <p>
+     * Endpoint: PATCH /api/v1/admin/tenants/{id}/config
+     * Returns: 200 OK with updated tenant
+     * <p>
+     * Consolidates multiple legacy endpoints into single unified update
+     * Only non-null fields in request are processed
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+    @PatchMapping("/{id}/config")
+    @RequiresXTenantId
+    @RequiresPermission(TenantPermissions.UPDATE)
+    public ResponseEntity<TenantSummaryResponse> atualizarConfigUnificada(
+            @PathVariable Long id,
             @RequestBody UnifiedTenantConfigRequest request) {
-        Long tenantId = TenantContext.getTenantId();
-        Tenant tenant = tenantService.updateConfig(tenantId, request);
-        return ResponseEntity.ok(tenantMapper.toResponse(tenant));
+
+        log.info("[TENANT CONTROLLER] Updating tenant config: {}", id);
+
+        // Delegate to UseCase
+        TenantResponse response = updateTenantConfigUseCase.execute(id, request);
+        TenantSummaryResponse summaryResponse = new TenantSummaryResponse(
+                response.id(),
+                response.name(),
+                response.active(),
+                response.trial()
+        );
+
+        return ResponseEntity.ok(summaryResponse);
     }
 }

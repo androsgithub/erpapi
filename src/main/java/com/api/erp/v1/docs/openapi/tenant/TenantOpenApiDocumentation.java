@@ -1,13 +1,14 @@
 package com.api.erp.v1.docs.openapi.tenant;
 
-import com.api.erp.v1.main.master.tenant.application.dto.TenantRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.TenantResponse;
-import com.api.erp.v1.main.master.tenant.application.dto.UnifiedTenantConfigRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.TenantRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.update.UnifiedTenantConfigRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.response.TenantSummaryResponse;
 import com.api.erp.v1.main.master.tenant.domain.controller.ITenantController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public interface TenantOpenApiDocumentation extends ITenantController {
     @ApiResponse(responseCode = "200", description = "Dados da tenant retornados com sucesso")
     @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     @ApiResponse(responseCode = "400", description = "Tenant não configurada para o tenant")
-    ResponseEntity<TenantResponse> obter();
+    ResponseEntity<TenantSummaryResponse> obter();
 
     @Override
     @Operation(
@@ -40,7 +41,7 @@ public interface TenantOpenApiDocumentation extends ITenantController {
     )
     @ApiResponse(responseCode = "200", description = "Lista de tenants retornada com sucesso")
     @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
-    ResponseEntity<List<TenantResponse>> listar();
+    ResponseEntity<List<TenantSummaryResponse>> listar();
 
     @Override
     @Operation(
@@ -50,7 +51,8 @@ public interface TenantOpenApiDocumentation extends ITenantController {
     @ApiResponse(responseCode = "200", description = "Tenant atualizada com sucesso")
     @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     @ApiResponse(responseCode = "400", description = "Tenant não configurada ou dados inválidos")
-    ResponseEntity<TenantResponse> atualizar(
+    ResponseEntity<TenantSummaryResponse> atualizar(
+            @PathVariable Long id,
             @RequestBody TenantRequest request
     );
 
@@ -80,7 +82,8 @@ public interface TenantOpenApiDocumentation extends ITenantController {
     @ApiResponse(responseCode = "200", description = "Configurações atualizadas com sucesso")
     @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     @ApiResponse(responseCode = "400", description = "Configuração inválida")
-    ResponseEntity<TenantResponse> atualizarConfigUnificada(
+    ResponseEntity<TenantSummaryResponse> atualizarConfigUnificada(
+            @PathVariable Long id,
             @RequestBody UnifiedTenantConfigRequest request
     );
 }

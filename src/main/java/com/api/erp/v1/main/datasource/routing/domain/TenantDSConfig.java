@@ -120,7 +120,7 @@ public class TenantDSConfig {
     }
 
     public String getDbDialect() {
-        return dbType.getDialeto();
+        return dbType.getDialect();
     }
 
     @Override

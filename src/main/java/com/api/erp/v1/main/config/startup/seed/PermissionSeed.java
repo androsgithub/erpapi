@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -76,8 +75,6 @@ public class PermissionSeed {
             /* ===================== PERMISSÕES ===================== */
 
             List<Permission> permissionsExistentes = permissionRepository.findAll();
-            Map<String, Permission> permissionsPorCodigo = permissionsExistentes.stream()
-                    .collect(Collectors.toMap(Permission::getCode, p -> p));
 
             List<Permission> newPermissions = new ArrayList<>();
 
@@ -86,7 +83,7 @@ public class PermissionSeed {
                 String module = extractModuleName(permissionClass);
 
                 for (String code : codes) {
-                    if (!permissionsPorCodigo.containsKey(code)) {
+                    if (permissionsExistentes.stream().noneMatch(p -> p.getCode().equals(code))) {
                         PermissionAction action = extractPermissionAction(code);
                         Permission newPermission = Permission.builder()
                                 .code(code)
@@ -94,17 +91,17 @@ public class PermissionSeed {
                                 .module(module)
                                 .action(action)
                                 .build();
-                        newPermission.setScope(TenantScope.GLOBAL);
+                        newPermission.setScope(TenantScope.TENANT);
                         newPermissions.add(newPermission);
                     }
                 }
             }
-
+            List<Permission> salvas;
             if (!newPermissions.isEmpty()) {
-                List<Permission> salvas = permissionRepository.saveAll(newPermissions);
-                salvas.forEach(p -> permissionsPorCodigo.put(p.getCode(), p));
+                salvas = permissionRepository.saveAll(newPermissions);
                 log.info("✅ {} permissions created", newPermissions.size());
             } else {
+                salvas = new ArrayList<>();
                 log.info("⏭️  No new permissions to create");
             }
 
@@ -118,7 +115,7 @@ public class PermissionSeed {
                         .map(TenantScopeEntity::getId)
                         .collect(Collectors.toSet());
 
-                List<Permission> newPermissionsToAdd = permissionsPorCodigo.values().stream()
+                List<Permission> newPermissionsToAdd = salvas.stream()
                         .filter(p -> !permissionsJaVinculadas.contains(p.getId()))
                         .toList();
 

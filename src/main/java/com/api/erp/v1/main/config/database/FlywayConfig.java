@@ -31,7 +31,7 @@ public class FlywayConfig {
             log.error("Error getting dbType from driver while running migrations! Using DBType.MYSQL as default");
         }
 
-        String flywayLocation = "classpath:db/migration/master/" + dbType.getNome().toLowerCase();
+        String flywayLocation = "classpath:db/migration/master/" + dbType.getName().toLowerCase();
 
 
         Flyway flyway = Flyway.configure()

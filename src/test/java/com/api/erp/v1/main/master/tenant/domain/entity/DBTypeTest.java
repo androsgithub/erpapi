@@ -154,8 +154,8 @@ class DBTypeTest {
     @EnumSource(DBType.class)
     @DisplayName("dado_qualquerDBType_quando_acessarPropriedades_entao_naoSaoNulas")
     void testGivenAnyDBType_WhenAccessProperties_ThenNotNull(DBType dbType) {
-        assertThat(dbType.getNome()).isNotNull().isNotBlank();
-        assertThat(dbType.getDialeto()).isNotNull().isNotBlank();
+        assertThat(dbType.getName()).isNotNull().isNotBlank();
+        assertThat(dbType.getDialect()).isNotNull().isNotBlank();
         assertThat(dbType.getDriver()).isNotNull().isNotBlank();
     }
 

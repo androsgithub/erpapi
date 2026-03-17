@@ -28,7 +28,6 @@ public class RoleSeed {
 
         List<Role> rolesExistentes = roleRepository.findAll();
         Set<String> nomesRolesExistentes = rolesExistentes.stream()
-                .filter(role -> role.getTenantId().equals(TenantContext.getTenantId()))
                 .map(Role::getName)
                 .collect(Collectors.toSet());
 

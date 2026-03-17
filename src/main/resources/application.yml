@@ -112,8 +112,8 @@ logging:
       hibernate:
         orm:
           jdbc:
-#            bind: TRACE
-#        SQL: DEBUG
+            bind: TRACE
+        SQL: DEBUG
       flywaydb: DEBUG
     root: INFO
     com:
@@ -137,3 +137,6 @@ dros:
 scalar:
   enabled: true
   url: http://localhost:8080/v3/api-docs
+
+encryption:
+  key: 8afde4a57139300448bc8582a1fdd35de05ba7d8f3cfb15220616ecd72f64db6

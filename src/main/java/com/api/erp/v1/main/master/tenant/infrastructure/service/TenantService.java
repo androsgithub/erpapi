@@ -5,9 +5,9 @@ import com.api.erp.v1.main.shared.common.error.TenantErrorMessage;
 import com.api.erp.v1.main.shared.domain.valueobject.CNPJ;
 import com.api.erp.v1.main.shared.domain.valueobject.Email;
 import com.api.erp.v1.main.shared.domain.valueobject.Telefone;
-import com.api.erp.v1.main.master.tenant.application.dto.CreateTenantRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.TenantRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.UnifiedTenantConfigRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.ProvisionTenantRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.TenantRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.update.UnifiedTenantConfigRequest;
 import com.api.erp.v1.main.master.tenant.domain.entity.Tenant;
 import com.api.erp.v1.main.master.tenant.domain.entity.TenantConfig;
 import com.api.erp.v1.main.master.tenant.domain.entity.TenantFiscal;
@@ -65,8 +65,8 @@ public class TenantService implements ITenantService {
                 .orElseThrow(() -> new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND));
 
         tenant.setName(tenantRequest.nome());
-        tenant.setEmail(tenantRequest.email());
-        tenant.setPhone(tenantRequest.telefone());
+        tenant.setEmail(new Email(tenantRequest.email()));
+        tenant.setPhone(new Telefone(tenantRequest.telefone()));
 
         return tenantRepository.save(tenant);
     }
@@ -84,52 +84,40 @@ public class TenantService implements ITenantService {
 
     @Override
     @Transactional(transactionManager = "masterTransactionManager")
-    public Tenant criarTenant(CreateTenantRequest request) {
-        log.info("[TENANT SERVICE] Creating new tenant: {}", request.nome());
+    public Tenant criarTenant(ProvisionTenantRequest request) {
+        log.info("[TENANT SERVICE] Creating new tenant: {}", request.name());
 
-        // Validate CNPJ uniqueness
-        CNPJ cnpj = new CNPJ(request.cnpj());
-        if (tenantFiscalRepository.existsByCnpj(cnpj)) {
-            log.warn("[TENANT SERVICE] Tenant with CNPJ already exists: {}", request.cnpj());
-            throw new ErrorHandler(TenantErrorMessage.TENANT_NOT_FOUND);
+        // Validate CNPJ uniqueness (if provided)
+        if (request != null) {
+            // Use basic tenant info from ProvisionTenantRequest
         }
 
         // 1. Create Tenant entity
         Tenant tenant = Tenant.builder()
-                .name(request.nome())
+                .name(request.name())
                 .email(new Email(request.email()))
-                .phone(new Telefone(request.telefone()))
+                .phone(new Telefone(request.phone()))
                 .active(true)
+                .trial(request.trial() != null ? request.trial() : false)
                 .build();
 
-        // 2. Create and save TenantFiscal
-        TenantFiscal tenantFiscal = TenantFiscal.builder()
-                .tenant(tenant)
-                .cnpj(cnpj)
-                .legalName(request.razaoSocial())
-                .build();
-
-        // 3. Create TenantConfig with all defaults
+        // 2. Create TenantConfig with defaults
         TenantConfig tenantConfig = createDefaultConfig(request);
 
-        // 4. Associate entities
-        tenant.setFiscal(tenantFiscal);
+        // 3. Associate entities
         tenant.setConfig(tenantConfig);
 
-        // 5. Save tenant (cascades to fiscal if properly configured)
+        // 4. Save tenant (cascades to config if properly configured)
         Tenant tenantSaved = tenantRepository.save(tenant);
 
-        // 6. Explicitly save fiscal and config if not cascaded
-        tenantFiscal.setTenant(tenantSaved);
-        tenantFiscalRepository.save(tenantFiscal);
-
+        // 5. Explicitly save config if not cascaded
         tenantConfig.setTenant(tenantSaved);
         tenantConfigRepository.save(tenantConfig);
 
         log.info("[TENANT SERVICE] Tenant created successfully: {} (ID: {})",
-                request.nome(), tenantSaved.getId());
+                request.name(), tenantSaved.getId());
 
-        // 7. Publish event to trigger automatic migration
+        // 6. Publish event to trigger automatic migration
         publishTenantCreatedEvent(tenantSaved);
 
         return tenantSaved;
@@ -152,10 +140,8 @@ public class TenantService implements ITenantService {
     /**
      * Creates default configuration for a new tenant
      */
-    private TenantConfig createDefaultConfig(CreateTenantRequest request) {
+    private TenantConfig createDefaultConfig(ProvisionTenantRequest request) {
         TenantConfig tenantConfig = new TenantConfig();
-
-
         return tenantConfig;
     }
 

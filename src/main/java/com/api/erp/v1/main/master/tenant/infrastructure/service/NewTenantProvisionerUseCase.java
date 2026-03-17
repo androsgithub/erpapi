@@ -1,12 +1,12 @@
 package com.api.erp.v1.main.master.tenant.infrastructure.service;
 
 import com.api.erp.v1.main.datasource.routing.TenantContext;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.ProvisionTenantRequest;
 import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
 import com.api.erp.v1.main.migration.service.TenantMigrationQueue;
-import com.api.erp.v1.main.master.tenant.application.dto.CreateNewTenantWithDatasourceRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.CreateTenantRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.TenantDatasourceRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.TenantDatasourceResponse;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.CreateNewTenantWithDatasourceRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.TenantDatasourceRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.response.TenantDatasourceResponse;
 import com.api.erp.v1.main.master.tenant.domain.entity.Tenant;
 import com.api.erp.v1.main.master.tenant.domain.repository.TenantDatasourceRepository;
 import com.api.erp.v1.main.master.tenant.domain.service.ITenantDatasourceService;
@@ -65,7 +65,7 @@ public class NewTenantProvisionerUseCase {
         
         log.info("");
         log.info("╔════════════════════════════════════════════════════════════════╗");
-        log.info("║  PROVISIONANDO NOVO TENANT: {}", request.nome());
+        log.info("║  PROVISIONANDO NOVO TENANT: {}", request.name());
         log.info("╚════════════════════════════════════════════════════════════════╝");
         
         try {
@@ -73,17 +73,16 @@ public class NewTenantProvisionerUseCase {
             // PHASE 1: CRIAR TENANT NO MASTER DATABASE
             // ═══════════════════════════════════════════════════════════════════
             log.info("1️⃣  Criando tenant no master database...");
-            
-            CreateTenantRequest criarRequest = new CreateTenantRequest(
-                    request.nome(),
-                    request.cnpj(),
-                    request.razaoSocial(),
+
+            ProvisionTenantRequest criarRequest = new ProvisionTenantRequest(
+                    request.name(),
                     request.email(),
                     request.telefone(),
-                    request.tenantType(),
-                    request.tenantSubdomain(),
-                    request.contribuinteICMS(),
-                    request.regimeTributario()
+                    null, // planId - não vem do request de datasource
+                    false, // trial - padrão false
+                    null, // trialDays
+                    null, // allowedDomains
+                    null // features
             );
             
             Tenant tenantCriado = tenantService.criarTenant(criarRequest);

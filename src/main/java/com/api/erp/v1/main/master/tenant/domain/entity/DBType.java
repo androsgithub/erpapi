@@ -18,22 +18,22 @@ public enum DBType {
     VERTICA("vertica", "org.hibernate.dialect.PostgreSQLDialect", "com.vertica.jdbc.Driver"),
     CLICKHOUSE("clickhouse", "org.hibernate.dialect.PostgreSQLDialect", "com.clickhouse.jdbc.ClickHouseDriver");
 
-    private final String nome;
-    private final String dialeto;
+    private final String name;
+    private final String dialect;
     private final String driver;
 
-    DBType(String nome, String dialeto, String driver) {
-        this.nome = nome;
-        this.dialeto = dialeto;
+    DBType(String nome, String dialect, String driver) {
+        this.name = nome;
+        this.dialect = dialect;
         this.driver = driver;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public String getDialeto() {
-        return dialeto;
+    public String getDialect() {
+        return dialect;
     }
 
     public String getDriver() {
@@ -49,7 +49,7 @@ public enum DBType {
         }
         
         for (DBType banco : values()) {
-            if (banco.nome.equalsIgnoreCase(nome.trim())) {
+            if (banco.name.equalsIgnoreCase(nome.trim())) {
                 return banco;
             }
         }
@@ -66,7 +66,7 @@ public enum DBType {
         
         String dialectoLower = dialeto.toLowerCase();
         for (DBType banco : values()) {
-            if (banco.dialeto.equalsIgnoreCase(dialeto) || dialectoLower.contains(banco.nome)) {
+            if (banco.dialect.equalsIgnoreCase(dialeto) || dialectoLower.contains(banco.name)) {
                 return banco;
             }
         }
@@ -107,6 +107,6 @@ public enum DBType {
 
     @Override
     public String toString() {
-        return this.nome + " (Dialeto: " + this.dialeto + ")";
+        return this.name + " (Dialeto: " + this.dialect + ")";
     }
 }

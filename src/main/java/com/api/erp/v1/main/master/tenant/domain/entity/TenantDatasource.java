@@ -1,5 +1,6 @@
 package com.api.erp.v1.main.master.tenant.domain.entity;
 
+import com.api.erp.v1.main.shared.infrastructure.security.EncryptionProvider;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -163,25 +164,32 @@ public class TenantDatasource {
 
     /**
      * Encriptografa uma senha em plaintext
-     * TODO: Implementar com algoritmo real (ex: AES, bcrypt, etc)
-     * Para agora, usa Base64 como placeholder (NÃO usar em produção)
+     * 
+     * Usa EncryptionProvider para acessar o EncryptionService registrado no Spring.
+     * Suporta múltiplas implementações:
+     * - AES256EncryptionService (recomendado para produção)
+     * - Qualquer outro EncryptionService registrado
+     * - Base64 fallback para desenvolvimento/teste
      * 
      * @param plainPassword senha em plaintext
-     * @return senha encriptografada
+     * @return senha encriptografada (Base64 ou AES-256 dependendo da configuração)
      */
     private String encryptPassword(String plainPassword) {
         if (plainPassword == null || plainPassword.isEmpty()) {
             return null;
         }
-        // PLACEHOLDER: Usar algoritmo real de criptografia
-        // return encryptionService.encrypt(plainPassword);
-        return java.util.Base64.getEncoder().encodeToString(plainPassword.getBytes());
+        // Usar EncryptionProvider que acessa o serviço via Spring ApplicationContext
+        return com.api.erp.v1.main.shared.infrastructure.security.EncryptionProvider.encrypt(plainPassword);
     }
 
     /**
      * Descriptografa uma senha encriptografada
-     * TODO: Implementar com algoritmo real (ex: AES, bcrypt, etc)
-     * Para agora, usa Base64 como placeholder (NÃO usar em produção)
+     * 
+     * Usa EncryptionProvider para acessar o EncryptionService registrado no Spring.
+     * Suporta múltiplas implementações:
+     * - AES256EncryptionService (recomendado para produção)
+     * - Qualquer outro EncryptionService registrado
+     * - Base64 fallback para desenvolvimento/teste
      * 
      * @param encryptedPassword senha encriptografada
      * @return senha em plaintext
@@ -190,14 +198,8 @@ public class TenantDatasource {
         if (encryptedPassword == null || encryptedPassword.isEmpty()) {
             return null;
         }
-        // PLACEHOLDER: Usar algoritmo real de criptografia
-        // return encryptionService.decrypt(encryptedPassword);
-        try {
-            return new String(java.util.Base64.getDecoder().decode(encryptedPassword));
-        } catch (IllegalArgumentException e) {
-            // Se não for Base64 válido, retorna como está
-            return encryptedPassword;
-        }
+        // Usar EncryptionProvider que acessa o serviço via Spring ApplicationContext
+        return EncryptionProvider.decrypt(encryptedPassword);
     }
 
     /**

@@ -83,11 +83,11 @@ public class SchemaGenerator {
 
         for (DBType dbType : dbTypes) {
             try {
-                log.info("Generating schemas for database: {}", dbType.getNome());
+                log.info("Generating schemas for database: {}", dbType.getName());
                 gerarSchemaPorTabela(dbType);
-                log.info("Schemas generated successfully for: {}", dbType.getNome());
+                log.info("Schemas generated successfully for: {}", dbType.getName());
             } catch (Exception e) {
-                log.error("Error generating schema for database {}: {}", dbType.getNome(), e.getMessage(), e);
+                log.error("Error generating schema for database {}: {}", dbType.getName(), e.getMessage(), e);
             }
         }
 
@@ -127,14 +127,14 @@ public class SchemaGenerator {
      * Cria e configura o ServiceRegistry do Hibernate.
      */
     private static StandardServiceRegistry criarServiceRegistry(DBType dbType) {
-        return new StandardServiceRegistryBuilder().applySetting("hibernate.connection.driver_class", dbType.getDriver()).applySetting("hibernate.dialect", dbType.getDialeto()).build();
+        return new StandardServiceRegistryBuilder().applySetting("hibernate.connection.driver_class", dbType.getDriver()).applySetting("hibernate.dialect", dbType.getDialect()).build();
     }
 
     /**
      * Prepares output directory, cleaning previous content if it exists.
      */
     private static Path prepararDiretorioOutput(DBType dbType) throws IOException {
-        Path pastaOutput = Paths.get(OUTPUT_DIR, dbType.getNome());
+        Path pastaOutput = Paths.get(OUTPUT_DIR, dbType.getName());
 
         if (Files.exists(pastaOutput)) {
             log.debug("Cleaning existing directory: {}", pastaOutput);

@@ -1,8 +1,8 @@
 package com.api.erp.v1.main.master.tenant.domain.service;
 
-import com.api.erp.v1.main.master.tenant.application.dto.CreateTenantRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.TenantRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.UnifiedTenantConfigRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.ProvisionTenantRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.TenantRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.request.update.UnifiedTenantConfigRequest;
 import com.api.erp.v1.main.master.tenant.domain.entity.Tenant;
 import com.api.erp.v1.main.master.tenant.domain.entity.TenantConfig;
 
@@ -13,7 +13,7 @@ public interface ITenantService {
 
     boolean isTenantAtiva(Long tenantId);
 
-    Tenant criarTenant(CreateTenantRequest request);
+    Tenant criarTenant(ProvisionTenantRequest request);
 
     java.util.List<Tenant> listarTenants();
 

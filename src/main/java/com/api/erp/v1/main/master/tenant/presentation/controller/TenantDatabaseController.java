@@ -1,18 +1,18 @@
 package com.api.erp.v1.main.master.tenant.presentation.controller;
 
 import com.api.erp.v1.main.datasource.routing.TenantContext;
-import com.api.erp.v1.main.master.tenant.application.dto.TenantDatasourceRequest;
-import com.api.erp.v1.main.master.tenant.application.dto.TenantDatasourceResponse;
-import com.api.erp.v1.main.master.tenant.application.dto.UpdateDatasourceResponse;
+import com.api.erp.v1.main.master.tenant.application.dto.request.create.TenantDatasourceRequest;
+import com.api.erp.v1.main.master.tenant.application.dto.response.TenantDatasourceResponse;
+import com.api.erp.v1.main.master.tenant.application.dto.response.UpdateDatasourceResponse;
 import com.api.erp.v1.main.master.tenant.domain.controller.ITenantDatabaseController;
 import com.api.erp.v1.docs.openapi.tenant.TenantDatabaseOpenApiDocumentation;
 import com.api.erp.v1.main.master.tenant.domain.entity.TenantPermissions;
-import com.api.erp.v1.main.master.tenant.domain.service.ITenantDatasourceService;
 import com.api.erp.v1.main.shared.infrastructure.documentation.RequiresXTenantId;
 import com.api.erp.v1.main.shared.infrastructure.security.annotations.RequiresPermission;
 import com.api.erp.v1.main.migration.domain.TenantMigrationEvent;
 import com.api.erp.v1.main.migration.service.TenantMigrationQueue;
 import com.api.erp.v1.main.master.tenant.domain.repository.TenantDatasourceRepository;
+import com.api.erp.v1.main.master.tenant.application.usecase.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,51 +21,41 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/tenant/database")
+@RequestMapping("/api/v1/admin/tenants/datasource")
 /**
  * PRESENTATION - REST Controller for Managing Tenant Datasources
  * 
+ * ARCHITECTURE:
+ * - Receives HTTP requests
+ * - Delegates to UseCases (application layer)
+ * - UseCases call domain services (domain layer)
+ * - Returns HTTP responses
+ * 
+ * Dependency Flow: Controller → UseCase → Domain Service → Repository
+ * 
+ * NO direct service calls - all logic orchestrated via UseCases
+ * NO domain logic in controller - only request/response handling
+ * 
  * Offers 3 main endpoints with well-defined responsibilities:
  * 
- * 1. POST /datasource/validate
- *    - Apenas VALIDA a conexão de um datasource
- *    - NÃO cria/atualiza nada no banco
- *    - Útil para pré-validação antes de criar novo tenant
- *    - Resposta: 200 (válido) ou 400 (inválido)
+ * 1. POST /validate
+ *    - VALIDATES datasource connection WITHOUT persisting
+ *    - Pre-validation before creating/updating tenant
+ *    - Response: 200 (valid) or 400 (invalid)
  * 
- * 2. PUT /datasource
- *    - ATUALIZA a configuração de datasource do tenant
- *    - Opcionalmente ENFILEIRA migrações (via flag: runMigrations = true)
- *    - Se runMigrations = false (padrão): Apenas atualiza config
- *    - Se runMigrations = true: Atualiza + Valida + Enfileira migrações
- *    - Resposta: 200 (apenas update) ou 202 (update + migrations)
+ * 2. GET / & PUT /
+ *    - GET: Retrieve current datasource configuration
+ *    - PUT: UPDATE datasource configuration
+ *    - Optional flag: runMigrations (enqueue migrations if true)
+ *    - Response: 200 (update only) or 202 (update + migrations)
  * 
- * 3. POST /datasource/configure-and-migrate
- *    - ATUALIZA datasource + VALIDA + ENFILEIRA migrações (sempre)
- *    - Alternativa ao PUT com runMigrations=true
- *    - Conveniência quando sempre quer reenfileirar
- *    - Fases: config → teste conexão → enfileira Flyway + seed
- *    - Resposta: 202 (aceito, processando em background)
- * 
- * FLUXOS DE USO:
- * 
- * A. Create novo tenant:
- *    1. POST /datasource/validate (pré-validação)
- *    2. POST /api/v1/tenant/register (cria tudo + enfileira)
- * 
- * B. Update APENAS config de datasource (SEM rer-migrar):
- *    1. PUT /datasource (com runMigrations: false ou omitido)
- * 
- * C. Update datasource E reenfileirar migrações:
- *    OPÇÃO 1 - Via PUT:
- *    1. PUT /datasource (com runMigrations: true)
- *    
- *    OPÇÃO 2 - Via POST (mais explícito):
- *    1. POST /datasource/validate (pré-validação)
- *    2. POST /datasource/configure-and-migrate (atualiza + reenfileira)
+ * 3. POST /configure-and-migrate
+ *    - UPDATE datasource + VALIDATE + ENQUEUE migrations (always)
+ *    - Phases: config → test connection → enqueue Flyway + seed
+ *    - Response: 202 (Accepted, processing in background)
  * 
  * @author ERP System
- * @version 1.0
+ * @version 2.0 - UseCase Based Architecture
  */
 public class TenantDatabaseController implements ITenantDatabaseController, TenantDatabaseOpenApiDocumentation {
     private static final String SUCCESS = "success";
@@ -82,42 +72,56 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
     private static final String DB_TYPE = "dbType";
     private static final String USERNAME = "username";
 
-    private final ITenantDatasourceService tenantDataSourceService;
+    // UseCases (Application Layer)
+    private final ValidateTenantDatasourceUseCase validateDatasourceUseCase;
+    private final ConfigureTenantDatasourceUseCase configureDatasourceUseCase;
+    private final UpdateTenantDatasourceUseCase updateDatasourceUseCase;
+    private final com.api.erp.v1.main.master.tenant.application.usecase.UpdateTenantDatasourceWithPasswordUseCase updateDatasourceWithPasswordUseCase;
+    private final GetTenantDatasourceUseCase getDatasourceUseCase;
+    
+    // Infrastructure services (for migration queuing)
     private final TenantMigrationQueue migrationQueue;
     private final TenantDatasourceRepository tenantDatasourceRepository;
 
     public TenantDatabaseController(
-            ITenantDatasourceService tenantDataSourceService,
+            ValidateTenantDatasourceUseCase validateDatasourceUseCase,
+            ConfigureTenantDatasourceUseCase configureDatasourceUseCase,
+            UpdateTenantDatasourceUseCase updateDatasourceUseCase,
+            com.api.erp.v1.main.master.tenant.application.usecase.UpdateTenantDatasourceWithPasswordUseCase updateDatasourceWithPasswordUseCase,
+            GetTenantDatasourceUseCase getDatasourceUseCase,
             TenantMigrationQueue migrationQueue,
             TenantDatasourceRepository tenantDatasourceRepository) {
-        this.tenantDataSourceService = tenantDataSourceService;
+        this.validateDatasourceUseCase = validateDatasourceUseCase;
+        this.configureDatasourceUseCase = configureDatasourceUseCase;
+        this.updateDatasourceUseCase = updateDatasourceUseCase;
+        this.updateDatasourceWithPasswordUseCase = updateDatasourceWithPasswordUseCase;
+        this.getDatasourceUseCase = getDatasourceUseCase;
         this.migrationQueue = migrationQueue;
         this.tenantDatasourceRepository = tenantDatasourceRepository;
     }
 
+
     /**
-     * ═════════════════════════════════════════════════════════════════════════
-     * VALIDAR CONFIGURAÇÃO DE DATASOURCE
+     * ═══════════════════════════════════════════════════════════════════════════
+     * VALIDATE DATASOURCE CONNECTION
      * 
-     * Valida a configuração e conectividade de um datasource ANTES de utilizá-lo.
-     * Útil para o pré-requisito do fluxo de criação de novo tenant.
-     * 
-     * Resposta:
-     * - 200: Datasource válido e conectável
-     * - 400: Erro de validação ou conexão falhou
-     * ═════════════════════════════════════════════════════════════════════════
+     * Endpoint: POST /api/v1/admin/tenants/{tenantId}/datasource/validate
+     * Purpose: Validate datasource connectivity WITHOUT persisting
+     * Returns: 200 (valid) or 400 (invalid)
+     * ═══════════════════════════════════════════════════════════════════════════
      */
-    @PostMapping("/datasource/validate")
+    @PostMapping("/validate")
     public ResponseEntity<?> validarDatasource(
             @RequestBody TenantDatasourceRequest request) {
+        Long tenantId = TenantContext.getTenantId();
         
-        log.info("[DATASOURCE CONTROLLER] Validating datasource configuration...");
+        log.info("[DATASOURCE CONTROLLER] Validating datasource for tenant: {}", tenantId);
         log.info("[DATASOURCE CONTROLLER] Host: {} | Port: {} | Database: {}", 
                 request.host(), request.port(), request.databaseName());
         
         try {
-            // Test connection with the datasource
-            boolean isValid = tenantDataSourceService.testarConexao(request);
+            // Delegate to UseCase
+            boolean isValid = validateDatasourceUseCase.execute(request);
             
             if (!isValid) {
                 log.error("[DATASOURCE CONTROLLER] ❌ Failed to validate datasource");
@@ -136,6 +140,9 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
         }
     }
     
+    /**
+     * Helper: Build validation success response
+     */
     private Map<String, Object> buildValidationSuccessResponse(TenantDatasourceRequest request) {
         Map<String, Object> response = new java.util.HashMap<>();
         response.put(SUCCESS, true);
@@ -153,92 +160,42 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
     }
     
     /**
-     * ═════════════════════════════════════════════════════════════════════════
-     * CONFIGURE DATASOURCE + ENFILEIRAR MIGRAÇÃO + SEED
+     * ═══════════════════════════════════════════════════════════════════════════
+     * GET CURRENT DATASOURCE CONFIGURATION
      * 
-     * Novo endpoint que configura datasource E enfileira automaticamente:
-     * 1. Configura datasource do tenant
-     * 2. Testa conexão com o novo datasource
-     * 3. Enfileira migração (Flyway)
-     * 4. Enfileira MainSeed (permissões, usuário admin, etc)
-     * 
-     * Resposta:
-     * - 202: Datasource configurado e tarefas enfileiradas com sucesso
-     * - 400: Erro de validação ou conexão falhou
-     * - 500: Erro ao enfileirar migrações
-     * ═════════════════════════════════════════════════════════════════════════
+     * Endpoint: GET /api/v1/admin/tenants/{tenantId}/datasource
+     * Returns: 200 OK with datasource details
+     * ═══════════════════════════════════════════════════════════════════════════
      */
-    @Override
-    @PostMapping("/datasource/configure-and-migrate")
-    @RequiresXTenantId
-    @RequiresPermission(TenantPermissions.UPDATE)
-    public ResponseEntity<?> configurarDatasourceEEnfileirarMigracao(
-            @RequestBody TenantDatasourceRequest request) {
-        Long tenantId = TenantContext.getTenantId();
-        
-        log.info("[DATASOURCE CONTROLLER] ════════════════════════════════════════════");
-        log.info("[DATASOURCE CONTROLLER] CONFIGURANDO DATASOURCE + MIGRAÇÕES + SEED");
-        log.info("[DATASOURCE CONTROLLER] Tenant ID: {}", tenantId);
-        log.info("[DATASOURCE CONTROLLER] ════════════════════════════════════════════");
-        
-        try {
-            // PHASE 1: Configure datasource
-            log.info("[DATASOURCE CONTROLLER] 1️⃣  Configurando novo datasource...");
-            TenantDatasourceResponse datasourceResponse = 
-                    tenantDataSourceService.configurarDatasource(tenantId, request);
-            log.info("[DATASOURCE CONTROLLER] ✅ Datasource configurado com sucesso");
-            
-            // PHASE 2: Testar conexão
-            log.info("[DATASOURCE CONTROLLER] 2️⃣  Testando conexão com datasource...");
-            boolean testeConexao = tenantDataSourceService.testarConexao(request);
-            if (!testeConexao) {
-                log.error("[DATASOURCE CONTROLLER] ❌ Falha ao conectar com datasource");
-                Map<String, Object> error = new java.util.HashMap<>();
-                error.put(SUCCESS, false);
-                error.put(ERROR, "Falha ao conectar com datasource");
-                error.put(DATASOURCE, datasourceResponse);
-                return ResponseEntity.badRequest().body(error);
-            }
-            log.info("[DATASOURCE CONTROLLER] ✅ Conexão teste bem-sucedida");
-            
-            // PHASE 3: Enfileirar migração + seed (novo sistema unificado)
-            log.info("[DATASOURCE CONTROLLER] 3️⃣  Enfileirando migração + seeders...");
-            var datasource = tenantDatasourceRepository.findByTenantIdAndActiveTrue(tenantId).orElse(null);
-            var event = migrationQueue.enqueueEvent(
-                    tenantId,
-                    "Tenant " + tenantId,
-                    datasource,
-                    TenantMigrationEvent.MigrationEventSource.MANUAL_REQUEST
-            );
-            log.info("[DATASOURCE CONTROLLER] ✅ Evento enfileirado (EventID: {})", event.getEventId());
-            log.info("[DATASOURCE CONTROLLER] 🚀 Processesmento será iniciado automaticamente");
-            
-            return ResponseEntity.accepted().body(buildConfigureAndMigrateResponse(event, datasourceResponse));
-            
-        } catch (IllegalArgumentException e) {
-            log.error("[DATASOURCE CONTROLLER] ❌ Erro de validação: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(buildErrorResponse(e.getMessage()));
-        } catch (Exception e) {
-            log.error("[DATASOURCE CONTROLLER] ❌ Erro ao processar", e);
-            return ResponseEntity.internalServerError()
-                    .body(buildErrorResponse("Erro ao configurar datasource e enfileirar migrações: " + e.getMessage()));
-        }
-    }
-
-    @Override
-    @GetMapping("/datasource")
+    @GetMapping()
     @RequiresXTenantId
     @RequiresPermission(TenantPermissions.SEARCH)
     public ResponseEntity<TenantDatasourceResponse> obterDatasource() {
         Long tenantId = TenantContext.getTenantId();
-        log.info("[TENANT CONTROLLER] Getting datasource configuration for tenant: {}", tenantId);
-        return tenantDataSourceService.obterDatasource(tenantId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        log.info("[DATASOURCE CONTROLLER] Getting datasource for tenant: {}", tenantId);
+        
+        try {
+            // Delegate to UseCase
+            TenantDatasourceResponse response = getDatasourceUseCase.execute(tenantId);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            log.error("[DATASOURCE CONTROLLER] Datasource not found: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @Override
-    @PutMapping("/datasource")
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * UPDATE DATASOURCE CONFIGURATION (WITH OPTIONAL MIGRATION QUEUING)
+     * 
+     * Endpoint: PUT /api/v1/admin/tenants/{tenantId}/datasource
+     * Returns: 200 (update only) or 202 (update + migrations enqueued)
+     * 
+     * If runMigrations=true: Configuration + validation + migration enqueueing
+     * If runMigrations=false or omitted: Configuration only
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+    @PutMapping()
     @RequiresXTenantId
     @RequiresPermission(TenantPermissions.UPDATE)
     public ResponseEntity<UpdateDatasourceResponse> atualizarDatasource(
@@ -246,21 +203,21 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
         Long tenantId = TenantContext.getTenantId();
         
         log.info("[DATASOURCE CONTROLLER] ════════════════════════════════════════════");
-        log.info("[DATASOURCE CONTROLLER] ATUALIZANDO DATASOURCE DO TENANT");
+        log.info("[DATASOURCE CONTROLLER] UPDATING TENANT DATASOURCE");
         log.info("[DATASOURCE CONTROLLER] Tenant ID: {} | Host: {} | Port: {}", 
                 tenantId, request.host(), request.port());
-        log.info("[DATASOURCE CONTROLLER] Enfileirar Migrações: {}", request.runMigrations());
+        log.info("[DATASOURCE CONTROLLER] Enqueue Migrations: {}", request.runMigrations());
         log.info("[DATASOURCE CONTROLLER] ════════════════════════════════════════════");
         
         try {
-            // PHASE 1: Update configuração do datasource
-            log.info("[DATASOURCE CONTROLLER] 1️⃣  Atualizando datasource...");
-            TenantDatasourceResponse datasourceResponse = tenantDataSourceService.atualizarDatasource(tenantId, request);
-            log.info("[DATASOURCE CONTROLLER] ✅ Datasource atualizado com sucesso");
+            // PHASE 1: Update datasource configuration
+            log.info("[DATASOURCE CONTROLLER] 1️⃣  Updating datasource...");
+            TenantDatasourceResponse datasourceResponse = updateDatasourceUseCase.execute(tenantId, request);
+            log.info("[DATASOURCE CONTROLLER] ✅ Datasource updated successfully");
             
-            // PHASE 2: Se runMigrations = true, enfileirar migrações
+            // PHASE 2: If runMigrations = true, enqueue migrations
             if (request.runMigrations() != null && request.runMigrations()) {
-                log.info("[DATASOURCE CONTROLLER] 2️⃣  Enfileirando migrações (flag: runMigrations = true)...");
+                log.info("[DATASOURCE CONTROLLER] 2️⃣  Enqueueing migrations (flag: runMigrations = true)...");
                 
                 try {
                     var datasource = tenantDatasourceRepository.findByTenantIdAndActiveTrue(tenantId).orElse(null);
@@ -270,16 +227,17 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
                             datasource,
                             TenantMigrationEvent.MigrationEventSource.MANUAL_REQUEST
                     );
-                    log.info("[DATASOURCE CONTROLLER] ✅ Evento enfileirado (EventID: {})", event.getEventId());
-                    log.info("[DATASOURCE CONTROLLER] 🚀 Migrações serão processadas automaticamente");
+                    log.info("[DATASOURCE CONTROLLER] ✅ Event enqueued (EventID: {})", event.getEventId());
+                    log.info("[DATASOURCE CONTROLLER] 🚀 Migrations will be processed automatically");
                     
-                    // Returns response com info de migração enfileirada
+                    // Build response with migration information
                     Map<String, Object> migrationInfo = new java.util.HashMap<>();
                     migrationInfo.put(EVENT_ID, event.getEventId());
                     migrationInfo.put(STATUS, event.getStatus().getLabel());
                     migrationInfo.put(SOURCE, event.getSource().getLabel());
                     migrationInfo.put(ENQUEUED_AT, event.getEnqueuedAt());
-                    migrationInfo.put(MESSAGE, "Migrações enfileiradas com sucesso");
+                    migrationInfo.put(MESSAGE, "Migrations enqueued successfully");
+                    
                     UpdateDatasourceResponse responseWithMigration = new UpdateDatasourceResponse(
                             datasourceResponse,
                             migrationInfo,
@@ -288,66 +246,242 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
                     return ResponseEntity.accepted().body(responseWithMigration);
                     
                 } catch (Exception e) {
-                    log.error("[DATASOURCE CONTROLLER] ⚠️  Erro ao enfileirar migrações", e);
-                    // Datasource foi atualizado, mas migrações falharam
+                    log.error("[DATASOURCE CONTROLLER] ⚠️  Error enqueueing migrations", e);
+                    // Datasource was updated, but migrations failed
                     UpdateDatasourceResponse partialResponse = new UpdateDatasourceResponse(
                             datasourceResponse,
                             null,
-                            "Datasource atualizado, mas erro ao enfileirar migrações: " + e.getMessage()
+                            "Datasource updated, but error enqueueing migrations: " + e.getMessage()
                     );
                     return ResponseEntity.accepted().body(partialResponse);
                 }
             }
             
-            log.info("[DATASOURCE CONTROLLER] ✅ Operação concluída (migrações não enfileiradas)");
-            return ResponseEntity.ok(new UpdateDatasourceResponse(datasourceResponse));
+            log.info("[DATASOURCE CONTROLLER] ✅ Operation completed (migrations not enqueued)");
+            return ResponseEntity.ok(new UpdateDatasourceResponse(datasourceResponse, null, null));
             
         } catch (Exception e) {
-            log.error("[DATASOURCE CONTROLLER] ❌ Erro ao atualizar datasource", e);
+            log.error("[DATASOURCE CONTROLLER] ❌ Error updating datasource", e);
             return ResponseEntity.internalServerError().body(null);
         }
     }
 
     /**
-     * ═════════════════════════════════════════════════════════════════════════
-     * ENFILEIRAR MIGRAÇÕES MANUALMENTE
+     * ═══════════════════════════════════════════════════════════════════════════
+     * UPDATE DATASOURCE WITH PASSWORD VERIFICATION
      * 
-     * Endpoint simples para enfileirar novas migrações sem modificar datasource.
-     * Útil quando o datasource já está configurado e você só quer rodar migrações.
+     * Endpoint: PUT /api/v1/admin/tenants/{tenantId}/datasource/update-with-password
      * 
-     * Resposta:
-     * - 202: Migração enfileirada com sucesso
-     * - 400: Datasource não encontrado
-     * - 500: Erro ao enfileirar
-     * ═════════════════════════════════════════════════════════════════════════
+     * Security-Enhanced Update:
+     * - REQUIRES currentPassword verification before allowing update
+     * - Optional newPassword parameter to change password during update
+     * - If newPassword is empty, keeps current password
+     * 
+     * Request Body:
+     * {
+     *   "currentPassword": "existing_password",
+     *   "newPassword": "new_password_or_empty",
+     *   "host": "db.example.com",
+     *   "port": 5432,
+     *   "databaseName": "tenant_db",
+     *   "username": "db_user",
+     *   "dbType": "POSTGRESQL",
+     *   "runMigrations": true
+     * }
+     * 
+     * Flow:
+     * 1. User provides currentPassword (must match stored password)
+     * 2. Service verifies currentPassword against decrypted stored password
+     * 3. If match: Update datasource (with newPassword if provided)
+     * 4. If no match: Return 400 Bad Request with InvalidPasswordVerification error
+     * 5. If runMigrations=true: Enqueue migrations after update
+     * 
+     * Returns: 200 (update only) or 202 (update + migrations enqueued)
+     * ═══════════════════════════════════════════════════════════════════════════
      */
-    @PostMapping("/datasource/enqueue-migration")
+    @PutMapping("/update-with-password")
+    @RequiresXTenantId
+    @RequiresPermission(TenantPermissions.UPDATE)
+    public ResponseEntity<UpdateDatasourceResponse> atualizarDatasourceComVerificacaoDeSenha(
+            @RequestBody com.api.erp.v1.main.master.tenant.application.dto.request.update.UpdateTenantDatasourceWithPasswordRequest request) {
+        Long tenantId = TenantContext.getTenantId();
+        
+        log.info("[DATASOURCE CONTROLLER WITH PASSWORD] ════════════════════════════════════════════");
+        log.info("[DATASOURCE CONTROLLER WITH PASSWORD] UPDATING TENANT DATASOURCE WITH PASSWORD VERIFICATION");
+        log.info("[DATASOURCE CONTROLLER WITH PASSWORD] Tenant ID: {} | Host: {} | Port: {}", 
+                tenantId, request.host(), request.port());
+        log.info("[DATASOURCE CONTROLLER WITH PASSWORD] Password Change: {}", 
+                request.newPassword() != null && !request.newPassword().isEmpty() ? "Changing" : "Keeping");
+        log.info("[DATASOURCE CONTROLLER WITH PASSWORD] Enqueue Migrations: {}", request.runMigrations());
+        log.info("[DATASOURCE CONTROLLER WITH PASSWORD] ════════════════════════════════════════════");
+        
+        try {
+            // PHASE 1: Update datasource configuration with password verification
+            log.info("[DATASOURCE CONTROLLER WITH PASSWORD] 1️⃣  Verifying password and updating datasource...");
+            TenantDatasourceResponse datasourceResponse = updateDatasourceWithPasswordUseCase.execute(tenantId, request);
+            log.info("[DATASOURCE CONTROLLER WITH PASSWORD] ✅ Datasource updated successfully with password verification");
+            
+            // PHASE 2: If runMigrations = true, enqueue migrations
+            if (request.runMigrations() != null && request.runMigrations()) {
+                log.info("[DATASOURCE CONTROLLER WITH PASSWORD] 2️⃣  Enqueueing migrations (flag: runMigrations = true)...");
+                
+                try {
+                    var datasource = tenantDatasourceRepository.findByTenantIdAndActiveTrue(tenantId).orElse(null);
+                    var event = migrationQueue.enqueueEvent(
+                            tenantId,
+                            "Tenant " + tenantId,
+                            datasource,
+                            TenantMigrationEvent.MigrationEventSource.MANUAL_REQUEST
+                    );
+                    log.info("[DATASOURCE CONTROLLER WITH PASSWORD] ✅ Event enqueued (EventID: {})", event.getEventId());
+                    log.info("[DATASOURCE CONTROLLER WITH PASSWORD] 🚀 Migrations will be processed automatically");
+                    
+                    // Build response with migration information
+                    Map<String, Object> migrationInfo = new java.util.HashMap<>();
+                    migrationInfo.put(EVENT_ID, event.getEventId());
+                    migrationInfo.put(STATUS, event.getStatus().getLabel());
+                    migrationInfo.put(SOURCE, event.getSource().getLabel());
+                    migrationInfo.put(ENQUEUED_AT, event.getEnqueuedAt());
+                    migrationInfo.put(MESSAGE, "Migrations enqueued successfully after password-verified update");
+                    
+                    UpdateDatasourceResponse responseWithMigration = new UpdateDatasourceResponse(
+                            datasourceResponse,
+                            migrationInfo,
+                            null
+                    );
+                    return ResponseEntity.accepted().body(responseWithMigration);
+                    
+                } catch (Exception e) {
+                    log.error("[DATASOURCE CONTROLLER WITH PASSWORD] ⚠️  Error enqueueing migrations", e);
+                    // Datasource was updated, but migrations failed
+                    UpdateDatasourceResponse partialResponse = new UpdateDatasourceResponse(
+                            datasourceResponse,
+                            null,
+                            "Datasource updated, but error enqueueing migrations: " + e.getMessage()
+                    );
+                    return ResponseEntity.accepted().body(partialResponse);
+                }
+            }
+            
+            log.info("[DATASOURCE CONTROLLER WITH PASSWORD] ✅ Operation completed (migrations not enqueued)");
+            return ResponseEntity.ok(new UpdateDatasourceResponse(datasourceResponse, null, null));
+            
+        } catch (com.api.erp.v1.main.shared.common.error.InvalidPasswordVerificationException e) {
+            log.warn("[DATASOURCE CONTROLLER WITH PASSWORD] ❌ Password verification FAILED for tenant: {}", tenantId);
+            log.warn("[DATASOURCE CONTROLLER WITH PASSWORD] Error: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            log.error("[DATASOURCE CONTROLLER WITH PASSWORD] ❌ Error updating datasource with password verification", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * CONFIGURE DATASOURCE + VALIDATE + ENQUEUE MIGRATIONS
+     * 
+     * Endpoint: POST /api/v1/admin/tenants/{tenantId}/datasource/configure-migrate
+     * Returns: 202 Accepted (processing in background)
+     * 
+     * All-in-one endpoint for:
+     * 1. Configure datasource
+     * 2. Test connection
+     * 3. Enqueue migrations + seed
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+    @PostMapping("/configure-migrate")
+    @RequiresXTenantId
+    @RequiresPermission(TenantPermissions.UPDATE)
+    public ResponseEntity<?> configurarDatasourceEEnfileirarMigracao(
+            @RequestBody TenantDatasourceRequest request) {
+        Long tenantId = TenantContext.getTenantId();
+        
+        log.info("[DATASOURCE CONTROLLER] ════════════════════════════════════════════");
+        log.info("[DATASOURCE CONTROLLER] CONFIGURING DATASOURCE + MIGRATIONS + SEED");
+        log.info("[DATASOURCE CONTROLLER] Tenant ID: {}", tenantId);
+        log.info("[DATASOURCE CONTROLLER] ════════════════════════════════════════════");
+        
+        try {
+            // PHASE 1: Configure datasource
+            log.info("[DATASOURCE CONTROLLER] 1️⃣  Configuring datasource...");
+            TenantDatasourceResponse datasourceResponse = 
+                    configureDatasourceUseCase.execute(tenantId, request);
+            log.info("[DATASOURCE CONTROLLER] ✅ Datasource configured successfully");
+            
+            // PHASE 2: Validate connection
+            log.info("[DATASOURCE CONTROLLER] 2️⃣  Testing connection...");
+            boolean isValid = validateDatasourceUseCase.execute(request);
+            if (!isValid) {
+                log.error("[DATASOURCE CONTROLLER] ❌ Failed to connect to datasource");
+                Map<String, Object> error = new java.util.HashMap<>();
+                error.put(SUCCESS, false);
+                error.put(ERROR, "Failed to connect to datasource");
+                error.put(DATASOURCE, datasourceResponse);
+                return ResponseEntity.badRequest().body(error);
+            }
+            log.info("[DATASOURCE CONTROLLER] ✅ Connection test successful");
+            
+            // PHASE 3: Enqueue migrations + seed
+            log.info("[DATASOURCE CONTROLLER] 3️⃣  Enqueueing migrations + seeders...");
+            var datasource = tenantDatasourceRepository.findByTenantIdAndActiveTrue(tenantId).orElse(null);
+            var event = migrationQueue.enqueueEvent(
+                    tenantId,
+                    "Tenant " + tenantId,
+                    datasource,
+                    TenantMigrationEvent.MigrationEventSource.MANUAL_REQUEST
+            );
+            log.info("[DATASOURCE CONTROLLER] ✅ Event enqueued (EventID: {})", event.getEventId());
+            log.info("[DATASOURCE CONTROLLER] 🚀 Processing will start automatically");
+            
+            return ResponseEntity.accepted().body(buildConfigureAndMigrateResponse(event, datasourceResponse));
+            
+        } catch (IllegalArgumentException e) {
+            log.error("[DATASOURCE CONTROLLER] ❌ Validation error: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(buildErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            log.error("[DATASOURCE CONTROLLER] ❌ Error processing", e);
+            return ResponseEntity.internalServerError()
+                    .body(buildErrorResponse("Error configuring datasource and enqueueing migrations: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * MANUALLY ENQUEUE MIGRATIONS (without modifying datasource)
+     * 
+     * Endpoint: POST /api/v1/admin/tenants/{tenantId}/datasource/enqueue-migration
+     * Returns: 202 Accepted
+     * 
+     * Useful when datasource is already configured and you just need to run migrations
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+    @PostMapping("/enqueue-migration")
     @RequiresXTenantId
     @RequiresPermission(TenantPermissions.UPDATE)
     public ResponseEntity<?> enqueueMigration() {
         Long tenantId = TenantContext.getTenantId();
         
         log.info("[DATASOURCE CONTROLLER] ════════════════════════════════════════════");
-        log.info("[DATASOURCE CONTROLLER] ENFILEIRANDO MIGRAÇÃO MANUALMENTE");
+        log.info("[DATASOURCE CONTROLLER] ENQUEUEING MIGRATION MANUALLY");
         log.info("[DATASOURCE CONTROLLER] Tenant ID: {}", tenantId);
         log.info("[DATASOURCE CONTROLLER] ════════════════════════════════════════════");
         
         try {
-            // Buscar datasource ativo
-            log.info("[DATASOURCE CONTROLLER] 1️⃣  Buscando datasource ativo...");
+            // PHASE 1: Find active datasource
+            log.info("[DATASOURCE CONTROLLER] 1️⃣  Finding active datasource...");
             var datasource = tenantDatasourceRepository.findByTenantIdAndActiveTrue(tenantId).orElse(null);
             
             if (datasource == null) {
-                log.error("[DATASOURCE CONTROLLER] ❌ Datasource ativo não encontrado para tenant: {}", tenantId);
+                log.error("[DATASOURCE CONTROLLER] ❌ No active datasource found for tenant: {}", tenantId);
                 return ResponseEntity.badRequest().body(buildErrorResponse(
-                        "Nenhum datasource ativo encontrado para este tenant"
+                        "No active datasource found for this tenant"
                 ));
             }
             
-            log.info("[DATASOURCE CONTROLLER] ✅ Datasource encontrado");
+            log.info("[DATASOURCE CONTROLLER] ✅ Datasource found");
             
-            // Enfileirar migration
-            log.info("[DATASOURCE CONTROLLER] 2️⃣  Enfileirando migração...");
+            // PHASE 2: Enqueue migration
+            log.info("[DATASOURCE CONTROLLER] 2️⃣  Enqueueing migration...");
             var event = migrationQueue.enqueueEvent(
                     tenantId,
                     "Tenant " + tenantId,
@@ -355,23 +489,26 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
                     TenantMigrationEvent.MigrationEventSource.MANUAL_REQUEST
             );
             
-            log.info("[DATASOURCE CONTROLLER] ✅ Evento enfileirado (EventID: {})", event.getEventId());
-            log.info("[DATASOURCE CONTROLLER] 🚀 Processesmento será iniciado automaticamente");
+            log.info("[DATASOURCE CONTROLLER] ✅ Event enqueued (EventID: {})", event.getEventId());
+            log.info("[DATASOURCE CONTROLLER] 🚀 Processing will start automatically");
             
             return ResponseEntity.accepted().body(buildMigrationQueuedResponse(event));
             
         } catch (Exception e) {
-            log.error("[DATASOURCE CONTROLLER] ❌ Erro ao enfileirar migração", e);
+            log.error("[DATASOURCE CONTROLLER] ❌ Error enqueueing migration", e);
             return ResponseEntity.internalServerError().body(buildErrorResponse(
-                    "Erro ao enfileirar migração: " + e.getMessage()
+                    "Error enqueueing migration: " + e.getMessage()
             ));
         }
     }
 
+    /**
+     * Helper: Build response for migration queued
+     */
     private Map<String, Object> buildMigrationQueuedResponse(TenantMigrationEvent event) {
         Map<String, Object> response = new java.util.HashMap<>();
         response.put(SUCCESS, true);
-        response.put(MESSAGE, "Migração enfileirada com sucesso");
+        response.put(MESSAGE, "Migration enqueued successfully");
         
         Map<String, Object> migrationMap = new java.util.HashMap<>();
         migrationMap.put(EVENT_ID, event.getEventId());
@@ -385,19 +522,20 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
         return response;
     }
 
+    /**
+     * Helper: Build response for configure and migrate operation
+     */
     private Map<String, Object> buildConfigureAndMigrateResponse(
             TenantMigrationEvent event,
             TenantDatasourceResponse datasource) {
         Map<String, Object> response = new java.util.HashMap<>();
         response.put(SUCCESS, true);
-        response.put(MESSAGE, "Datasource configurado com sucesso. Migrações enfileiradas.");
+        response.put(MESSAGE, "Datasource configured successfully. Migrations enqueued.");
         
         Map<String, Object> datasourceMap = new java.util.HashMap<>();
-        datasourceMap.put("id", datasource.id());
         datasourceMap.put(HOST, datasource.host());
         datasourceMap.put(DATABASE_NAME, datasource.databaseName());
         datasourceMap.put(DB_TYPE, datasource.dbType());
-        datasourceMap.put("isActive", datasource.isActive());
         response.put(DATASOURCE, datasourceMap);
         
         Map<String, Object> migrationMap = new java.util.HashMap<>();
@@ -410,6 +548,9 @@ public class TenantDatabaseController implements ITenantDatabaseController, Tena
         return response;
     }
 
+    /**
+     * Helper: Build error response
+     */
     private Map<String, Object> buildErrorResponse(String errorMessage) {
         Map<String, Object> response = new java.util.HashMap<>();
         response.put(SUCCESS, false);

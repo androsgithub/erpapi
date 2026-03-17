@@ -44,7 +44,7 @@ public class TenantMigrationService {
                 log.error("Error getting dbType by driver during migrations! Using DBType.MYSQL as default");
             }
 
-            String flywayLocation = "classpath:db/migration/tenant/" + dbType.getNome().toLowerCase();
+            String flywayLocation = "classpath:db/migration/tenant/" + dbType.getName().toLowerCase();
 
             Flyway flyway = Flyway.configure()
                     .dataSource(tenantDataSource)
@@ -109,7 +109,7 @@ public class TenantMigrationService {
         config.setIdleTimeout(30000);  // 30 segundos
         config.setAutoCommit(true);
 
-        log.debug("📦 Creating HikariDataSource for: {}", datasource.getDbType().getNome());
+        log.debug("📦 Creating HikariDataSource for: {}", datasource.getDbType().getName());
         return new HikariDataSource(config);
     }
 
